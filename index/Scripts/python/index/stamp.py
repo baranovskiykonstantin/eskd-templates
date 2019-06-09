@@ -50,13 +50,16 @@ def setFirstPageFrameValue(name, value):
                 cursor.CharScaleWidth = textwidth.getWidthFactor("ФИО", value)
             frame.setString(value)
 
-def clear(*args):
+def clean(*args):
     """Очистить основную надпись.
 
     Удалить содержимое полей основной надписи и форматной рамки.
 
     """
+    if common.isThreadWorking():
+        return
     doc = XSCRIPTCONTEXT.getDocument()
+    doc.lockControllers()
     for frame in doc.getTextFrames():
         if frame.Name.startswith("1.") \
             and not frame.Name.endswith("(наименование)") \
@@ -69,6 +72,7 @@ def clear(*args):
                         cursor = frame.Text.createTextCursor()
                         cursor.CharScaleWidth = 100
     syncCommonFields()
+    doc.unlockControllers()
 
 def fill(*args):
     """Заполнить основную надпись.
@@ -78,9 +82,13 @@ def fill(*args):
     Новое значение вносится только в том случае, если оно не пустое.
 
     """
+    if common.isThreadWorking():
+        return
     schematic = common.getSchematicData()
     if schematic is None:
         return
+    doc = XSCRIPTCONTEXT.getDocument()
+    doc.lockControllers()
     settings = config.load()
     # Наименование документа
     docTitle = schematic.title.replace('\\n', '\n')
@@ -128,3 +136,4 @@ def fill(*args):
     setFirstPageFrameValue("11 Утв.", schematic.approver)
 
     syncCommonFields()
+    doc.unlockControllers()

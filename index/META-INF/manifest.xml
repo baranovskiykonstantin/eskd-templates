@@ -14,6 +14,7 @@
  <manifest:file-entry manifest:full-path="Scripts/python/index/pythonpath/schematic.py" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/python/index/pythonpath/textwidth.py" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/python/index/pythonpath/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/index/doc/help.py" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/python/index/doc/help.html" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/python/index/doc/" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/python/index/index.py" manifest:media-type="application/binary"/>

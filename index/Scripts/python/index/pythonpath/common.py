@@ -11,6 +11,7 @@
 
 import os
 import traceback
+import threading
 import uno
 import kicadnet
 import schematic
@@ -24,6 +25,13 @@ STAMP_COMMON_FIELDS = (
     "21 Взам. инв. №",
     "22 Инв. № дубл."
 )
+
+def isThreadWorking():
+    """Работает ли макрос в отдельном потоке?"""
+    for thread in threading.enumerate():
+        if thread.name == "IndexBuildingThread":
+            return True
+    return False
 
 def showMessage(text, title="Сообщение"):
     """Показать текстовое сообщение.
@@ -202,6 +210,7 @@ def appendRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
         return False
+    doc.lockControllers()
     text = doc.getText()
     text.insertControlCharacter(
         text.getEnd(),
@@ -334,6 +343,7 @@ def appendRevTable():
     cursor = text.createTextCursor()
     cursor.gotoEnd(False)
     cursor.ParaStyleName = "Пустой"
+    doc.unlockControllers()
     return True
 
 def removeRevTable():

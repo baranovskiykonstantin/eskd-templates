@@ -10,6 +10,8 @@ common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
 config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
 
 def setSettings(*args):
+    if common.isThreadWorking():
+        return
     context = XSCRIPTCONTEXT.getComponentContext()
     settings = config.load()
 

@@ -207,21 +207,12 @@ def getWidthFactor(column, text):
         or column not in supportedColumns \
         or len(text) <= fitsAnyway:
             return 100
-    textWidth = columnWidth
-    try:
-        import tkinter
-        from tkinter import font as tkfont
-    except ImportError:
-        textWidth = 0
-        for char in text:
-            if char in CHAR_WIDTH_MM:
-                textWidth += CHAR_WIDTH_MM[char][fontSize]
-            else:
-                textWidth += CHAR_WIDTH_MM["max"][fontSize]
-    else:
-        tkroot = tkinter.Tk(baseName="textwidth")
-        font = tkfont.Font(family="OpenGost Type B TT", size=fontSize)
-        textWidth = font.measure(text) / tkroot.winfo_fpixels("1m")
+    textWidth = 0
+    for char in text:
+        if char in CHAR_WIDTH_MM:
+            textWidth += CHAR_WIDTH_MM[char][fontSize]
+        else:
+            textWidth += CHAR_WIDTH_MM["max"][fontSize]
     widthFactor = int((100 * columnWidth) / textWidth)
     widthFactor = max(widthFactor, 1)
     widthFactor = min(widthFactor, 100)

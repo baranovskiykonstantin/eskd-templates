@@ -109,20 +109,25 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     self.prevTableRowsCount = tableRowsCount
 
                     # Автоматическое добавление/удаление
-                    # таблицы регистрации изменений
+                    # таблицы регистрации изменений.
+                    # Данное действие выполняется только при редактировании
+                    # таблицы перечня вручную. При автоматическом построении
+                    # перечня таблица регистрации изменений добавляется
+                    # отдельным образом (см. index.py).
                     pageCount = currentController.PageCount
                     if pageCount != self.prevPageCount:
                         self.prevPageCount = pageCount
-                        settings = config.load()
-                        if settings.getboolean("index", "append rev table"):
-                            if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
-                                pageCount -= 1
-                            if pageCount > settings.getint("index", "pages rev table"):
-                                if common.appendRevTable():
-                                    self.prevPageCount +=1
-                            else:
-                                if common.removeRevTable():
-                                    self.prevPageCount -=1
+                        if not common.isThreadWorking():
+                            settings = config.load()
+                            if settings.getboolean("index", "append rev table"):
+                                if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+                                    pageCount -= 1
+                                if pageCount > settings.getint("index", "pages rev table"):
+                                    if common.appendRevTable():
+                                        self.prevPageCount +=1
+                                else:
+                                    if common.removeRevTable():
+                                        self.prevPageCount -=1
 
         currentFrame = currentController.ViewCursor.TextFrame
         if currentFrame is not None \
