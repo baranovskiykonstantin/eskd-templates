@@ -63,7 +63,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         cursor = doc.getText().createTextCursor()
         self.prevFirstPageStyleName = cursor.PageDescName
         table = doc.getTextTables().getByName("Перечень_элементов")
-        self.prevTableRowsCount = table.getRows().getCount()
+        self.prevTableRowCount = table.getRows().getCount()
         self.prevPageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
 
     def modified(self, event):
@@ -75,59 +75,42 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         # снова создать обработчик сообщений об изменениях.
         doc.removeModifyListener(self)
 
-        # Высота строк подстраивается автоматически так, чтобы нижнее обрамление
-        # последней строки листа совпадало с верхней линией основной надписи.
+        # Высота строк подстраивается автоматически так, чтобы нижнее
+        # обрамление последней строки листа совпадало с верхней линией
+        # основной надписи.
+        # Данное действие выполняется только при редактировании таблицы
+        # перечня вручную.
+        # При автоматическом построении перечня высота строк и таблица
+        # регистрации изменений обрабатываются отдельным образом
+        # (см. index.py).
         cursor = doc.getText().createTextCursor()
         firstPageStyleName = cursor.PageDescName
         if firstPageStyleName and doc.getTextTables().hasByName("Перечень_элементов"):
             table = doc.getTextTables().getByName("Перечень_элементов")
-            tableRowsCount = table.getRows().getCount()
+            tableRowCount = table.getRows().getCount()
             if firstPageStyleName != self.prevFirstPageStyleName \
-                or tableRowsCount != self.prevTableRowsCount:
-                    firstRowsCount = 28
-                    if firstPageStyleName.endswith("3") \
-                        or firstPageStyleName.endswith("4"):
-                            firstRowsCount = 26
-                    otherRowsCount = 32
-                    for index in range(1, tableRowsCount):
-                        if index <= firstRowsCount:
-                            if firstPageStyleName.endswith("1") \
-                                or firstPageStyleName.endswith("2"):
-                                # без граф заказчика:
-                                    table.getRows().getByIndex(index).Height = 827
-                            else:
-                                # с графами заказчика:
-                                if index == firstRowsCount:
-                                    table.getRows().getByIndex(index).Height = 811
-                                else:
-                                    table.getRows().getByIndex(index).Height = 806
-                        elif (index - firstRowsCount) % otherRowsCount == 0:
-                            table.getRows().getByIndex(index).Height = 834
-                        else:
-                            table.getRows().getByIndex(index).Height = 801
+                or tableRowCount != self.prevTableRowCount \
+                and not common.isThreadWorking():
+                    for rowIndex in range(1, tableRowCount):
+                        table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
                     self.prevFirstPageStyleName = firstPageStyleName
-                    self.prevTableRowsCount = tableRowsCount
+                    self.prevTableRowCount = tableRowCount
 
                     # Автоматическое добавление/удаление
                     # таблицы регистрации изменений.
-                    # Данное действие выполняется только при редактировании
-                    # таблицы перечня вручную. При автоматическом построении
-                    # перечня таблица регистрации изменений добавляется
-                    # отдельным образом (см. index.py).
                     pageCount = currentController.PageCount
                     if pageCount != self.prevPageCount:
                         self.prevPageCount = pageCount
-                        if not common.isThreadWorking():
-                            settings = config.load()
-                            if settings.getboolean("index", "append rev table"):
-                                if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
-                                    pageCount -= 1
-                                if pageCount > settings.getint("index", "pages rev table"):
-                                    if common.appendRevTable():
-                                        self.prevPageCount +=1
-                                else:
-                                    if common.removeRevTable():
-                                        self.prevPageCount -=1
+                        settings = config.load()
+                        if settings.getboolean("index", "append rev table"):
+                            if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+                                pageCount -= 1
+                            if pageCount > settings.getint("index", "pages rev table"):
+                                if common.appendRevTable():
+                                    self.prevPageCount +=1
+                            else:
+                                if common.removeRevTable():
+                                    self.prevPageCount -=1
 
         currentFrame = currentController.ViewCursor.TextFrame
         if currentFrame is not None \

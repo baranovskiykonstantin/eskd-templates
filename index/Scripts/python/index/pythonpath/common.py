@@ -357,3 +357,42 @@ def removeRevTable():
     cursor.goLeft(1, True)
     cursor.setString("")
     return True
+
+def getIndexRowHeight(rowIndex):
+    """Вычислить высоту строки перечня элементов.
+
+    Высота строк вычисляется так, чтобы нижнее обрамление последней строки
+    листа совпадало с верхней линией основной надписи.
+
+    Аргументы:
+
+    rowIndex -- номер строки.
+
+    Возвращаемое значение -- высота строки таблицы.
+
+    """
+    height = 800
+    doc = XSCRIPTCONTEXT.getDocument()
+    firstPageStyleName = doc.getText().createTextCursor().PageDescName
+    tableRowCount = doc.getTextTables().getByName("Перечень_элементов").getRows().getCount()
+    firstRowCount = 28
+    otherRowCount = 32
+    if firstPageStyleName.endswith("3") \
+        or firstPageStyleName.endswith("4"):
+            firstRowCount = 26
+    if rowIndex <= firstRowCount:
+        if firstPageStyleName.endswith("1") \
+            or firstPageStyleName.endswith("2"):
+            # без граф заказчика:
+                height = 827
+        else:
+            # с графами заказчика:
+            if rowIndex == firstRowCount:
+                height = 811
+            else:
+                height = 806
+    elif (rowIndex - firstRowCount) % otherRowCount == 0:
+        height = 834
+    else:
+        height = 801
+    return height

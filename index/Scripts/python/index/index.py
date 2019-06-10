@@ -48,6 +48,7 @@ class IndexBuildingThread(threading.Thread):
             table.getRows().insertByIndex(lastRow, 1)
 
         def fillRow(values, isTitle=False):
+            table.getRows().getByIndex(lastRow).Height = common.getIndexRowHeight(lastRow)
             normValues = list(values)
             extraRef = None
             extraName = None
@@ -137,6 +138,7 @@ class IndexBuildingThread(threading.Thread):
             if extraComment is not None:
                 extraRow[3] = extraComment
 
+            doc.lockControllers()
             for i in range(4):
                 cell = table.getCellByPosition(i, lastRow)
                 cellCursor = cell.createTextCursor()
@@ -145,6 +147,7 @@ class IndexBuildingThread(threading.Thread):
                 cellCursor.CharScaleWidth = widthFactors[i]
                 cell.setString(normValues[i])
             nextRow()
+            doc.unlockControllers()
 
             if any(extraRow):
                 fillRow(extraRow, isTitle)
