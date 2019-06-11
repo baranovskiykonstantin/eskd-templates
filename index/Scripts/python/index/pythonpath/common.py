@@ -42,8 +42,7 @@ def showMessage(text, title="Сообщение"):
 
     """
     desktop = XSCRIPTCONTEXT.getDesktop()
-    model = desktop.getCurrentComponent()
-    parent = model.CurrentController.Frame.ContainerWindow
+    parent = desktop.getCurrentComponent().CurrentController.Frame.ContainerWindow
     msgbox = parent.getToolkit().createMessageBox(
         parent,
         uno.Enum("com.sun.star.awt.MessageBoxType", "MESSAGEBOX"),

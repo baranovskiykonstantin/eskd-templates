@@ -3,56 +3,9 @@ import uno
 import unohelper
 from com.sun.star.util import XModifyListener
 
-def prepareEmbeddedModulesImport(*args):
-    """Подготовка к импорту встроенных в документ модулей.
-
-    При создании нового документа из шаблона, его сразу же нужно сохранить,
-    чтобы получить доступ к содержимому. Пока новый документ не сохранён его
-    путь не определён и равен пустой строке.
-
-    После сохранения нового документа или при открытии ранее созданного
-    документа нужно добавить путь встроенных модулей к путям поиска модулей
-    python (sys.path). Это требуется выполнить один раз, после чего импорт
-    встроенных модулей станет возможным и в других файлах макросов.
-
-    """
-    doc = XSCRIPTCONTEXT.getDocument()
-    if not doc.URL:
-        ctx = XSCRIPTCONTEXT.getComponentContext()
-        dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
-            "com.sun.star.frame.DispatchHelper",
-            ctx
-        )
-        dispatchHelper.executeDispatch(
-            XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
-            ".uno:SaveAs",
-            "",
-            0,
-            ()
-        )
-        if not doc.URL:
-            desktop = XSCRIPTCONTEXT.getDesktop()
-            model = desktop.getCurrentComponent()
-            parent = model.CurrentController.Frame.ContainerWindow
-            msgbox = parent.getToolkit().createMessageBox(
-                parent,
-                uno.Enum("com.sun.star.awt.MessageBoxType", "MESSAGEBOX"),
-                uno.getConstantByName("com.sun.star.awt.MessageBoxButtons.BUTTONS_OK"),
-                "Внимание!",
-                "Для работы макросов необходимо сначала сохранить документ!"
-            )
-            msgbox.execute()
-            prepareEmbeddedModulesImport()
-            return
-    sys.path.append(uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL) + "/Scripts/python/index/pythonpath/")
-
-prepareEmbeddedModulesImport()
-
-import common
-import config
-
-common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
+# Декларация встроенных модулей. Они будут импортированы позже.
+common = None
+config = None
 
 
 class DocModifyListener(unohelper.Base, XModifyListener):
@@ -139,8 +92,71 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.addModifyListener(self)
 
 
+def importEmbeddedModules(*args):
+    """Подготовка к импорту встроенных в документ модулей.
+
+    При создании нового документа из шаблона, его сразу же нужно сохранить,
+    чтобы получить доступ к содержимому. Пока новый документ не сохранён его
+    путь не определён и равен пустой строке.
+
+    После сохранения нового документа или при открытии ранее созданного
+    документа нужно добавить путь встроенных модулей к путям поиска модулей
+    python (sys.path). Это требуется выполнить один раз, после чего импорт
+    встроенных модулей станет возможным и в других файлах макросов.
+
+    """
+    doc = XSCRIPTCONTEXT.getDocument()
+    if not doc.URL:
+        ctx = XSCRIPTCONTEXT.getComponentContext()
+        dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.frame.DispatchHelper",
+            ctx
+        )
+        dispatchHelper.executeDispatch(
+            XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+            ".uno:SaveAs",
+            "",
+            0,
+            ()
+        )
+        if not doc.URL:
+            desktop = XSCRIPTCONTEXT.getDesktop()
+            parent = desktop.getCurrentComponent().CurrentController.Frame.ContainerWindow
+            msgbox = parent.getToolkit().createMessageBox(
+                parent,
+                uno.Enum("com.sun.star.awt.MessageBoxType", "MESSAGEBOX"),
+                uno.getConstantByName("com.sun.star.awt.MessageBoxButtons.BUTTONS_YES_NO"),
+                "Внимание!",
+                "Для работы макросов необходимо сначала сохранить документ.\n"
+                "Продолжить?"
+            )
+            yes = uno.getConstantByName("com.sun.star.awt.MessageBoxResults.YES")
+            result = msgbox.execute()
+            if result == yes:
+                importEmbeddedModules()
+            else:
+                dispatchHelper.executeDispatch(
+                    XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+                    ".uno:CloseDoc",
+                    "",
+                    0,
+                    ()
+                )
+            return False
+    sys.path.append(uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL) + "/Scripts/python/index/pythonpath/")
+    global common
+    import common
+    common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
+    global config
+    import config
+    config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
+    return True
+
+
 def init(*args):
     """Начальная настройка при открытии документа."""
+    if not importEmbeddedModules():
+        return
     doc = XSCRIPTCONTEXT.getDocument()
     ctx = XSCRIPTCONTEXT.getComponentContext()
     settings = config.load()
@@ -215,3 +231,5 @@ def init(*args):
                 uno.Enum("com.sun.star.ui.DockingArea", "DOCKINGAREA_DEFAULT"),
                 toolbarPos
             )
+
+g_exportedScripts = init,
