@@ -204,7 +204,6 @@ def getWidthFactor(column, text):
         return 100
     fontSize, columnWidth, fitsAnyway = supportedColumns[column]
     if not text \
-        or column not in supportedColumns \
         or len(text) <= fitsAnyway:
             return 100
     textWidth = 0

@@ -6,7 +6,7 @@ import textwidth
 common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
 config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
 
-def syncCommonFields(*args):
+def syncCommonFields():
     """Обновить значения общих граф.
 
     Обновить значения граф форматной рамки последующих листов, которые
@@ -137,3 +137,5 @@ def fill(*args):
 
     syncCommonFields()
     doc.unlockControllers()
+
+g_exportedScripts = clean, fill

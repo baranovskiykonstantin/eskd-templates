@@ -19,19 +19,21 @@ class Component():
 
     def getFieldValue(self, name):
         """Вернуть значение поля с указанным именем."""
+        value = None
         if name == "Обозначение":
-            return self.reference
-        if name == "Значение":
+            value = self.reference
+        elif name == "Значение":
             if self.schematic.settings.getboolean("index", "add units"):
-                return self.getValueWithUnits()
-            return self.value
-        if name == "Посад.место":
-            return self.footprint
-        if name == "Документация":
-            return self.datasheet
-        if name in self.fields:
-            return self.formatPattern(self.fields[name])
-        return None
+                value = self.getValueWithUnits()
+            else:
+                value = self.value
+        elif name == "Посад.место":
+            value = self.footprint
+        elif name == "Документация":
+            value = self.datasheet
+        elif name in self.fields:
+            value = self.formatPattern(self.fields[name])
+        return value
 
     def getRefType(self, ref=None):
         """Вернуть буквенную часть обозначения."""

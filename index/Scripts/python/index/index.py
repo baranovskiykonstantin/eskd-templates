@@ -213,7 +213,7 @@ class IndexBuildingThread(threading.Thread):
                 common.appendRevTable()
 
 
-def clean(force=False, *args):
+def clean(*args, force=False):
     """Очистить перечень элементов.
 
     Удалить всё содержимое из таблицы перечня элементов, оставив только

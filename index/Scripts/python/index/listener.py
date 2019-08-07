@@ -13,10 +13,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
 
     def __init__(self,):
         doc = XSCRIPTCONTEXT.getDocument()
-        cursor = doc.getText().createTextCursor()
-        self.prevFirstPageStyleName = cursor.PageDescName
-        table = doc.getTextTables().getByName("Перечень_элементов")
-        self.prevTableRowCount = table.getRows().getCount()
+        self.prevFirstPageStyleName = doc.getText().createTextCursor().PageDescName
+        self.prevTableRowCount = doc.getTextTables().getByName("Перечень_элементов").getRows().getCount()
         self.prevPageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
 
     def modified(self, event):
@@ -25,7 +23,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         currentController = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController
         # Чтобы избежать рекурсивного зацикливания,
         # необходимо сначала удалить, а после изменений,
-        # снова создать обработчик сообщений об изменениях.
+        # снова добавить обработчик сообщений об изменениях.
         doc.removeModifyListener(self)
 
         # Высота строк подстраивается автоматически так, чтобы нижнее
@@ -36,16 +34,17 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         # При автоматическом построении перечня высота строк и таблица
         # регистрации изменений обрабатываются отдельным образом
         # (см. index.py).
-        cursor = doc.getText().createTextCursor()
-        firstPageStyleName = cursor.PageDescName
+        firstPageStyleName = doc.getText().createTextCursor().PageDescName
         if firstPageStyleName and doc.getTextTables().hasByName("Перечень_элементов"):
             table = doc.getTextTables().getByName("Перечень_элементов")
             tableRowCount = table.getRows().getCount()
             if firstPageStyleName != self.prevFirstPageStyleName \
                 or tableRowCount != self.prevTableRowCount \
                 and not common.isThreadWorking():
+                    doc.lockControllers()
                     for rowIndex in range(1, tableRowCount):
                         table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+                    doc.unlockControllers()
                     self.prevFirstPageStyleName = firstPageStyleName
                     self.prevTableRowCount = tableRowCount
 
@@ -133,15 +132,7 @@ def importEmbeddedModules(*args):
             yes = uno.getConstantByName("com.sun.star.awt.MessageBoxResults.YES")
             result = msgbox.execute()
             if result == yes:
-                importEmbeddedModules()
-            else:
-                dispatchHelper.executeDispatch(
-                    XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
-                    ".uno:CloseDoc",
-                    "",
-                    0,
-                    ()
-                )
+                return importEmbeddedModules()
             return False
     sys.path.append(uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL) + "/Scripts/python/index/pythonpath/")
     global common
@@ -155,10 +146,21 @@ def importEmbeddedModules(*args):
 
 def init(*args):
     """Начальная настройка при открытии документа."""
+    ctx = XSCRIPTCONTEXT.getComponentContext()
+    dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
+        "com.sun.star.frame.DispatchHelper",
+        ctx
+    )
     if not importEmbeddedModules():
+        dispatchHelper.executeDispatch(
+            XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+            ".uno:CloseDoc",
+            "",
+            0,
+            ()
+        )
         return
     doc = XSCRIPTCONTEXT.getDocument()
-    ctx = XSCRIPTCONTEXT.getComponentContext()
     settings = config.load()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
@@ -197,10 +199,6 @@ def init(*args):
         )
         configProvider = ctx.ServiceManager.createInstanceWithContext(
             "com.sun.star.configuration.ConfigurationProvider",
-            ctx
-        )
-        dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
-            "com.sun.star.frame.DispatchHelper",
             ctx
         )
         nodePath = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
