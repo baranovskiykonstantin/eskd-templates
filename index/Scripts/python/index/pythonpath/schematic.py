@@ -595,6 +595,7 @@ class Schematic():
         self.company = ""
         self.developer = ""
         self.verifier = ""
+        self.inspector = ""
         self.approver = ""
         self.components = []
 

@@ -172,6 +172,8 @@ def getSchematicData():
                             schematicData.verifier = item.attributes["value"]
                         elif item.attributes["number"] == "4":
                             schematicData.approver = item.attributes["value"]
+                        elif item.attributes["number"] == "6":
+                            schematicData.inspector = item.attributes["value"]
                 break
         for comp in netlist.items("comp"):
             component = schematic.Component(schematicData)

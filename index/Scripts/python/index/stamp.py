@@ -44,7 +44,7 @@ def setFirstPageFrameValue(name, value):
         fullName = "1.{}.{}".format(i, name)
         if doc.getTextFrames().hasByName(fullName):
             frame = doc.getTextFrames().getByName(fullName)
-            if name in ("11 Разраб.", "11 Пров.", "11 Утв."):
+            if name in ("11 Разраб.", "11 Пров.", "11 Н. контр.", "11 Утв."):
                 frame.setString("")
                 cursor = frame.Text.createTextCursor()
                 cursor.CharScaleWidth = textwidth.getWidthFactor("ФИО", value)
@@ -68,6 +68,7 @@ def clean(*args):
                 frame.setString("")
                 if frame.Name.endswith(".11 Разраб.") \
                     or frame.Name.endswith(".11 Пров.") \
+                    or frame.Name.endswith(".11 Н. контр.") \
                     or frame.Name.endswith(".11 Утв."):
                         cursor = frame.Text.createTextCursor()
                         cursor.CharScaleWidth = 100
@@ -132,6 +133,8 @@ def fill(*args):
     setFirstPageFrameValue("11 Разраб.", schematic.developer)
     # Проверил
     setFirstPageFrameValue("11 Пров.", schematic.verifier)
+    # Нормативный контроль
+    setFirstPageFrameValue("11 Н. контр.", schematic.inspector)
     # Утвердил
     setFirstPageFrameValue("11 Утв.", schematic.approver)
 
