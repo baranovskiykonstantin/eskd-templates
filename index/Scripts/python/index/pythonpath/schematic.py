@@ -32,7 +32,9 @@ class Component():
         elif name == "Документация":
             value = self.datasheet
         elif name in self.fields:
-            value = self.formatPattern(self.fields[name])
+            value = self.fields[name]
+        if value:
+            value = self.formatPattern(value)
         return value
 
     def getRefType(self, ref=None):
@@ -177,76 +179,124 @@ class Component():
             return numValue + separator + multiplier + units
         return self.value
 
-    def formatPattern(self, pattern):
+    def formatPattern(self, pattern, check=False):
         """Преобразовать шаблон.
 
         Шаблон представляет собой строку текста, в которой конструкции типа:
-        {Префикс|НаименованиеПоля|Суффикс}
-        будут преобразованы в записи вида:
+
+        ${НаименованиеПоля}
+        ${Префикс|НаименованиеПоля|Суффикс}
+
+        будут преобразованы в текст вида:
+
+        ЗначениеПоля
         ПрефиксЗначениеПоляСуффикс
 
         Например:
-        "МЛТ-0,5-{|Значение|}{-|Класс точности|}-В" -> "МЛТ-0,5-4,7кОм-±5%-В"
+        "МЛТ-0,5-${Значение}${-|Класс точности|}-В" -> "МЛТ-0,5-4,7кОм-±5%-В"
         Если значение поля пусто или указанного поля нет в компоненте, то
-        соответствующий элемент шаблона игнорируется. Если, допустим, для
+        соответствующий элемент шаблона удаляется. Если, допустим, для
         приведённого выше примера, в компоненте нет поля "Класс точности", то
         результат будет следующим:
         "МЛТ-0,5-4,7кОм-В" (префикс '-' тоже отсутствует)
 
         Символы '{', '|', '}' имеют специальное назначение. Если в шаблоне
-        требуется указать один из этих символов, то их нужно экранировать
-        символом обратной косой черты ' \ ', например:
-        "Обозначение компонента \{ {|Обозначение|} \} в фигурных скобках"
+        требуется указать эти символы, то их нужно экранировать символом
+        обратной косой черты ' \ ', например:
+        "Обозначение компонента ${\{|Обозначение|\}} в фигурных скобках."
+        Но спец. символы вне конструкции ${} экранировать не нужно:
+        "Обозначение компонента {${Обозначение}} в фигурных скобках."
+
+        Если параметр check==True, то вместо преобразования строки будет
+        выполнена проверка - является ли переданная строка шаблоном. При первом
+        обнаружении конструкции ${} будет возвращено значение True, при
+        отсутствии такой конструкции - False.
 
         """
         out = ""
         prefix = ""
         fieldName = ""
         suffix = ""
-        escapeFlag = False
-        prefixFlag = False
-        fieldFlag = False
-        suffixFlag = False
+        temp = ""
+
+        # Флаг, указывающий на то, что спец.символ нужно обработать как обычный
+        ignore = False
+        # Флаг, указывающий на обрабатываемую часть подстановки.
+        substitution = ""
+
+        def resetSubstitution():
+            nonlocal out, temp, substitution, prefix, fieldName, suffix
+            out += temp
+            substitution = temp = ""
+            prefix = fieldName = suffix = ""
 
         for char in pattern:
-            if char == '\\' and not escapeFlag:
-                escapeFlag = True
-                continue
-            elif char == '{' and not escapeFlag:
-                if prefixFlag or fieldFlag or suffixFlag:
-                    # Шаблон имеет неверный формат
-                    return pattern
-                prefixFlag = True
-            elif char == "|" and prefixFlag and not escapeFlag:
-                prefixFlag = False
-                fieldFlag = True
-            elif char == "|" and fieldFlag and not escapeFlag:
-                fieldFlag = False
-                suffixFlag = True
-            elif char == "|" and suffixFlag and not escapeFlag:
-                # Шаблон имеет неверный формат
-                return pattern
-            elif char == "}" and not escapeFlag:
-                if not suffixFlag:
-                    # Шаблон имеет неверный формат
-                    return pattern
-                suffixFlag = False
-                fieldValue = self.getFieldValue(fieldName)
-                if fieldValue:
-                    out += prefix + fieldValue + suffix
-                prefix = fieldName = suffix = ""
-            elif prefixFlag:
-                prefix += char
-            elif fieldFlag:
-                fieldName += char
-            elif suffixFlag:
-                suffix += char
+            if char == '\\' and substitution and not ignore:
+                    ignore = True
+                    temp += char
+                    continue
+            elif substitution:
+                temp += char
+                if substitution == "beginning":
+                    if char == '{' and not ignore:
+                        substitution = "prefix"
+                    else:
+                        out += temp
+                        substitution = temp = ""
+                elif char == '{' and not ignore:
+                    # Конструкция ${} имеет неверный формат:
+                    # ${...{
+                    #      ^
+                    # открывающаяся фигурная скобка внутри подстановки.
+                    resetSubstitution()
+                elif char == '|' and substitution == "prefix" and not ignore:
+                    substitution = "fieldName"
+                elif char == '|' and substitution == "fieldName" and not ignore:
+                    substitution = "suffix"
+                elif char == '|' and substitution == "suffix" and not ignore:
+                    # Конструкция ${} имеет неверный формат:
+                    # ${prefix|fieldName|suffix|
+                    #                          ^
+                    # третья вертикальная черта внутри подстановки.
+                    resetSubstitution()
+                elif char == "}" and not ignore:
+                    if substitution == "fieldName":
+                        # Конструкция ${} имеет неверный формат:
+                        # ${prefix|fieldName}
+                        #                   ^
+                        # одна вертикальная черта в подстановке. Должно быть
+                        # либо две (для пефикса/суффикса), либо не быть вовсе.
+                        resetSubstitution()
+                    else:
+                        if substitution == "prefix":
+                            # Если по завершении конструкции ${} имеется только
+                            # префикс, значит найдена сокращённая конструкция
+                            # (без префикса/суффикса).
+                            fieldName = prefix
+                            prefix = ""
+                        if check:
+                            return True
+                        fieldValue = self.getFieldValue(fieldName)
+                        if fieldValue:
+                            out += prefix + fieldValue + suffix
+                    substitution = temp = prefix = fieldName = suffix = ""
+                elif substitution == "prefix":
+                    prefix += char
+                elif substitution == "fieldName":
+                    fieldName += char
+                elif substitution == "suffix":
+                    suffix += char
+            elif char == '$':
+                substitution = "beginning"
+                temp += char
             else:
                 out += char
-            escapeFlag = False
-        if prefixFlag or fieldFlag or suffixFlag:
-            # Шаблон имеет неверный формат
-            return pattern
+            ignore = False
+        if substitution:
+            # Конструкция ${} неожиданно закончилась.
+            resetSubstitution()
+        if check:
+            return False
         return out
 
     def getIndexValue(self, name):
@@ -265,12 +315,8 @@ class Component():
         if name not in ("type", "name", "doc", "comment"):
             return ""
         fieldName = self.schematic.settings.get("fields", name)
-        isPattern = re.match(
-            r".*(?<!\\)\{.*(?<!\\)\|.*(?<!\\)\|.*(?<!\\)\}.*",
-            fieldName
-        )
         value = ""
-        if isPattern:
+        if self.formatPattern(fieldName, check=True):
             value = self.formatPattern(fieldName)
         else:
             value = self.getFieldValue(fieldName)

@@ -12,7 +12,7 @@ config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
 class IndexBuildingThread(threading.Thread):
     """Перечень заполняется из отдельного вычислительного потока.
 
-    Из-за особенностей реализации uno-интерфейса процесс построения перечня
+    Из-за особенностей реализации uno-интерфейса, процесс построения перечня
     занимает значительное время. Чтобы избежать продолжительного зависания
     графического интерфейса LibreOffice, перечень заполняется из отдельного
     вычислительного потока и внесённые изменения сразу же отображаются в окне
@@ -36,7 +36,7 @@ class IndexBuildingThread(threading.Thread):
         emptyRowsRef = settings.getint("index", "empty rows between diff ref")
         emptyRowsType = settings.getint("index", "empty rows between diff type")
         lastRow = table.getRows().getCount() - 1
-        # В процессе заполнения перечня в конце таблицы всегда должна
+        # В процессе заполнения перечня, в конце таблицы всегда должна
         # оставаться пустая строка с ненарушенным форматированием.
         # На её основе будут создаваться новые строки.
         # По окончанию, последняя строка будет удалена.
@@ -50,9 +50,6 @@ class IndexBuildingThread(threading.Thread):
         def fillRow(values, isTitle=False):
             table.getRows().getByIndex(lastRow).Height = common.getIndexRowHeight(lastRow)
             normValues = list(values)
-            extraRef = None
-            extraName = None
-            extraComment = None
             extraRow = ["", "", "", ""]
             widthFactors = [100, 100, 100, 100]
             colNames = (
@@ -78,7 +75,8 @@ class IndexBuildingThread(threading.Thread):
                 pos = max(pos1, pos2)
                 if pos == -1:
                     # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое, но всё же меньше максимального.
+                    # превышает критическое значение, но всё же меньше
+                    # максимального.
                     pos1 = ref.find(", ", extremePos)
                     pos2 = ref.find("-", extremePos)
                     pos = max(pos1, pos2)
@@ -86,10 +84,10 @@ class IndexBuildingThread(threading.Thread):
                     separator = ref[pos]
                     if separator == ",":
                         normValues[0] = ref[:(pos + 1)]
-                        extraRef = ref[(pos + 2):]
+                        extraRow[0] = ref[(pos + 2):]
                     elif separator == "-":
                         normValues[0] = ref[:(pos + 1)]
-                        extraRef = ref[pos:]
+                        extraRow[0] = ref[pos:]
                 widthFactors[0] = textwidth.getWidthFactor(
                     colNames[0],
                     normValues[0]
@@ -103,11 +101,12 @@ class IndexBuildingThread(threading.Thread):
                 pos = name.rfind(" ", 0, extremePos)
                 if pos == -1:
                     # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое, но всё же меньше максимального.
+                    # превышает критическое значение, но всё же меньше
+                    # максимального.
                     pos = name.find(" ", extremePos)
                 if pos != -1:
                     normValues[1] = name[:pos]
-                    extraName = name[(pos + 1):]
+                    extraRow[1] = name[(pos + 1):]
                 widthFactors[1] = textwidth.getWidthFactor(
                     colNames[1],
                     normValues[1]
@@ -121,22 +120,16 @@ class IndexBuildingThread(threading.Thread):
                 pos = comment.rfind(" ", 0, extremePos)
                 if pos == -1:
                     # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое, но всё же меньше максимального.
+                    # превышает критическое значение, но всё же меньше
+                    # максимального.
                     pos = comment.find(" ", extremePos)
                 if pos != -1:
                     normValues[3] = comment[:pos]
-                    extraComment = comment[(pos + 1):]
+                    extraRow[3] = comment[(pos + 1):]
                 widthFactors[3] = textwidth.getWidthFactor(
                     colNames[3],
                     normValues[3]
                 )
-
-            if extraRef is not None:
-                extraRow[0] = extraRef
-            if extraName is not None:
-                extraRow[1] = extraName
-            if extraComment is not None:
-                extraRow[3] = extraComment
 
             doc.lockControllers()
             for i in range(4):

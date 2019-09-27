@@ -908,25 +908,29 @@ class Button10ActionListener(unohelper.Base, XActionListener):
         )
         if event.Source.getModel().Name == "Button11":
             separators = {
-                "марка":["", "-"],
-                "значение":["", ""],
-                "класс точности":["", ""],
-                "тип":["-", ""],
+                "Марка":["", "-"],
+                "Значение":["", ""],
+                "Класс точности":["", ""],
+                "Тип":["-", ""],
             }
             # KB2S - kicadbom2spec
             settingsKB2S = config.loadFromKicadbom2spec()
             if settingsKB2S is not None:
                 for item in separators:
-                    if settingsKB2S.has_option("prefixes", item):
-                        separators[item][0] = settingsKB2S.get("prefixes", item)[1:-1]
-                    if settingsKB2S.has_option("suffixes", item):
-                        separators[item][1] = settingsKB2S.get("suffixes", item)[1:-1]
-            name = "{{{}}}{{{}}}{{{}}}{{{}}}".format(
-                "|Марка|".join(separators["марка"]),
-                "|Значение|".join(separators["значение"]),
-                "|Класс точности|".join(separators["класс точности"]),
-                "|Тип|".join(separators["тип"]),
-            )
+                    if settingsKB2S.has_option("prefixes", item.lower()):
+                        separators[item][0] = settingsKB2S.get("prefixes", item.lower())[1:-1]
+                    if settingsKB2S.has_option("suffixes", item.lower()):
+                        separators[item][1] = settingsKB2S.get("suffixes", item.lower())[1:-1]
+            name = ""
+            for item in separators:
+                if any(separators[item]):
+                    name += "${{{}|{}|{}}}".format(
+                        separators[item][0],
+                        item,
+                        separators[item][1]
+                    )
+                else:
+                    name += "${{{}}}".format(item)
             defaultValues = (
                 ("EditControl10", "Группа"),
                 ("EditControl11", name),
