@@ -26,42 +26,42 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         # снова добавить обработчик сообщений об изменениях.
         doc.removeModifyListener(self)
 
-        # Высота строк подстраивается автоматически так, чтобы нижнее
-        # обрамление последней строки листа совпадало с верхней линией
-        # основной надписи.
-        # Данное действие выполняется только при редактировании таблицы
-        # перечня вручную.
-        # При автоматическом построении перечня высота строк и таблица
-        # регистрации изменений обрабатываются отдельным образом
-        # (см. index.py).
         firstPageStyleName = doc.getText().createTextCursor().PageDescName
         if firstPageStyleName and doc.getTextTables().hasByName("Перечень_элементов"):
             table = doc.getTextTables().getByName("Перечень_элементов")
             tableRowCount = table.getRows().getCount()
             if firstPageStyleName != self.prevFirstPageStyleName \
-                or tableRowCount != self.prevTableRowCount \
-                and not common.isThreadWorking():
-                    doc.lockControllers()
-                    for rowIndex in range(1, tableRowCount):
-                        table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
-                    doc.unlockControllers()
+                or tableRowCount != self.prevTableRowCount:
                     self.prevFirstPageStyleName = firstPageStyleName
                     self.prevTableRowCount = tableRowCount
+                    if not common.isThreadWorking():
+                        # Высота строк подстраивается автоматически так, чтобы нижнее
+                        # обрамление последней строки листа совпадало с верхней линией
+                        # основной надписи.
+                        # Данное действие выполняется только при редактировании таблицы
+                        # перечня вручную.
+                        # При автоматическом построении перечня высота строк и таблица
+                        # регистрации изменений обрабатываются отдельным образом
+                        # (см. index.py).
+                        doc.lockControllers()
+                        for rowIndex in range(1, tableRowCount):
+                            table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+                        doc.unlockControllers()
 
-                    # Автоматическое добавление/удаление
-                    # таблицы регистрации изменений.
-                    pageCount = currentController.PageCount
-                    if pageCount != self.prevPageCount:
-                        self.prevPageCount = pageCount
-                        if config.getboolean("index", "append rev table"):
-                            if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
-                                pageCount -= 1
-                            if pageCount > config.getint("index", "pages rev table"):
-                                if common.appendRevTable():
-                                    self.prevPageCount +=1
-                            else:
-                                if common.removeRevTable():
-                                    self.prevPageCount -=1
+                        # Автоматическое добавление/удаление
+                        # таблицы регистрации изменений.
+                        pageCount = currentController.PageCount
+                        if pageCount != self.prevPageCount:
+                            self.prevPageCount = pageCount
+                            if config.getboolean("index", "append rev table"):
+                                if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+                                    pageCount -= 1
+                                if pageCount > config.getint("index", "pages rev table"):
+                                    if common.appendRevTable():
+                                        self.prevPageCount += 1
+                                else:
+                                    if common.removeRevTable():
+                                        self.prevPageCount -= 1
 
         currentFrame = currentController.ViewCursor.TextFrame
         if currentFrame is not None \
