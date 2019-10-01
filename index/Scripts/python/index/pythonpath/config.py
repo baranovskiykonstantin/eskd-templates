@@ -3,67 +3,28 @@
 Модуль предоставляет средства для загрузки и сохранения параметров.
 Параметры хранятся в текстовом файле внутри odt-документа.
 
-Внимание!
-Глобальную переменную XSCRIPTCONTEXT обязательно нужно установить
-после импорта модуля.
-
 """
 
 import os
 import sys
-import configparser
+from configparser import ConfigParser
 import tempfile
 import uno
 
+# Глобальная переменная XSCRIPTCONTEXT устанавливается в listener.py:init()
 XSCRIPTCONTEXT = None
 
-DEFAULTS = {
-    "index": {
-        "source": "",
-        "add units": "yes",
-        "space before units": "no",
-        "concatenate same name groups": "no",
-        "title with doc": "no",
-        "every group has title": "no",
-        "empty row after group title": "no",
-        "empty rows between diff ref": 1,
-        "empty rows between diff type": 0,
-        "extreme width factor": 80,
-        "append rev table": "no",
-        "pages rev table": 3,
-    },
-    "fields": {
-        "type": "Тип",
-        "name": "Наименование",
-        "doc": "Документ",
-        "comment": "Примечание",
-        "adjustable": "Подбирают при регулировании",
-    },
-    "stamp": {
-        "convert doc title": "yes",
-        "convert doc id": "yes",
-        "fill first usage": "yes",
-    },
-    "settings": {
-        "pos x": "100",
-        "pos y": "100",
-        "set view options": "yes",
-        "compatibility mode": "no",
-    }
-}
+SETTINGS = ConfigParser()
 
 def load():
     """Загрузить настройки.
 
     Считать параметры работы из файла.
 
-    Возвращаемое значение -- ConfigParser
-
     """
+    global SETTINGS
     doc = XSCRIPTCONTEXT.getDocument()
     ctx = XSCRIPTCONTEXT.getComponentContext()
-    config = configparser.ConfigParser(dict_type=dict)
-    config.read_dict(DEFAULTS)
     fileAccess = ctx.ServiceManager.createInstance(
         "com.sun.star.ucb.SimpleFileAccess"
     )
@@ -76,19 +37,53 @@ def load():
         configInput.setInputStream(fileStream)
         configInput.setEncoding("UTF-8")
         configString = configInput.readString((), False)
-        config.read_string(configString, source=configFileUrl)
+        SETTINGS.read_string(configString, source=configFileUrl)
         configInput.closeInput()
-    return config
+    else:
+        SETTINGS.read_dict(
+            {
+                "index": {
+                    "source": "",
+                    "add units": "yes",
+                    "space before units": "no",
+                    "concatenate same name groups": "no",
+                    "title with doc": "no",
+                    "every group has title": "no",
+                    "empty row after group title": "no",
+                    "empty rows between diff ref": 1,
+                    "empty rows between diff type": 0,
+                    "extreme width factor": 80,
+                    "append rev table": "no",
+                    "pages rev table": 3,
+                },
+                "fields": {
+                    "type": "Тип",
+                    "name": "Наименование",
+                    "doc": "Документ",
+                    "comment": "Примечание",
+                    "adjustable": "Подбирают при регулировании",
+                },
+                "stamp": {
+                    "convert doc title": "yes",
+                    "convert doc id": "yes",
+                    "fill first usage": "yes",
+                },
+                "settings": {
+                    "pos x": "100",
+                    "pos y": "100",
+                    "set view options": "yes",
+                    "compatibility mode": "no",
+                }
+            }
+        )
 
-def save(config):
+def save():
     """Сохранить настройки.
 
     Записать параметры работы в файл.
 
-    Аргументы:
-    config (ConfigParser) -- параметры для сохранения.
-
     """
+    global SETTINGS
     doc = XSCRIPTCONTEXT.getDocument()
     serviceManager = XSCRIPTCONTEXT.getComponentContext().ServiceManager
     fileAccess = serviceManager.createInstance(
@@ -105,9 +100,29 @@ def save(config):
     )
     tempFileUrl = uno.systemPathToFileUrl(tempFile.name)
     with tempFile:
-        config.write(tempFile)
+        SETTINGS.write(tempFile)
     fileAccess.copy(tempFileUrl, configFileUrl)
     fileAccess.kill(tempFileUrl)
+
+def get(section, option):
+    """Получить значение параметра "option" из раздела "section"."""
+    global SETTINGS
+    return SETTINGS.get(section, option)
+
+def getboolean(section, option):
+    """Получить булево значение параметра "option" из раздела "section"."""
+    global SETTINGS
+    return SETTINGS.getboolean(section, option)
+
+def getint(section, option):
+    """Получить целочисленное значение параметра "option" из раздела "section"."""
+    global SETTINGS
+    return SETTINGS.getint(section, option)
+
+def set(section, option, value):
+    """Установить значение "value" параметру "option" из раздела "section"."""
+    global SETTINGS
+    return SETTINGS.set(section, option, value)
 
 def loadFromKicadbom2spec():
     """Загрузить настройки kicadbom2spec.
@@ -131,7 +146,7 @@ def loadFromKicadbom2spec():
             "settings.ini"
         )
     if os.path.isfile(configPath):
-        settings = configparser.ConfigParser()
+        settings = ConfigParser()
         settings.read(configPath)
         return settings
     return None

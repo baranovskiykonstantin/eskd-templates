@@ -6,14 +6,10 @@ from com.sun.star.awt import XWindowListener
 import common
 import config
 
-common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-
 def setSettings(*args):
     if common.isThreadWorking():
         return
     context = XSCRIPTCONTEXT.getComponentContext()
-    settings = config.load()
 
     editControlHeight = 14
     if platform == "linux":
@@ -61,7 +57,7 @@ def setSettings(*args):
     checkModelSet.PositionY = dialogModel.Height - checkModelSet.Height - 4
     checkModelSet.Name = "CheckBoxSet"
     checkModelSet.State = {False: 0, True: 1}[
-        settings.getboolean("settings", "set view options")
+        config.getboolean("settings", "set view options")
     ]
     checkModelSet.Label = "Оптимальный вид документа"
     checkModelSet.HelpText = """\
@@ -116,8 +112,8 @@ def setSettings(*args):
     )
     dialog.setModel(dialogModel)
     dialog.setPosSize(
-        settings.getint("settings", "pos x"),
-        settings.getint("settings", "pos y"),
+        config.getint("settings", "pos x"),
+        config.getint("settings", "pos y"),
         0,
         0,
         3
@@ -173,7 +169,7 @@ def setSettings(*args):
     editControlModel00.PositionX = 0
     editControlModel00.PositionY = buttonModel00.PositionY
     editControlModel00.Name = "EditControl00"
-    editControlModel00.Text = settings.get("index", "source")
+    editControlModel00.Text = config.get("index", "source")
     pageModel0.insertByName("EditControl00", editControlModel00)
 
     editControlModel01 = pageModel0.createInstance(
@@ -184,7 +180,7 @@ def setSettings(*args):
     editControlModel01.PositionX = 0
     editControlModel01.PositionY = editControlModel00.PositionY + editControlModel00.Height
     editControlModel01.Name = "EditControl01"
-    editControlModel01.Value = settings.getint("index", "empty rows between diff ref")
+    editControlModel01.Value = config.getint("index", "empty rows between diff ref")
     editControlModel01.ValueMin = 0
     editControlModel01.ValueMax = 99
     editControlModel01.ValueStep = 1
@@ -224,7 +220,7 @@ def setSettings(*args):
     editControlModel02.PositionX = editControlModel01.PositionX
     editControlModel02.PositionY = editControlModel01.PositionY + editControlModel01.Height
     editControlModel02.Name = "EditControl02"
-    editControlModel02.Value = settings.getint("index", "empty rows between diff type")
+    editControlModel02.Value = config.getint("index", "empty rows between diff type")
     editControlModel02.ValueMin = 0
     editControlModel02.ValueMax = 99
     editControlModel02.ValueStep = 1
@@ -260,7 +256,7 @@ def setSettings(*args):
     editControlModel03.PositionX = editControlModel02.PositionX
     editControlModel03.PositionY = editControlModel02.PositionY + editControlModel02.Height
     editControlModel03.Name = "EditControl03"
-    editControlModel03.Value = settings.getint("index", "extreme width factor")
+    editControlModel03.Value = config.getint("index", "extreme width factor")
     editControlModel03.ValueMin = 0
     editControlModel03.ValueMax = 99
     editControlModel03.ValueStep = 1
@@ -298,7 +294,7 @@ def setSettings(*args):
     checkModel00.Height = 15
     checkModel00.Name = "CheckBox00"
     checkModel00.State = {False: 0, True: 1}[
-        settings.getboolean("index", "add units")
+        config.getboolean("index", "add units")
     ]
     checkModel00.Label = "Добавить единицы измерения"
     checkModel00.HelpText = """\
@@ -320,7 +316,7 @@ def setSettings(*args):
     checkModel01.Height = checkModel00.Height
     checkModel01.Name = "CheckBox01"
     checkModel01.State = \
-        {False: 0, True: 1}[settings.getboolean("index", "space before units")]
+        {False: 0, True: 1}[config.getboolean("index", "space before units")]
     checkModel01.Label = "Вставить пробел перед единицами измерения"
     checkModel01.HelpText = """\
 Если отмечено, то между цифровой
@@ -337,7 +333,7 @@ def setSettings(*args):
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
     checkModel02.State = \
-        {False: 0, True: 1}[settings.getboolean("index", "concatenate same name groups")]
+        {False: 0, True: 1}[config.getboolean("index", "concatenate same name groups")]
     checkModel02.Label = "Объединить однотипные группы"
     checkModel02.HelpText = """\
 По умолчанию, группой считается
@@ -358,7 +354,7 @@ def setSettings(*args):
     checkModel03.Height = checkModel00.Height
     checkModel03.Name = "CheckBox03"
     checkModel03.State = \
-        {False: 0, True: 1}[settings.getboolean("index", "title with doc")]
+        {False: 0, True: 1}[config.getboolean("index", "title with doc")]
     checkModel03.Label = "Указать документ в заголовке группы"
     checkModel03.HelpText = """\
 По умолчанию, в качестве заголовка группы
@@ -382,7 +378,7 @@ def setSettings(*args):
     checkModel04.Height = checkModel00.Height
     checkModel04.Name = "CheckBox04"
     checkModel04.State = \
-        {False: 0, True: 1}[settings.getboolean("index", "every group has title")]
+        {False: 0, True: 1}[config.getboolean("index", "every group has title")]
     checkModel04.Label = "Формировать заголовок для каждой группы"
     checkModel04.HelpText = """\
 По умолчанию, заголовок формируется
@@ -406,7 +402,7 @@ def setSettings(*args):
     checkModel05.Height = checkModel00.Height
     checkModel05.Name = "CheckBox05"
     checkModel05.State = \
-        {False: 0, True: 1}[settings.getboolean("index", "empty row after group title")]
+        {False: 0, True: 1}[config.getboolean("index", "empty row after group title")]
     checkModel05.Label = "Добавить пустую строку после заголовка группы"
     checkModel05.HelpText = """\
 Если отмечено, то между заголовком
@@ -422,7 +418,7 @@ def setSettings(*args):
     editControlModel04.PositionX = tabsModel.Width - editControlModel04.Width - 3
     editControlModel04.PositionY = checkModel05.PositionY + checkModel05.Height
     editControlModel04.Name = "EditControl04"
-    editControlModel04.Value = settings.getint("index", "pages rev table")
+    editControlModel04.Value = config.getint("index", "pages rev table")
     editControlModel04.ValueMin = 0
     editControlModel04.ValueMax = 99
     editControlModel04.ValueStep = 1
@@ -443,7 +439,7 @@ def setSettings(*args):
     )
     checkModel06.Name = "CheckBox06"
     checkModel06.State = \
-        {False: 0, True: 1}[settings.getboolean("index", "append rev table")]
+        {False: 0, True: 1}[config.getboolean("index", "append rev table")]
     checkModel06.Label = "Добавить лист регистрации изменений, если количество листов больше:"
     checkModel06.HelpText = """\
 Если отмечено и количество листов
@@ -494,7 +490,7 @@ def setSettings(*args):
     editControlModel10.PositionX = labelModel10.Width
     editControlModel10.PositionY = labelModel10.PositionY
     editControlModel10.Name = "EditControl10"
-    editControlModel10.Text = settings.get("fields", "type")
+    editControlModel10.Text = config.get("fields", "type")
     pageModel1.insertByName("EditControl10", editControlModel10)
 
     labelModel11 = pageModel1.createInstance(
@@ -523,7 +519,7 @@ def setSettings(*args):
     editControlModel11.PositionX = labelModel11.Width
     editControlModel11.PositionY = labelModel11.PositionY
     editControlModel11.Name = "EditControl11"
-    editControlModel11.Text = settings.get("fields", "name")
+    editControlModel11.Text = config.get("fields", "name")
     pageModel1.insertByName("EditControl11", editControlModel11)
 
     labelModel12 = pageModel1.createInstance(
@@ -554,7 +550,7 @@ def setSettings(*args):
     editControlModel12.PositionX = labelModel12.Width
     editControlModel12.PositionY = labelModel12.PositionY
     editControlModel12.Name = "EditControl12"
-    editControlModel12.Text = settings.get("fields", "doc")
+    editControlModel12.Text = config.get("fields", "doc")
     pageModel1.insertByName("EditControl12", editControlModel12)
 
     labelModel13 = pageModel1.createInstance(
@@ -583,7 +579,7 @@ def setSettings(*args):
     editControlModel13.PositionX = labelModel13.Width
     editControlModel13.PositionY = labelModel13.PositionY
     editControlModel13.Name = "EditControl13"
-    editControlModel13.Text = settings.get("fields", "comment")
+    editControlModel13.Text = config.get("fields", "comment")
     pageModel1.insertByName("EditControl13", editControlModel13)
 
     labelModel14 = pageModel1.createInstance(
@@ -615,7 +611,7 @@ def setSettings(*args):
     editControlModel14.PositionX = labelModel14.Width
     editControlModel14.PositionY = labelModel14.PositionY
     editControlModel14.Name = "EditControl14"
-    editControlModel14.Text = settings.get("fields", "adjustable")
+    editControlModel14.Text = config.get("fields", "adjustable")
     pageModel1.insertByName("EditControl14", editControlModel14)
 
     buttonModel10 = pageModel1.createInstance(
@@ -649,7 +645,7 @@ def setSettings(*args):
     checkModel10.PositionY = 232
     checkModel10.Name = "CheckBox10"
     checkModel10.State = \
-        {False: 0, True: 1}[settings.getboolean("settings", "compatibility mode")]
+        {False: 0, True: 1}[config.getboolean("settings", "compatibility mode")]
     checkModel10.Label = "Режим совместимости с kicadbom2spec"
     checkModel10.HelpText = """\
 Если отмечено, то при формировании
@@ -678,7 +674,7 @@ def setSettings(*args):
     checkModel20.Height = 15
     checkModel20.Name = "CheckBox20"
     checkModel20.State = {False: 0, True: 1}[
-        settings.getboolean("stamp", "convert doc title")
+        config.getboolean("stamp", "convert doc title")
     ]
     checkModel20.Label = "Преобразовать наименование документа"
     checkModel20.HelpText = """\
@@ -698,7 +694,7 @@ def setSettings(*args):
     checkModel21.Height = checkModel20.Height
     checkModel21.Name = "CheckBox21"
     checkModel21.State = {False: 0, True: 1}[
-        settings.getboolean("stamp", "convert doc id")
+        config.getboolean("stamp", "convert doc id")
     ]
     checkModel21.Label = "Преобразовать обозначение документа"
     checkModel21.HelpText = """\
@@ -718,7 +714,7 @@ def setSettings(*args):
     checkModel22.Height = checkModel20.Height
     checkModel22.Name = "CheckBox22"
     checkModel22.State = {False: 0, True: 1}[
-        settings.getboolean("stamp", "fill first usage")
+        config.getboolean("stamp", "fill first usage")
     ]
     checkModel22.Label = "Автоматически заполнить графу \"Перв. примен.\""
     checkModel22.HelpText = """\
@@ -734,19 +730,19 @@ def setSettings(*args):
     # Action Listeners
     # ------------------------------------------------------------------------
 
-    dialog.addWindowListener(DialogWindowListener(dialog, settings))
+    dialog.addWindowListener(DialogWindowListener(dialog))
     buttonOK = dialog.getControl("ButtonOK")
-    buttonOK.addActionListener(ButtonOKActionListener(dialog, settings))
+    buttonOK.addActionListener(ButtonOKActionListener(dialog))
     ButtonCancel = dialog.getControl("ButtonCancel")
-    ButtonCancel.addActionListener(ButtonCancelActionListener(dialog, settings))
+    ButtonCancel.addActionListener(ButtonCancelActionListener(dialog))
 
     Button00 = dialog.getControl("Tabs").getControl("Page0").getControl("Button00")
-    Button00.addActionListener(Button00ActionListener(dialog, settings))
+    Button00.addActionListener(Button00ActionListener(dialog))
 
     Button10 = dialog.getControl("Tabs").getControl("Page1").getControl("Button10")
     Button11 = dialog.getControl("Tabs").getControl("Page1").getControl("Button11")
-    Button10.addActionListener(Button10ActionListener(dialog, settings))
-    Button11.addActionListener(Button10ActionListener(dialog, settings))
+    Button10.addActionListener(Button10ActionListener(dialog))
+    Button11.addActionListener(Button10ActionListener(dialog))
 
     # ------------------------------------------------------------------------
 
@@ -759,22 +755,20 @@ def setSettings(*args):
 
 
 class DialogWindowListener(unohelper.Base, XWindowListener):
-    def __init__(self, dialog, settings):
+    def __init__(self, dialog):
         self.dialog = dialog
-        self.settings = settings
 
     def windowMoved(self, event):
-        self.settings.set("settings", "pos x", str(event.X))
-        self.settings.set("settings", "pos y", str(event.Y))
+        config.set("settings", "pos x", str(event.X))
+        config.set("settings", "pos y", str(event.Y))
 
     def windowHidden(self, event):
-        config.save(self.settings)
+        config.save()
 
 
 class ButtonOKActionListener(unohelper.Base, XActionListener):
-    def __init__(self, dialog, settings):
+    def __init__(self, dialog):
         self.dialog = dialog
-        self.settings = settings
 
     def actionPerformed(self, event):
         page0 = self.dialog.getControl("Tabs").getControl("Page0")
@@ -784,7 +778,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # --------------------------------------------------------------------
         # Оптимальный вид
         # --------------------------------------------------------------------
-        self.settings.set("settings", "set view options",
+        config.set("settings", "set view options",
             {0: "no", 1: "yes"}[self.dialog.getControl("CheckBoxSet").getState()]
         )
 
@@ -792,40 +786,40 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Перечень элементов
         # --------------------------------------------------------------------
 
-        self.settings.set("index", "source",
+        config.set("index", "source",
             page0.getControl("EditControl00").getText()
         )
-        self.settings.set("index", "empty rows between diff ref",
+        config.set("index", "empty rows between diff ref",
             str(int(page0.getControl("EditControl01").getValue()))
         )
-        self.settings.set("index", "empty rows between diff type",
+        config.set("index", "empty rows between diff type",
             str(int(page0.getControl("EditControl02").getValue()))
         )
-        self.settings.set("index", "extreme width factor",
+        config.set("index", "extreme width factor",
             str(int(page0.getControl("EditControl03").getValue()))
         )
-        self.settings.set("index", "add units",
+        config.set("index", "add units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox00").getState()]
         )
-        self.settings.set("index", "space before units",
+        config.set("index", "space before units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox01").getState()]
         )
-        self.settings.set("index", "concatenate same name groups",
+        config.set("index", "concatenate same name groups",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox02").getState()]
         )
-        self.settings.set("index", "title with doc",
+        config.set("index", "title with doc",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox03").getState()]
         )
-        self.settings.set("index", "every group has title",
+        config.set("index", "every group has title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox04").getState()]
         )
-        self.settings.set("index", "empty row after group title",
+        config.set("index", "empty row after group title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox05").getState()]
         )
-        self.settings.set("index", "append rev table",
+        config.set("index", "append rev table",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox06").getState()]
         )
-        self.settings.set("index", "pages rev table",
+        config.set("index", "pages rev table",
             str(int(page0.getControl("EditControl04").getValue()))
         )
 
@@ -833,22 +827,22 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Поля
         # --------------------------------------------------------------------
 
-        self.settings.set("fields", "type",
+        config.set("fields", "type",
             page1.getControl("EditControl10").getText()
         )
-        self.settings.set("fields", "name",
+        config.set("fields", "name",
             page1.getControl("EditControl11").getText()
         )
-        self.settings.set("fields", "doc",
+        config.set("fields", "doc",
             page1.getControl("EditControl12").getText()
         )
-        self.settings.set("fields", "comment",
+        config.set("fields", "comment",
             page1.getControl("EditControl13").getText()
         )
-        self.settings.set("fields", "adjustable",
+        config.set("fields", "adjustable",
             page1.getControl("EditControl14").getText()
         )
-        self.settings.set("settings", "compatibility mode",
+        config.set("settings", "compatibility mode",
             {0: "no", 1: "yes"}[page1.getControl("CheckBox10").getState()]
         )
 
@@ -856,13 +850,13 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Основная надпись
         # --------------------------------------------------------------------
 
-        self.settings.set("stamp", "convert doc title",
+        config.set("stamp", "convert doc title",
             {0: "no", 1: "yes"}[page2.getControl("CheckBox20").getState()]
         )
-        self.settings.set("stamp", "convert doc id",
+        config.set("stamp", "convert doc id",
             {0: "no", 1: "yes"}[page2.getControl("CheckBox21").getState()]
         )
-        self.settings.set("stamp", "fill first usage",
+        config.set("stamp", "fill first usage",
             {0: "no", 1: "yes"}[page2.getControl("CheckBox22").getState()]
         )
 
@@ -870,18 +864,16 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
 
 
 class ButtonCancelActionListener(unohelper.Base, XActionListener):
-    def __init__(self, dialog, settings):
+    def __init__(self, dialog):
         self.dialog = dialog
-        self.settings = settings
 
     def actionPerformed(self, event):
         self.dialog.endExecute()
 
 
 class Button00ActionListener(unohelper.Base, XActionListener):
-    def __init__(self, dialog, settings):
+    def __init__(self, dialog):
         self.dialog = dialog
-        self.settings = settings
 
     def actionPerformed(self, event):
         editControl = self.dialog.getControl("Tabs").getControl("Page0").getControl("EditControl00")
@@ -893,9 +885,8 @@ class Button00ActionListener(unohelper.Base, XActionListener):
 
 
 class Button10ActionListener(unohelper.Base, XActionListener):
-    def __init__(self, dialog, settings):
+    def __init__(self, dialog):
         self.dialog = dialog
-        self.settings = settings
 
     def actionPerformed(self, event):
         page1 = self.dialog.getControl("Tabs").getControl("Page1")

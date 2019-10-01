@@ -3,10 +3,6 @@
 Модуль содержит вспомогательные функции и данные, которые могут использоваться
 различными макросами.
 
-Внимание!
-Глобальную переменную XSCRIPTCONTEXT обязательно нужно установить
-после импорта модуля.
-
 """
 
 import os
@@ -17,6 +13,7 @@ import kicadnet
 import schematic
 import config
 
+# Глобальная переменная XSCRIPTCONTEXT устанавливается в listener.py:init()
 XSCRIPTCONTEXT = None
 
 STAMP_COMMON_FIELDS = (
@@ -106,8 +103,7 @@ def getSourceFileName():
         не найден или не выбран.
 
     """
-    settings = config.load()
-    sourcePath = settings.get("index", "source")
+    sourcePath = config.get("index", "source")
     if os.path.exists(sourcePath):
         return sourcePath
     sourceDir = ""
@@ -122,15 +118,15 @@ def getSourceFileName():
         if sourceName:
             sourcePath = os.path.join(sourceDir, sourceName)
             if os.path.exists(sourcePath):
-                settings.set("index", "source", sourcePath)
-                config.save(settings)
+                config.set("index", "source", sourcePath)
+                config.save()
                 return sourcePath
     sourcePath = showFilePicker(
         os.path.join(sourceDir, sourceName)
     )
     if sourcePath is not None:
-        settings.set("index", "source", sourcePath)
-        config.save(settings)
+        config.set("index", "source", sourcePath)
+        config.save()
         return sourcePath
     return None
 
@@ -151,10 +147,9 @@ def getSchematicData():
             "Перечень элементов"
         )
         return None
-    settings = config.load()
     try:
         netlist = kicadnet.Netlist(sourceFileName)
-        schematicData = schematic.Schematic(settings)
+        schematicData = schematic.Schematic()
         for sheet in netlist.items("sheet"):
             if sheet.attributes["name"] == "/":
                 title_block = netlist.find("title_block", sheet)

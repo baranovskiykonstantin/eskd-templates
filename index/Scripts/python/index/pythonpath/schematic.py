@@ -1,7 +1,7 @@
 """Объектное представление схемы."""
 
 import re
-from config import loadFromKicadbom2spec
+import config
 
 REF_REGEXP = re.compile(r"([^0-9?]+)([0-9]+)")
 
@@ -23,7 +23,7 @@ class Component():
         if name == "Обозначение":
             value = self.reference
         elif name == "Значение":
-            if self.schematic.settings.getboolean("index", "add units"):
+            if config.getboolean("index", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
@@ -96,7 +96,7 @@ class Component():
         }
         numValue = ""
         separator = ""
-        if self.schematic.settings.getboolean("index", "space before units"):
+        if config.getboolean("index", "space before units"):
             separator = ' '
         multiplier = ""
         units = ""
@@ -314,7 +314,7 @@ class Component():
         """
         if name not in ("type", "name", "doc", "comment"):
             return ""
-        fieldName = self.schematic.settings.get("fields", name)
+        fieldName = config.get("fields", name)
         value = ""
         if self.formatPattern(fieldName, check=True):
             value = self.formatPattern(fieldName)
@@ -383,10 +383,7 @@ class CompRange(Component):
         """Вернуть перечень обозначений множества одинаковых компонентов."""
         refStr = ""
         adjustable = False
-        adjustableField = self.schematic.settings.get(
-            "fields",
-            "adjustable"
-        )
+        adjustableField = config.get("fields", "adjustable")
         if self.getFieldValue(adjustableField) is not None:
             adjustable = True
         if len(self._refRange) > 1:
@@ -477,10 +474,7 @@ class CompGroup():
         if not self._compRanges:
             self._compRanges.append(compRange)
             return True
-        skipRefType = self.schematic.settings.getboolean(
-            "index",
-            "concatenate same name groups"
-        )
+        skipRefType = config.getboolean("index", "concatenate same name groups")
         lastCompRange = self._compRanges[-1]
         if (lastCompRange.getRefType() == compRange.getRefType() or skipRefType) \
             and lastCompRange.getIndexValue("type") == compRange.getIndexValue("type"):
@@ -528,7 +522,7 @@ class CompGroup():
         if not currentType:
             return []
 
-        if not self.schematic.settings.getboolean("index", "title with doc"):
+        if not config.getboolean("index", "title with doc"):
             return [currentType]
 
         currentName = self._compRanges[0].getIndexValue("name")
@@ -588,8 +582,7 @@ class CompGroup():
 class Schematic():
     """Данные о схеме и компонентах."""
 
-    def __init__(self, settings):
-        self.settings = settings
+    def __init__(self):
         self.title = ""
         self.number = ""
         self.company = ""
@@ -600,9 +593,9 @@ class Schematic():
         self.components = []
 
         self.typeNamesDict = {}
-        if self.settings.getboolean("settings", "compatibility mode"):
+        if config.getboolean("settings", "compatibility mode"):
             # KB2S - kicadbom2spec
-            settingsKB2S = loadFromKicadbom2spec()
+            settingsKB2S = config.loadFromKicadbom2spec()
             if settingsKB2S is not None:
                 if settingsKB2S.has_section('group names singular'):
                     for index in settingsKB2S.options('group names singular'):

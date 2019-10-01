@@ -5,9 +5,6 @@ import common
 import config
 import textwidth
 
-common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-
 
 class IndexBuildingThread(threading.Thread):
     """Перечень заполняется из отдельного вычислительного потока.
@@ -30,11 +27,10 @@ class IndexBuildingThread(threading.Thread):
         clean(force=True)
         doc = XSCRIPTCONTEXT.getDocument()
         table = doc.getTextTables().getByName("Перечень_элементов")
-        settings = config.load()
         compGroups = schematic.getGroupedComponents()
         prevGroup = None
-        emptyRowsRef = settings.getint("index", "empty rows between diff ref")
-        emptyRowsType = settings.getint("index", "empty rows between diff type")
+        emptyRowsRef = config.getint("index", "empty rows between diff ref")
+        emptyRowsType = config.getint("index", "empty rows between diff type")
         lastRow = table.getRows().getCount() - 1
         # В процессе заполнения перечня, в конце таблицы всегда должна
         # оставаться пустая строка с ненарушенным форматированием.
@@ -58,7 +54,7 @@ class IndexBuildingThread(threading.Thread):
                 "Кол.",
                 "Примечание"
             )
-            extremeWidthFactor = settings.getint("index", "extreme width factor")
+            extremeWidthFactor = config.getint("index", "extreme width factor")
             for index, value in enumerate(values):
                 widthFactors[index] = textwidth.getWidthFactor(
                     colNames[index],
@@ -155,7 +151,7 @@ class IndexBuildingThread(threading.Thread):
                 for _ in range(emptyRows):
                     nextRow()
             if len(group) == 1 \
-                and not settings.getboolean("index", "every group has title"):
+                and not config.getboolean("index", "every group has title"):
                     compRef = group[0].getRefRangeString()
                     compType = group[0].getTypeSingular()
                     compName = group[0].getIndexValue("name")
@@ -178,7 +174,7 @@ class IndexBuildingThread(threading.Thread):
                     ["", title, "", ""],
                     isTitle=True
                 )
-            if settings.getboolean("index", "empty row after group title"):
+            if config.getboolean("index", "empty row after group title"):
                 nextRow()
             for compRange in group:
                 compRef = compRange.getRefRangeString()
@@ -200,9 +196,9 @@ class IndexBuildingThread(threading.Thread):
         lastRow += 1
         table.getRows().removeByIndex(lastRow, 1)
 
-        if settings.getboolean("index", "append rev table"):
+        if config.getboolean("index", "append rev table"):
             pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
-            if pageCount > settings.getint("index", "pages rev table"):
+            if pageCount > config.getint("index", "pages rev table"):
                 common.appendRevTable()
 
 
@@ -319,9 +315,8 @@ def toggleRevTable(*args):
     if common.isThreadWorking():
         return
     doc = XSCRIPTCONTEXT.getDocument()
-    settings = config.load()
-    settings.set("index", "append rev table", "no")
-    config.save(settings)
+    config.set("index", "append rev table", "no")
+    config.save()
     if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
         common.removeRevTable()
     else:

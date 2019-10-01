@@ -3,9 +3,6 @@ import common
 import config
 import textwidth
 
-common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
-
 def syncCommonFields():
     """Обновить значения общих граф.
 
@@ -90,10 +87,9 @@ def fill(*args):
         return
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
-    settings = config.load()
     # Наименование документа
     docTitle = schematic.title.replace('\\n', '\n')
-    if settings.getboolean("stamp", "convert doc title"):
+    if config.getboolean("stamp", "convert doc title"):
         suffix = "Перечень элементов"
         titleParts = docTitle.rsplit("Схема электрическая ", 1)
         schTypes = (
@@ -121,12 +117,12 @@ def fill(*args):
         r"([А-ЯA-Z0-9]+(?:[\.\-][0-9]+)+\s?)(Э[1-7])",
         docId
     )
-    if settings.getboolean("stamp", "convert doc id") \
+    if config.getboolean("stamp", "convert doc id") \
         and idParts is not None:
             docId = 'П'.join(idParts.groups())
     setFirstPageFrameValue("2 Обозначение документа", docId)
     # Первое применение
-    if settings.getboolean("stamp", "fill first usage") \
+    if config.getboolean("stamp", "fill first usage") \
         and idParts is not None:
             setFirstPageFrameValue("25 Перв. примен.", idParts.group(1).strip())
     # Разработал

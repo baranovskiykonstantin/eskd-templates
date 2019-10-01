@@ -53,11 +53,10 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     pageCount = currentController.PageCount
                     if pageCount != self.prevPageCount:
                         self.prevPageCount = pageCount
-                        settings = config.load()
-                        if settings.getboolean("index", "append rev table"):
+                        if config.getboolean("index", "append rev table"):
                             if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
                                 pageCount -= 1
-                            if pageCount > settings.getint("index", "pages rev table"):
+                            if pageCount > config.getint("index", "pages rev table"):
                                 if common.appendRevTable():
                                     self.prevPageCount +=1
                             else:
@@ -160,11 +159,11 @@ def init(*args):
             ()
         )
         return
+    config.load()
     doc = XSCRIPTCONTEXT.getDocument()
-    settings = config.load()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
-    if settings.getboolean("settings", "set view options"):
+    if config.getboolean("settings", "set view options"):
         options = (
             {
                 "path": "/org.openoffice.Office.Writer/Content/NonprintingCharacter",
