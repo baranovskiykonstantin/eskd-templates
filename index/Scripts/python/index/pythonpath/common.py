@@ -370,7 +370,6 @@ def getIndexRowHeight(rowIndex):
     height = 800
     doc = XSCRIPTCONTEXT.getDocument()
     firstPageStyleName = doc.getText().createTextCursor().PageDescName
-    tableRowCount = doc.getTextTables().getByName("Перечень_элементов").getRows().getCount()
     firstRowCount = 28
     otherRowCount = 32
     if firstPageStyleName.endswith("3") \

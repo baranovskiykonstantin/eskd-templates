@@ -452,6 +452,40 @@ def setSettings(*args):
 регистрации изменения будет удалён."""
     pageModel0.insertByName("CheckBox06", checkModel06)
 
+    checkModel07 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel07.PositionX = 5
+    checkModel07.PositionY = editControlModel04.PositionY + editControlModel04.Height
+    checkModel07.Width = tabsModel.Width - 10
+    checkModel07.Height = checkModel00.Height
+    checkModel07.Name = "CheckBox07"
+    checkModel07.State = \
+        {False: 0, True: 1}[config.getboolean("index", "prohibit titles at bottom")]
+    checkModel07.Label = "Запретить заголовки групп внизу страницы"
+    checkModel07.HelpText = """\
+Если отмечено, то заголовки групп,
+находящиеся внизу страницы без единого
+элемента, будут перемещены на следующую
+страницу."""
+    pageModel0.insertByName("CheckBox07", checkModel07)
+
+    checkModel08 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel08.PositionX = 5
+    checkModel08.PositionY = checkModel07.PositionY + checkModel07.Height
+    checkModel08.Width = tabsModel.Width - 10
+    checkModel08.Height = checkModel00.Height
+    checkModel08.Name = "CheckBox08"
+    checkModel08.State = \
+        {False: 0, True: 1}[config.getboolean("index", "prohibit empty rows at top")]
+    checkModel08.Label = "Запретить пустые строки вверху страницы"
+    checkModel08.HelpText = """\
+Если отмечено, то пустые строки
+вверху страницы будут удалены."""
+    pageModel0.insertByName("CheckBox08", checkModel08)
+
     # ------------------------------------------------------------------------
     # Fields Tab Model
     # ------------------------------------------------------------------------
@@ -821,6 +855,12 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("index", "pages rev table",
             str(int(page0.getControl("EditControl04").getValue()))
+        )
+        config.set("index", "prohibit titles at bottom",
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox07").getState()]
+        )
+        config.set("index", "prohibit empty rows at top",
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox08").getState()]
         )
 
         # --------------------------------------------------------------------

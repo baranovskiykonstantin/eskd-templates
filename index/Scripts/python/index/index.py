@@ -44,7 +44,6 @@ class IndexBuildingThread(threading.Thread):
             table.getRows().insertByIndex(lastRow, 1)
 
         def fillRow(values, isTitle=False):
-            table.getRows().getByIndex(lastRow).Height = common.getIndexRowHeight(lastRow)
             normValues = list(values)
             extraRow = ["", "", "", ""]
             widthFactors = [100, 100, 100, 100]
@@ -195,6 +194,62 @@ class IndexBuildingThread(threading.Thread):
 
         lastRow += 1
         table.getRows().removeByIndex(lastRow, 1)
+
+        if config.getboolean("index", "prohibit titles at bottom"):
+            firstPageStyleName = doc.getText().createTextCursor().PageDescName
+            tableRowCount = table.getRows().getCount()
+            firstRowCount = 28
+            otherRowCount = 32
+            if firstPageStyleName.endswith("3") \
+                or firstPageStyleName.endswith("4"):
+                    firstRowCount = 26
+            pos = firstRowCount
+            while pos < tableRowCount:
+                cell = table.getCellByPosition(1, pos)
+                cellCursor = cell.createTextCursor()
+                if cellCursor.ParaStyleName == "Наименование (заголовок)" \
+                    and cellCursor.getText().getString() != "":
+                        offset = 1
+                        while pos > offset:
+                            cell = table.getCellByPosition(1, pos - offset)
+                            cellCursor = cell.createTextCursor()
+                            if cellCursor.ParaStyleName != "Наименование (заголовок)" \
+                                or cellCursor.getText().getString() == "":
+                                    doc.lockControllers()
+                                    table.getRows().insertByIndex(pos - offset, offset)
+                                    doc.unlockControllers()
+                                    break
+                            offset += 1
+                pos += otherRowCount
+
+        if config.getboolean("index", "prohibit empty rows at top"):
+            firstPageStyleName = doc.getText().createTextCursor().PageDescName
+            tableRowCount = table.getRows().getCount()
+            firstRowCount = 29
+            otherRowCount = 32
+            if firstPageStyleName.endswith("3") \
+                or firstPageStyleName.endswith("4"):
+                    firstRowCount = 27
+            pos = firstRowCount
+            while pos < tableRowCount:
+                while True:
+                    rowIsEmpty = False
+                    for i in range(4):
+                        cell = table.getCellByPosition(i, pos)
+                        cellCursor = cell.createTextCursor()
+                        if cellCursor.getText().getString() != "":
+                            break
+                    else:
+                        rowIsEmpty = True
+                    if not rowIsEmpty:
+                        break
+                    doc.lockControllers()
+                    table.getRows().removeByIndex(pos, 1)
+                    doc.unlockControllers()
+                pos += otherRowCount
+
+        for rowIndex in range(1, table.getRows().getCount()):
+            table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
 
         if config.getboolean("index", "append rev table"):
             pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount

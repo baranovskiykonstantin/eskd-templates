@@ -52,6 +52,8 @@ def load():
                     "empty row after group title": "no",
                     "empty rows between diff ref": 1,
                     "empty rows between diff type": 0,
+                    "prohibit titles at bottom": "no",
+                    "prohibit empty rows at top": "no",
                     "extreme width factor": 80,
                     "append rev table": "no",
                     "pages rev table": 3,
