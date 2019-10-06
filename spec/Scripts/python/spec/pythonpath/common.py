@@ -83,10 +83,10 @@ def showFilePicker(filePath=""):
     )
     filePicker.setDefaultName(file)
     result = filePicker.execute()
-    resultOK = uno.getConstantByName(
+    OK = uno.getConstantByName(
         "com.sun.star.ui.dialogs.ExecutableDialogResults.OK"
     )
-    if result == resultOK:
+    if result == OK:
         sourcePath = uno.fileUrlToSystemPath(filePicker.getFiles()[0])
         return sourcePath
     return None

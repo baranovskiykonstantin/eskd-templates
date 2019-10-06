@@ -106,17 +106,43 @@ def importEmbeddedModules(*args):
     doc = XSCRIPTCONTEXT.getDocument()
     if not doc.URL:
         ctx = XSCRIPTCONTEXT.getComponentContext()
-        dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
-            "com.sun.star.frame.DispatchHelper",
+
+        filePicker = ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.ui.dialogs.OfficeFilePicker",
             ctx
         )
-        dispatchHelper.executeDispatch(
-            XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
-            ".uno:SaveAs",
-            "",
-            0,
-            ()
+        filePicker.setTitle("Сохранение нового перечня элементов")
+        pickerType = uno.getConstantByName(
+            "com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_SIMPLE"
         )
+        filePicker.initialize((pickerType,))
+        path = ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.util.PathSubstitution",
+            ctx
+        )
+        homeDir = path.getSubstituteVariableValue("$(work)")
+        filePicker.setDisplayDirectory(homeDir)
+        filePicker.setDefaultName("Перечень элементов.odt")
+        result = filePicker.execute()
+        OK = uno.getConstantByName(
+            "com.sun.star.ui.dialogs.ExecutableDialogResults.OK"
+        )
+        if result == OK:
+            fileUrl = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
+            fileUrl.Name = "URL"
+            fileUrl.Value = filePicker.getFiles()[0]
+
+            dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
+                "com.sun.star.frame.DispatchHelper",
+                ctx
+            )
+            dispatchHelper.executeDispatch(
+                XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+                ".uno:SaveAs",
+                "",
+                0,
+                (fileUrl,)
+            )
         if not doc.URL:
             desktop = XSCRIPTCONTEXT.getDesktop()
             parent = desktop.getCurrentComponent().CurrentController.Frame.ContainerWindow
