@@ -90,7 +90,6 @@ def fill(*args):
     # Наименование документа
     docTitle = schematic.title.replace('\\n', '\n')
     if config.getboolean("stamp", "convert doc title"):
-        suffix = "Перечень элементов"
         titleParts = docTitle.rsplit("Схема электрическая ", 1)
         schTypes = (
             "структурная",
@@ -104,10 +103,7 @@ def fill(*args):
         if len(titleParts) > 1 and titleParts[1] in schTypes:
             # Оставить только наименование изделия
             docTitle = titleParts[0]
-        if docTitle:
-            # Только один перевод строки
-            docTitle = docTitle.rstrip('\n') + '\n'
-        docTitle = docTitle + suffix
+            docTitle = docTitle.rstrip('\n .')
     setFirstPageFrameValue("1 Наименование документа", docTitle)
     # Наименование организации
     setFirstPageFrameValue("9 Наименование организации", schematic.company)
@@ -119,7 +115,7 @@ def fill(*args):
     )
     if config.getboolean("stamp", "convert doc id") \
         and idParts is not None:
-            docId = 'П'.join(idParts.groups())
+            docId = idParts.group(1).strip()
     setFirstPageFrameValue("2 Обозначение документа", docId)
     # Первое применение
     if config.getboolean("stamp", "fill first usage") \

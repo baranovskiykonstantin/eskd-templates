@@ -28,7 +28,7 @@ def setSettings(*args):
     dialogModel.Height = 300
     dialogModel.PositionX = 0
     dialogModel.PositionY = 0
-    dialogModel.Title = "Параметры перечня элементов"
+    dialogModel.Title = "Параметры спецификации"
 
     # ------------------------------------------------------------------------
     # Tabs Model
@@ -120,14 +120,14 @@ def setSettings(*args):
     )
 
     # ------------------------------------------------------------------------
-    # Index Tab Model
+    # Spec Tab Model
     # ------------------------------------------------------------------------
 
     pageModel0 = tabsModel.createInstance(
         "com.sun.star.awt.UnoPageModel"
     )
     tabsModel.insertByName("Page0", pageModel0)
-    pageModel0.Title = " Перечень элементов "
+    pageModel0.Title = " Спецификация "
 
     labelModel00 = pageModel0.createInstance(
         "com.sun.star.awt.UnoControlFixedTextModel"
@@ -169,7 +169,7 @@ def setSettings(*args):
     editControlModel00.PositionX = 0
     editControlModel00.PositionY = buttonModel00.PositionY
     editControlModel00.Name = "EditControl00"
-    editControlModel00.Text = config.get("index", "source")
+    editControlModel00.Text = config.get("spec", "source")
     pageModel0.insertByName("EditControl00", editControlModel00)
 
     editControlModel01 = pageModel0.createInstance(
@@ -180,7 +180,7 @@ def setSettings(*args):
     editControlModel01.PositionX = 0
     editControlModel01.PositionY = editControlModel00.PositionY + editControlModel00.Height
     editControlModel01.Name = "EditControl01"
-    editControlModel01.Value = config.getint("index", "empty rows between diff ref")
+    editControlModel01.Value = config.getint("spec", "empty rows between diff ref")
     editControlModel01.ValueMin = 0
     editControlModel01.ValueMax = 99
     editControlModel01.ValueStep = 1
@@ -220,7 +220,7 @@ def setSettings(*args):
     editControlModel02.PositionX = editControlModel01.PositionX
     editControlModel02.PositionY = editControlModel01.PositionY + editControlModel01.Height
     editControlModel02.Name = "EditControl02"
-    editControlModel02.Value = config.getint("index", "empty rows between diff type")
+    editControlModel02.Value = config.getint("spec", "empty rows between diff type")
     editControlModel02.ValueMin = 0
     editControlModel02.ValueMax = 99
     editControlModel02.ValueStep = 1
@@ -256,7 +256,7 @@ def setSettings(*args):
     editControlModel03.PositionX = editControlModel02.PositionX
     editControlModel03.PositionY = editControlModel02.PositionY + editControlModel02.Height
     editControlModel03.Name = "EditControl03"
-    editControlModel03.Value = config.getint("index", "extreme width factor")
+    editControlModel03.Value = config.getint("spec", "extreme width factor")
     editControlModel03.ValueMin = 0
     editControlModel03.ValueMax = 99
     editControlModel03.ValueStep = 1
@@ -294,7 +294,7 @@ def setSettings(*args):
     checkModel00.Height = 15
     checkModel00.Name = "CheckBox00"
     checkModel00.State = {False: 0, True: 1}[
-        config.getboolean("index", "add units")
+        config.getboolean("spec", "add units")
     ]
     checkModel00.Label = "Добавить единицы измерения"
     checkModel00.HelpText = """\
@@ -316,7 +316,7 @@ def setSettings(*args):
     checkModel01.Height = checkModel00.Height
     checkModel01.Name = "CheckBox01"
     checkModel01.State = \
-        {False: 0, True: 1}[config.getboolean("index", "space before units")]
+        {False: 0, True: 1}[config.getboolean("spec", "space before units")]
     checkModel01.Label = "Вставить пробел перед единицами измерения"
     checkModel01.HelpText = """\
 Если отмечено, то между цифровой
@@ -333,7 +333,7 @@ def setSettings(*args):
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
     checkModel02.State = \
-        {False: 0, True: 1}[config.getboolean("index", "concatenate same name groups")]
+        {False: 0, True: 1}[config.getboolean("spec", "concatenate same name groups")]
     checkModel02.Label = "Объединить однотипные группы"
     checkModel02.HelpText = """\
 По умолчанию, группой считается
@@ -354,7 +354,7 @@ def setSettings(*args):
     checkModel03.Height = checkModel00.Height
     checkModel03.Name = "CheckBox03"
     checkModel03.State = \
-        {False: 0, True: 1}[config.getboolean("index", "title with doc")]
+        {False: 0, True: 1}[config.getboolean("spec", "title with doc")]
     checkModel03.Label = "Указать документ в заголовке группы"
     checkModel03.HelpText = """\
 По умолчанию, в качестве заголовка группы
@@ -378,7 +378,7 @@ def setSettings(*args):
     checkModel04.Height = checkModel00.Height
     checkModel04.Name = "CheckBox04"
     checkModel04.State = \
-        {False: 0, True: 1}[config.getboolean("index", "every group has title")]
+        {False: 0, True: 1}[config.getboolean("spec", "every group has title")]
     checkModel04.Label = "Формировать заголовок для каждой группы"
     checkModel04.HelpText = """\
 По умолчанию, заголовок формируется
@@ -402,7 +402,7 @@ def setSettings(*args):
     checkModel05.Height = checkModel00.Height
     checkModel05.Name = "CheckBox05"
     checkModel05.State = \
-        {False: 0, True: 1}[config.getboolean("index", "empty row after group title")]
+        {False: 0, True: 1}[config.getboolean("spec", "empty row after group title")]
     checkModel05.Label = "Добавить пустую строку после заголовка группы"
     checkModel05.HelpText = """\
 Если отмечено, то между заголовком
@@ -418,7 +418,7 @@ def setSettings(*args):
     editControlModel04.PositionX = tabsModel.Width - editControlModel04.Width - 3
     editControlModel04.PositionY = checkModel05.PositionY + checkModel05.Height
     editControlModel04.Name = "EditControl04"
-    editControlModel04.Value = config.getint("index", "pages rev table")
+    editControlModel04.Value = config.getint("spec", "pages rev table")
     editControlModel04.ValueMin = 0
     editControlModel04.ValueMax = 99
     editControlModel04.ValueStep = 1
@@ -439,7 +439,7 @@ def setSettings(*args):
     )
     checkModel06.Name = "CheckBox06"
     checkModel06.State = \
-        {False: 0, True: 1}[config.getboolean("index", "append rev table")]
+        {False: 0, True: 1}[config.getboolean("spec", "append rev table")]
     checkModel06.Label = "Добавить лист регистрации изменений, если количество листов больше:"
     checkModel06.HelpText = """\
 Если отмечено и количество листов
@@ -461,7 +461,7 @@ def setSettings(*args):
     checkModel07.Height = checkModel00.Height
     checkModel07.Name = "CheckBox07"
     checkModel07.State = \
-        {False: 0, True: 1}[config.getboolean("index", "prohibit titles at bottom")]
+        {False: 0, True: 1}[config.getboolean("spec", "prohibit titles at bottom")]
     checkModel07.Label = "Запретить заголовки групп внизу страницы"
     checkModel07.HelpText = """\
 Если отмечено, то заголовки групп,
@@ -479,7 +479,7 @@ def setSettings(*args):
     checkModel08.Height = checkModel00.Height
     checkModel08.Name = "CheckBox08"
     checkModel08.State = \
-        {False: 0, True: 1}[config.getboolean("index", "prohibit empty rows at top")]
+        {False: 0, True: 1}[config.getboolean("spec", "prohibit empty rows at top")]
     checkModel08.Label = "Запретить пустые строки вверху страницы"
     checkModel08.HelpText = """\
 Если отмечено, то пустые строки
@@ -633,8 +633,8 @@ def setSettings(*args):
 Если компонент содержит
 поле с указанным именем,
 то возле его обозначения
-в перечне, будет указан
-символ "*"."""
+в спецификации, будет
+указан символ "*"."""
     pageModel1.insertByName("Label14", labelModel14)
 
     editControlModel14 = pageModel1.createInstance(
@@ -683,7 +683,7 @@ def setSettings(*args):
     checkModel10.Label = "Режим совместимости с kicadbom2spec"
     checkModel10.HelpText = """\
 Если отмечено, то при формировании
-перечня элементов из файла настроек
+спецификации из файла настроек
 приложения kicadbom2spec будут
 использованы данные о разделителях
 и словарь наименований групп."""
@@ -713,8 +713,7 @@ def setSettings(*args):
     checkModel20.Label = "Преобразовать наименование документа"
     checkModel20.HelpText = """\
 Если отмечено, тип схемы в наименовании
-документа будет заменён надписью
-"Перечень элементов".
+документа будет удалён.
 В противном случае, наименование
 останется без изменений."""
     pageModel2.insertByName("CheckBox20", checkModel20)
@@ -732,9 +731,9 @@ def setSettings(*args):
     ]
     checkModel21.Label = "Преобразовать обозначение документа"
     checkModel21.HelpText = """\
-Если отмечено, к типу схемы в
+Если отмечено, тип схемы в
 обозначении документа будет
-добавлен префикс "П" (перечень).
+удалён.
 В противном случае, обозначение
 останется без изменений."""
     pageModel2.insertByName("CheckBox21", checkModel21)
@@ -817,49 +816,49 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
 
         # --------------------------------------------------------------------
-        # Перечень элементов
+        # Спецификация
         # --------------------------------------------------------------------
 
-        config.set("index", "source",
+        config.set("spec", "source",
             page0.getControl("EditControl00").getText()
         )
-        config.set("index", "empty rows between diff ref",
+        config.set("spec", "empty rows between diff ref",
             str(int(page0.getControl("EditControl01").getValue()))
         )
-        config.set("index", "empty rows between diff type",
+        config.set("spec", "empty rows between diff type",
             str(int(page0.getControl("EditControl02").getValue()))
         )
-        config.set("index", "extreme width factor",
+        config.set("spec", "extreme width factor",
             str(int(page0.getControl("EditControl03").getValue()))
         )
-        config.set("index", "add units",
+        config.set("spec", "add units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox00").getState()]
         )
-        config.set("index", "space before units",
+        config.set("spec", "space before units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox01").getState()]
         )
-        config.set("index", "concatenate same name groups",
+        config.set("spec", "concatenate same name groups",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox02").getState()]
         )
-        config.set("index", "title with doc",
+        config.set("spec", "title with doc",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox03").getState()]
         )
-        config.set("index", "every group has title",
+        config.set("spec", "every group has title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox04").getState()]
         )
-        config.set("index", "empty row after group title",
+        config.set("spec", "empty row after group title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox05").getState()]
         )
-        config.set("index", "append rev table",
+        config.set("spec", "append rev table",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox06").getState()]
         )
-        config.set("index", "pages rev table",
+        config.set("spec", "pages rev table",
             str(int(page0.getControl("EditControl04").getValue()))
         )
-        config.set("index", "prohibit titles at bottom",
+        config.set("spec", "prohibit titles at bottom",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox07").getState()]
         )
-        config.set("index", "prohibit empty rows at top",
+        config.set("spec", "prohibit empty rows at top",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox08").getState()]
         )
 

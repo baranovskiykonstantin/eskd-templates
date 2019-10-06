@@ -23,7 +23,7 @@ class Component():
         if name == "Обозначение":
             value = self.reference
         elif name == "Значение":
-            if config.getboolean("index", "add units"):
+            if config.getboolean("spec", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
@@ -57,7 +57,7 @@ class Component():
 
     def _getTypeSingularAndPlural(self):
         """Вернуть тип элемента в единственном и множественном числе."""
-        typeValue = self.getIndexValue("type")
+        typeValue = self.getSpecValue("type")
         singularAndPlural = re.match(r"^([^\s]+)\s*\(([^\s]+)\)$", typeValue)
         if singularAndPlural:
             return singularAndPlural.groups()
@@ -96,7 +96,7 @@ class Component():
         }
         numValue = ""
         separator = ""
-        if config.getboolean("index", "space before units"):
+        if config.getboolean("spec", "space before units"):
             separator = ' '
         multiplier = ""
         units = ""
@@ -299,11 +299,11 @@ class Component():
             return False
         return out
 
-    def getIndexValue(self, name):
-        """Вернуть преобразованное значение для перечня.
+    def getSpecValue(self, name):
+        """Вернуть преобразованное значение для спецификации.
 
         Вернуть приведённое к конечному виду значение одного из полей,
-        используемых при построении перечня.
+        используемых при построении спецификации.
 
         Аргументы:
         name (str) -- название требуемого значения; может быть одним из:
@@ -330,7 +330,7 @@ class Component():
 class CompRange(Component):
     """Множество компонентов с одинаковыми параметрами.
 
-    Этот класс описывает множество компонентов перечня
+    Этот класс описывает множество компонентов спецификации
     элементов, которые имеют одинаковые тип, наименование, документ,
     примечание, буквенную часть обозначения и следуют последовательно.
 
@@ -371,10 +371,10 @@ class CompRange(Component):
             self.__init__(self.schematic, comp)
             return True
         if self.getRefType() == comp.getRefType() \
-            and self.getIndexValue("type") == comp.getIndexValue("type") \
-            and self.getIndexValue("name") == comp.getIndexValue("name") \
-            and self.getIndexValue("doc") == comp.getIndexValue("doc") \
-            and self.getIndexValue("comment") == comp.getIndexValue("comment"):
+            and self.getSpecValue("type") == comp.getSpecValue("type") \
+            and self.getSpecValue("name") == comp.getSpecValue("name") \
+            and self.getSpecValue("doc") == comp.getSpecValue("doc") \
+            and self.getSpecValue("comment") == comp.getSpecValue("comment"):
                 self._refRange.append(comp.reference)
                 return True
         return False
@@ -474,10 +474,10 @@ class CompGroup():
         if not self._compRanges:
             self._compRanges.append(compRange)
             return True
-        skipRefType = config.getboolean("index", "concatenate same name groups")
+        skipRefType = config.getboolean("spec", "concatenate same name groups")
         lastCompRange = self._compRanges[-1]
         if (lastCompRange.getRefType() == compRange.getRefType() or skipRefType) \
-            and lastCompRange.getIndexValue("type") == compRange.getIndexValue("type"):
+            and lastCompRange.getSpecValue("type") == compRange.getSpecValue("type"):
                 self._compRanges.append(compRange)
                 return True
         return False
@@ -522,17 +522,17 @@ class CompGroup():
         if not currentType:
             return []
 
-        if not config.getboolean("index", "title with doc"):
+        if not config.getboolean("spec", "title with doc"):
             return [currentType]
 
-        currentName = self._compRanges[0].getIndexValue("name")
-        currentDoc = self._compRanges[0].getIndexValue("doc")
+        currentName = self._compRanges[0].getSpecValue("name")
+        currentDoc = self._compRanges[0].getSpecValue("doc")
 
         # Список уникальных пар Наименование-Документ
         nameDocList = []
         for compRange in self:
-            currentName = compRange.getIndexValue("name")
-            currentDoc = compRange.getIndexValue("doc")
+            currentName = compRange.getSpecValue("name")
+            currentDoc = compRange.getSpecValue("doc")
             if not currentDoc:
                 # Если имеются компоненты, в которых документ не указан,
                 # то в заголовке для них будет указан только тип.

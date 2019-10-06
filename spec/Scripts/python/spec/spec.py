@@ -6,19 +6,19 @@ import config
 import textwidth
 
 
-class IndexBuildingThread(threading.Thread):
-    """Перечень заполняется из отдельного вычислительного потока.
+class SpecBuildingThread(threading.Thread):
+    """Спецификация заполняется из отдельного вычислительного потока.
 
-    Из-за особенностей реализации uno-интерфейса, процесс построения перечня
+    Из-за особенностей реализации uno-интерфейса, процесс построения специф.
     занимает значительное время. Чтобы избежать продолжительного зависания
-    графического интерфейса LibreOffice, перечень заполняется из отдельного
+    графического интерфейса LibreOffice, специф. заполняется из отдельного
     вычислительного потока и внесённые изменения сразу же отображаются в окне
     текстового редактора.
 
     """
     def __init__(self):
         threading.Thread.__init__(self)
-        self.name = "IndexBuildingThread"
+        self.name = "SpecBuildingThread"
 
     def run(self):
         schematic = common.getSchematicData()
@@ -26,13 +26,13 @@ class IndexBuildingThread(threading.Thread):
             return
         clean(force=True)
         doc = XSCRIPTCONTEXT.getDocument()
-        table = doc.getTextTables().getByName("Перечень_элементов")
+        table = doc.getTextTables().getByName("Спецификация")
         compGroups = schematic.getGroupedComponents()
         prevGroup = None
-        emptyRowsRef = config.getint("index", "empty rows between diff ref")
-        emptyRowsType = config.getint("index", "empty rows between diff type")
+        emptyRowsRef = config.getint("spec", "empty rows between diff ref")
+        emptyRowsType = config.getint("spec", "empty rows between diff type")
         lastRow = table.getRows().getCount() - 1
-        # В процессе заполнения перечня, в конце таблицы всегда должна
+        # В процессе заполнения специф., в конце таблицы всегда должна
         # оставаться пустая строка с ненарушенным форматированием.
         # На её основе будут создаваться новые строки.
         # По окончанию, последняя строка будет удалена.
@@ -53,7 +53,7 @@ class IndexBuildingThread(threading.Thread):
                 "Кол.",
                 "Примечание"
             )
-            extremeWidthFactor = config.getint("index", "extreme width factor")
+            extremeWidthFactor = config.getint("spec", "extreme width factor")
             for index, value in enumerate(values):
                 widthFactors[index] = textwidth.getWidthFactor(
                     colNames[index],
@@ -150,18 +150,18 @@ class IndexBuildingThread(threading.Thread):
                 for _ in range(emptyRows):
                     nextRow()
             if len(group) == 1 \
-                and not config.getboolean("index", "every group has title"):
+                and not config.getboolean("spec", "every group has title"):
                     compRef = group[0].getRefRangeString()
                     compType = group[0].getTypeSingular()
-                    compName = group[0].getIndexValue("name")
-                    compDoc = group[0].getIndexValue("doc")
+                    compName = group[0].getSpecValue("name")
+                    compDoc = group[0].getSpecValue("doc")
                     name = ""
                     if compType:
                         name += compType + ' '
                     name += compName
                     if compDoc:
                         name += ' ' + compDoc
-                    compComment = group[0].getIndexValue("comment")
+                    compComment = group[0].getSpecValue("comment")
                     fillRow(
                         [compRef, name, "1", compComment]
                     )
@@ -173,12 +173,12 @@ class IndexBuildingThread(threading.Thread):
                     ["", title, "", ""],
                     isTitle=True
                 )
-            if config.getboolean("index", "empty row after group title"):
+            if config.getboolean("spec", "empty row after group title"):
                 nextRow()
             for compRange in group:
                 compRef = compRange.getRefRangeString()
-                compName = compRange.getIndexValue("name")
-                compDoc = compRange.getIndexValue("doc")
+                compName = compRange.getSpecValue("name")
+                compDoc = compRange.getSpecValue("doc")
                 name = compName
                 if compDoc:
                     for title in titleLines:
@@ -186,7 +186,7 @@ class IndexBuildingThread(threading.Thread):
                             break
                     else:
                         name += ' ' + compDoc
-                compComment = compRange.getIndexValue("comment")
+                compComment = compRange.getSpecValue("comment")
                 fillRow(
                     [compRef, name, str(len(compRange)), compComment]
                 )
@@ -195,7 +195,7 @@ class IndexBuildingThread(threading.Thread):
         lastRow += 1
         table.getRows().removeByIndex(lastRow, 1)
 
-        if config.getboolean("index", "prohibit titles at bottom"):
+        if config.getboolean("spec", "prohibit titles at bottom"):
             firstPageStyleName = doc.getText().createTextCursor().PageDescName
             tableRowCount = table.getRows().getCount()
             firstRowCount = 28
@@ -222,7 +222,7 @@ class IndexBuildingThread(threading.Thread):
                             offset += 1
                 pos += otherRowCount
 
-        if config.getboolean("index", "prohibit empty rows at top"):
+        if config.getboolean("spec", "prohibit empty rows at top"):
             firstPageStyleName = doc.getText().createTextCursor().PageDescName
             tableRowCount = table.getRows().getCount()
             firstRowCount = 29
@@ -249,18 +249,18 @@ class IndexBuildingThread(threading.Thread):
                 pos += otherRowCount
 
         for rowIndex in range(1, table.getRows().getCount()):
-            table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+            table.getRows().getByIndex(rowIndex).Height = common.getSpecRowHeight(rowIndex)
 
-        if config.getboolean("index", "append rev table"):
+        if config.getboolean("spec", "append rev table"):
             pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
-            if pageCount > config.getint("index", "pages rev table"):
+            if pageCount > config.getint("spec", "pages rev table"):
                 common.appendRevTable()
 
 
 def clean(*args, force=False):
-    """Очистить перечень элементов.
+    """Очистить спецификацию.
 
-    Удалить всё содержимое из таблицы перечня элементов, оставив только
+    Удалить всё содержимое из таблицы спецификации, оставив только
     заголовок и одну пустую строку.
 
     """
@@ -288,7 +288,7 @@ def clean(*args, force=False):
     table = doc.createInstance("com.sun.star.text.TextTable")
     table.initialize(2, 4)
     text.insertTextContent(text.getEnd(), table, False)
-    table.setName("Перечень_элементов")
+    table.setName("Спецификация")
     table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
     table.Width = 18500
     table.LeftMargin = 2000
@@ -355,22 +355,22 @@ def clean(*args, force=False):
     doc.unlockControllers()
 
 def build(*args):
-    """Построить перечень элементов.
+    """Построить спецификацию.
 
-    Построить перечень элементов на основе данных из файла списка цепей.
+    Построить спецификацию на основе данных из файла списка цепей.
 
     """
     if common.isThreadWorking():
         return
-    indexBuilder = IndexBuildingThread()
-    indexBuilder.start()
+    specBuilder = SpecBuildingThread()
+    specBuilder.start()
 
 def toggleRevTable(*args):
     """Добавить/удалить таблицу регистрации изменений"""
     if common.isThreadWorking():
         return
     doc = XSCRIPTCONTEXT.getDocument()
-    config.set("index", "append rev table", "no")
+    config.set("spec", "append rev table", "no")
     config.save()
     if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
         common.removeRevTable()

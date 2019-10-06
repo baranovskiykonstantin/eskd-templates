@@ -14,7 +14,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
     def __init__(self,):
         doc = XSCRIPTCONTEXT.getDocument()
         self.prevFirstPageStyleName = doc.getText().createTextCursor().PageDescName
-        self.prevTableRowCount = doc.getTextTables().getByName("Перечень_элементов").getRows().getCount()
+        self.prevTableRowCount = doc.getTextTables().getByName("Спецификация").getRows().getCount()
         self.prevPageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
 
     def modified(self, event):
@@ -27,8 +27,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.removeModifyListener(self)
 
         firstPageStyleName = doc.getText().createTextCursor().PageDescName
-        if firstPageStyleName and doc.getTextTables().hasByName("Перечень_элементов"):
-            table = doc.getTextTables().getByName("Перечень_элементов")
+        if firstPageStyleName and doc.getTextTables().hasByName("Спецификация"):
+            table = doc.getTextTables().getByName("Спецификация")
             tableRowCount = table.getRows().getCount()
             if firstPageStyleName != self.prevFirstPageStyleName \
                 or tableRowCount != self.prevTableRowCount:
@@ -39,13 +39,13 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         # обрамление последней строки листа совпадало с верхней линией
                         # основной надписи.
                         # Данное действие выполняется только при редактировании таблицы
-                        # перечня вручную.
-                        # При автоматическом построении перечня высота строк и таблица
+                        # спецификации вручную.
+                        # При автоматическом построении специф. высота строк и таблица
                         # регистрации изменений обрабатываются отдельным образом
-                        # (см. index.py).
+                        # (см. spec.py).
                         doc.lockControllers()
                         for rowIndex in range(1, tableRowCount):
-                            table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+                            table.getRows().getByIndex(rowIndex).Height = common.getSpecRowHeight(rowIndex)
                         doc.unlockControllers()
 
                         # Автоматическое добавление/удаление
@@ -53,10 +53,10 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         pageCount = currentController.PageCount
                         if pageCount != self.prevPageCount:
                             self.prevPageCount = pageCount
-                            if config.getboolean("index", "append rev table"):
+                            if config.getboolean("spec", "append rev table"):
                                 if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
                                     pageCount -= 1
-                                if pageCount > config.getint("index", "pages rev table"):
+                                if pageCount > config.getint("spec", "pages rev table"):
                                     if common.appendRevTable():
                                         self.prevPageCount += 1
                                 else:
@@ -159,7 +159,7 @@ def importEmbeddedModules(*args):
             if result == yes:
                 return importEmbeddedModules()
             return False
-    sys.path.append(uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL) + "/Scripts/python/index/pythonpath/")
+    sys.path.append(uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL) + "/Scripts/python/spec/pythonpath/")
     global common
     import common
     common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
@@ -245,12 +245,12 @@ def init(*args):
                 )
         layoutManager = doc.getCurrentController().getFrame().LayoutManager
         toolbarPos = layoutManager.getElementPos(
-            "private:resource/toolbar/custom_index"
+            "private:resource/toolbar/custom_spec"
         )
         if toolbarPos.X == 0 and toolbarPos.Y == 0:
             toolbarPos.Y = 2147483647
             layoutManager.dockWindow(
-                "private:resource/toolbar/custom_index",
+                "private:resource/toolbar/custom_spec",
                 uno.Enum("com.sun.star.ui.DockingArea", "DOCKINGAREA_DEFAULT"),
                 toolbarPos
             )

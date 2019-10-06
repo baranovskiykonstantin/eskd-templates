@@ -26,7 +26,7 @@ STAMP_COMMON_FIELDS = (
 def isThreadWorking():
     """Работает ли макрос в отдельном потоке?"""
     for thread in threading.enumerate():
-        if thread.name == "IndexBuildingThread":
+        if thread.name == "SpecBuildingThread":
             return True
     return False
 
@@ -103,7 +103,7 @@ def getSourceFileName():
         не найден или не выбран.
 
     """
-    sourcePath = config.get("index", "source")
+    sourcePath = config.get("spec", "source")
     if os.path.exists(sourcePath):
         return sourcePath
     sourceDir = ""
@@ -118,14 +118,14 @@ def getSourceFileName():
         if sourceName:
             sourcePath = os.path.join(sourceDir, sourceName)
             if os.path.exists(sourcePath):
-                config.set("index", "source", sourcePath)
+                config.set("spec", "source", sourcePath)
                 config.save()
                 return sourcePath
     sourcePath = showFilePicker(
         os.path.join(sourceDir, sourceName)
     )
     if sourcePath is not None:
-        config.set("index", "source", sourcePath)
+        config.set("spec", "source", sourcePath)
         config.save()
         return sourcePath
     return None
@@ -144,7 +144,7 @@ def getSchematicData():
     if sourceFileName is None:
         showMessage(
             "Не удалось получить данные о схеме.",
-            "Перечень элементов"
+            "Спецификация"
         )
         return None
     try:
@@ -191,13 +191,13 @@ def getSchematicData():
             "Не удалось получить данные о схеме.\n\n" \
             "При разборе файла обнаружена ошибка:\n" \
             + str(error),
-            "Перечень элементов"
+            "Спецификация"
         )
     except:
         showMessage(
             "Не удалось получить данные о схеме.\n\n" \
             + traceback.format_exc(),
-            "Перечень элементов"
+            "Спецификация"
         )
     return None
 
@@ -354,8 +354,8 @@ def removeRevTable():
     cursor.setString("")
     return True
 
-def getIndexRowHeight(rowIndex):
-    """Вычислить высоту строки перечня элементов.
+def getSpecRowHeight(rowIndex):
+    """Вычислить высоту строки спецификации.
 
     Высота строк вычисляется так, чтобы нижнее обрамление последней строки
     листа совпадало с верхней линией основной надписи.

@@ -28,7 +28,7 @@ def load():
     fileAccess = ctx.ServiceManager.createInstance(
         "com.sun.star.ucb.SimpleFileAccess"
     )
-    configFileUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/index/settings.ini".format(doc.RuntimeUID)
+    configFileUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/spec/settings.ini".format(doc.RuntimeUID)
     if fileAccess.exists(configFileUrl):
         fileStream = fileAccess.openFileRead(configFileUrl)
         configInput = ctx.ServiceManager.createInstance(
@@ -42,7 +42,7 @@ def load():
     else:
         SETTINGS.read_dict(
             {
-                "index": {
+                "spec": {
                     "source": "",
                     "add units": "yes",
                     "space before units": "no",
@@ -91,7 +91,7 @@ def save():
     fileAccess = serviceManager.createInstance(
         "com.sun.star.ucb.SimpleFileAccess"
     )
-    configPathUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/index/".format(doc.RuntimeUID)
+    configPathUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/spec/".format(doc.RuntimeUID)
     if not fileAccess.exists(configPathUrl):
         fileAccess.createFolder(configPathUrl)
     configFileUrl = configPathUrl + "settings.ini"
