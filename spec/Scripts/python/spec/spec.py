@@ -286,16 +286,19 @@ def clean(*args, force=False):
     )
     # Таблица
     table = doc.createInstance("com.sun.star.text.TextTable")
-    table.initialize(2, 4)
+    table.initialize(2, 7)
     text.insertTextContent(text.getEnd(), table, False)
     table.setName("Спецификация")
     table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
     table.Width = 18500
     table.LeftMargin = 2000
     columnSeparators = table.TableColumnSeparators
-    columnSeparators[0].Position = 1081  # int((20)/185*10000)
-    columnSeparators[1].Position = 7027  # int((20+110)/185*10000)
-    columnSeparators[2].Position = 7567  # int((20+110+10)/185*10000)
+    columnSeparators[0].Position = 324   # int((6)/185*10000)
+    columnSeparators[1].Position = 648   # int((6+6)/185*10000)
+    columnSeparators[2].Position = 1081  # int((6+6+8)/185*10000)
+    columnSeparators[3].Position = 4864  # int((6+6+8+70)/185*10000)
+    columnSeparators[4].Position = 8270  # int((6+6+8+70+63)/185*10000)
+    columnSeparators[5].Position = 8810  # int((6+6+8+70+63+10)/185*10000)
     table.TableColumnSeparators = columnSeparators
     # Обрамление
     border = table.TableBorder
@@ -315,15 +318,19 @@ def clean(*args, force=False):
     table.getRows().getByIndex(0).Height = 1500
     table.getRows().getByIndex(0).IsAutoHeight = False
     headerNames = (
-        ("A1", "Поз.\nобозна-\nчение"),
-        ("B1", "Наименование"),
-        ("C1", "Кол."),
-        ("D1", "Примечание")
+        ("A1", "Формат", 900),
+        ("B1", "Зона", 900),
+        ("C1", "Поз.", 900),
+        ("D1", "Обозначение", 0),
+        ("E1", "Наименование", 0),
+        ("F1", "Кол.", 900),
+        ("G1", "Приме-\nчание", 0)
     )
-    for cellName, headerName in headerNames:
+    for cellName, headerName, cellOrient in headerNames:
         cell = table.getCellByName(cellName)
         cellCursor = cell.createTextCursor()
         cellCursor.ParaStyleName = "Заголовок графы таблицы"
+        cellCursor.CharRotation = cellOrient
         cell.TopBorderDistance = 0
         cell.BottomBorderDistance = 0
         cell.LeftBorderDistance = 50
@@ -336,10 +343,13 @@ def clean(*args, force=False):
     table.getRows().getByIndex(1).Height = 800
     table.getRows().getByIndex(1).IsAutoHeight = False
     cellStyles = (
-        ("A2", "Поз. обозначение"),
-        ("B2", "Наименование"),
-        ("C2", "Кол."),
-        ("D2", "Примечание")
+        ("A2", "Формат"),
+        ("B2", "Зона"),
+        ("C2", "Поз."),
+        ("D2", "Обозначение"),
+        ("E2", "Наименование"),
+        ("F2", "Кол."),
+        ("G2", "Примечание")
     )
     for cellName, cellStyle in cellStyles:
         cell = table.getCellByName(cellName)
