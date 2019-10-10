@@ -172,53 +172,13 @@ def setSettings(*args):
     editControlModel00.Text = config.get("spec", "source")
     pageModel0.insertByName("EditControl00", editControlModel00)
 
-    editControlModel01 = pageModel0.createInstance(
-        "com.sun.star.awt.UnoControlNumericFieldModel"
-    )
-    editControlModel01.Width = 50
-    editControlModel01.Height = editControlHeight
-    editControlModel01.PositionX = 0
-    editControlModel01.PositionY = editControlModel00.PositionY + editControlModel00.Height
-    editControlModel01.Name = "EditControl01"
-    editControlModel01.Value = config.getint("spec", "empty rows between diff ref")
-    editControlModel01.ValueMin = 0
-    editControlModel01.ValueMax = 99
-    editControlModel01.ValueStep = 1
-    editControlModel01.Spin = True
-    editControlModel01.DecimalAccuracy = 0
-    pageModel0.insertByName("EditControl01", editControlModel01)
-
-    labelModel01 = pageModel0.createInstance(
-        "com.sun.star.awt.UnoControlFixedTextModel"
-    )
-    labelModel01.PositionX = editControlModel01.PositionX + editControlModel01.Width
-    labelModel01.PositionY = editControlModel01.PositionY
-    labelModel01.Width = tabsModel.Width - labelModel01.PositionX
-    labelModel01.Height = editControlModel01.Height
-    labelModel01.VerticalAlign = uno.Enum(
-        "com.sun.star.style.VerticalAlignment",
-        "MIDDLE"
-    )
-    labelModel01.Name = "Label01"
-    labelModel01.Label = " пустых строк между компонентами с разными обозначениями"
-    labelModel01.HelpText = """\
-Указанное количество пустых строк будет
-вставлено между компонентами, которые
-отличаются буквенной частью обозначения.
-Но, если компоненты имеют одинаковый тип
-и установлен параметр
-"Объединить однотипные группы",
-то пустые строки между ними вставлены
-не будут."""
-    pageModel0.insertByName("Label01", labelModel01)
-
     editControlModel02 = pageModel0.createInstance(
         "com.sun.star.awt.UnoControlNumericFieldModel"
     )
-    editControlModel02.Width = editControlModel01.Width
-    editControlModel02.Height = editControlModel01.Height
-    editControlModel02.PositionX = editControlModel01.PositionX
-    editControlModel02.PositionY = editControlModel01.PositionY + editControlModel01.Height
+    editControlModel02.Width = 50
+    editControlModel02.Height = editControlHeight
+    editControlModel02.PositionX = 0
+    editControlModel02.PositionY = editControlModel00.PositionY + editControlModel00.Height
     editControlModel02.Name = "EditControl02"
     editControlModel02.Value = config.getint("spec", "empty rows between diff type")
     editControlModel02.ValueMin = 0
@@ -243,9 +203,8 @@ def setSettings(*args):
     labelModel02.Label = " пустых строк между компонентами разного типа"
     labelModel02.HelpText = """\
 Указанное количество пустых строк будет
-вставлено между компонентами, у которых
-совпадает буквенная часть обозначения,
-но отличается тип."""
+вставлено между компонентами различного
+типа в разделе "Прочие изделия"."""
     pageModel0.insertByName("Label02", labelModel02)
 
     editControlModel03 = pageModel0.createInstance(
@@ -333,16 +292,17 @@ def setSettings(*args):
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
     checkModel02.State = \
-        {False: 0, True: 1}[config.getboolean("spec", "concatenate same name groups")]
-    checkModel02.Label = "Объединить однотипные группы"
+        {False: 0, True: 1}[config.getboolean("spec", "separate group for each doc")]
+    checkModel02.Label = "Формировать отдельную группу для каждого документа"
     checkModel02.HelpText = """\
-По умолчанию, группой считается
-совокупность компонентов с одинаковой
-буквенной частью обозначения.
-Если отмечено, то идущие подряд компоненты
-с одинаковым типом будут объединены в одну
-группу, даже если буквенная часть их
-обозначений отличается."""
+По умолчанию, группы компонентов
+формируются по их типу, например:
+"Резисторы", "Конденсаторы" и т.д.
+Если отмечено, то группы компонентов
+будут разбиваться ещё и по документу,
+например:
+"Резисторы ГОСТ...", "Резисторы ТУ..."
+и т.д."""
     pageModel0.insertByName("CheckBox02", checkModel02)
 
     checkModel03 = pageModel0.createInstance(
@@ -487,6 +447,178 @@ def setSettings(*args):
     pageModel0.insertByName("CheckBox08", checkModel08)
 
     # ------------------------------------------------------------------------
+    # Sections Tab Model
+    # ------------------------------------------------------------------------
+
+    pageModel3 = tabsModel.createInstance(
+        "com.sun.star.awt.UnoPageModel"
+    )
+    tabsModel.insertByName("Page3", pageModel3)
+    pageModel3.Title = " Разделы "
+
+    checkModel30 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel30.PositionX = 5
+    checkModel30.PositionY = 5
+    checkModel30.Width = tabsModel.Width - 10
+    checkModel30.Height = 15
+    checkModel30.Name = "CheckBox30"
+    checkModel30.State = {False: 0, True: 1}[
+        config.getboolean("sections", "documentation")
+    ]
+    checkModel30.Label = "Документация"
+    checkModel30.HelpText = """\
+Если отмечено, то при формировании
+спецификации будет создан раздел
+"Документация"."""
+    pageModel3.insertByName("CheckBox30", checkModel30)
+
+    checkModel31 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel31.PositionX = checkModel30.PositionX + 10
+    checkModel31.PositionY = checkModel30.PositionY + checkModel30.Height
+    checkModel31.Width = checkModel30.Width
+    checkModel31.Height = checkModel30.Height
+    checkModel31.Name = "CheckBox31"
+    checkModel31.State = {False: 0, True: 1}[
+        config.getboolean("sections", "assembly")
+    ]
+    checkModel31.Label = "Сборочный чертёж"
+    checkModel31.HelpText = """\
+Если отмечено, то при формировании
+спецификации в разделе "Документация"
+будет указан сборочный чертёж."""
+    pageModel3.insertByName("CheckBox31", checkModel31)
+
+    checkModel32 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel32.PositionX = checkModel30.PositionX + 10
+    checkModel32.PositionY = checkModel30.PositionY + checkModel30.Height * 2
+    checkModel32.Width = checkModel30.Width
+    checkModel32.Height = checkModel30.Height
+    checkModel32.Name = "CheckBox32"
+    checkModel32.State = {False: 0, True: 1}[
+        config.getboolean("sections", "schematic")
+    ]
+    checkModel32.Label = "Схема электрическая принципиальная"
+    checkModel32.HelpText = """\
+Если отмечено, то при формировании
+спецификации в разделе "Документация"
+будет указана принципиальная схема."""
+    pageModel3.insertByName("CheckBox32", checkModel32)
+
+    checkModel33 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel33.PositionX = checkModel30.PositionX + 10
+    checkModel33.PositionY = checkModel30.PositionY + checkModel30.Height * 3
+    checkModel33.Width = checkModel30.Width
+    checkModel33.Height = checkModel30.Height
+    checkModel33.Name = "CheckBox33"
+    checkModel33.State = {False: 0, True: 1}[
+        config.getboolean("sections", "index")
+    ]
+    checkModel33.Label = "Перечень элементов"
+    checkModel33.HelpText = """\
+Если отмечено, то при формировании
+спецификации в разделе "Документация"
+будет указан перечень элементов."""
+    pageModel3.insertByName("CheckBox33", checkModel33)
+
+    checkModel34 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel34.PositionX = checkModel30.PositionX
+    checkModel34.PositionY = checkModel30.PositionY + checkModel30.Height * 4
+    checkModel34.Width = checkModel30.Width
+    checkModel34.Height = checkModel30.Height
+    checkModel34.Name = "CheckBox34"
+    checkModel34.State = {False: 0, True: 1}[
+        config.getboolean("sections", "details")
+    ]
+    checkModel34.Label = "Детали"
+    checkModel34.HelpText = """\
+Если отмечено, то при формировании
+спецификации будет создан раздел
+"Детали"."""
+    pageModel3.insertByName("CheckBox34", checkModel34)
+
+    checkModel35 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel35.PositionX = checkModel30.PositionX + 10
+    checkModel35.PositionY = checkModel30.PositionY + checkModel30.Height * 5
+    checkModel35.Width = checkModel30.Width
+    checkModel35.Height = checkModel30.Height
+    checkModel35.Name = "CheckBox35"
+    checkModel35.State = {False: 0, True: 1}[
+        config.getboolean("sections", "pcb")
+    ]
+    checkModel35.Label = "Плата печатная"
+    checkModel35.HelpText = """\
+Если отмечено, то при формировании
+спецификации в разделе "Детали"
+будет указана печатная плата."""
+    pageModel3.insertByName("CheckBox35", checkModel35)
+
+    checkModel36 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel36.PositionX = checkModel30.PositionX
+    checkModel36.PositionY = checkModel30.PositionY + checkModel30.Height * 6
+    checkModel36.Width = checkModel30.Width
+    checkModel36.Height = checkModel30.Height
+    checkModel36.Name = "CheckBox36"
+    checkModel36.State = {False: 0, True: 1}[
+        config.getboolean("sections", "standard parts")
+    ]
+    checkModel36.Label = "Стандартные изделия"
+    checkModel36.HelpText = """\
+Если отмечено, то при формировании
+спецификации будет создан раздел
+"Стандартные изделия"."""
+    pageModel3.insertByName("CheckBox36", checkModel36)
+
+    checkModel37 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel37.PositionX = checkModel30.PositionX
+    checkModel37.PositionY = checkModel30.PositionY + checkModel30.Height * 7
+    checkModel37.Width = checkModel30.Width
+    checkModel37.Height = checkModel30.Height
+    checkModel37.Name = "CheckBox37"
+    checkModel37.State = {False: 0, True: 1}[
+        config.getboolean("sections", "other parts")
+    ]
+    checkModel37.Label = "Прочие изделия"
+    checkModel37.HelpText = """\
+Если отмечено, то при формировании
+спецификации будет создан раздел
+"Прочие изделия"."""
+    pageModel3.insertByName("CheckBox37", checkModel37)
+
+    checkModel38 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel38.PositionX = checkModel30.PositionX
+    checkModel38.PositionY = checkModel30.PositionY + checkModel30.Height * 8
+    checkModel38.Width = checkModel30.Width
+    checkModel38.Height = checkModel30.Height
+    checkModel38.Name = "CheckBox38"
+    checkModel38.State = {False: 0, True: 1}[
+        config.getboolean("sections", "materials")
+    ]
+    checkModel38.Label = "Материалы"
+    checkModel38.HelpText = """\
+Если отмечено, то при формировании
+спецификации будет создан раздел
+"Материалы"."""
+    pageModel3.insertByName("CheckBox38", checkModel38)
+
+    # ------------------------------------------------------------------------
     # Fields Tab Model
     # ------------------------------------------------------------------------
 
@@ -615,38 +747,6 @@ def setSettings(*args):
     editControlModel13.Name = "EditControl13"
     editControlModel13.Text = config.get("fields", "comment")
     pageModel1.insertByName("EditControl13", editControlModel13)
-
-    labelModel14 = pageModel1.createInstance(
-        "com.sun.star.awt.UnoControlFixedTextModel"
-    )
-    labelModel14.PositionX = 0
-    labelModel14.PositionY = labelModel10.Height * 4
-    labelModel14.Width = labelModel10.Width
-    labelModel14.Height = labelModel10.Height
-    labelModel14.VerticalAlign = uno.Enum(
-        "com.sun.star.style.VerticalAlignment",
-        "MIDDLE"
-    )
-    labelModel14.Name = "Label14"
-    labelModel14.Label = "Подбирают при регулировании:"
-    labelModel14.HelpText = """\
-Если компонент содержит
-поле с указанным именем,
-то возле его обозначения
-в спецификации, будет
-указан символ "*"."""
-    pageModel1.insertByName("Label14", labelModel14)
-
-    editControlModel14 = pageModel1.createInstance(
-        "com.sun.star.awt.UnoControlEditModel"
-    )
-    editControlModel14.Width = tabsModel.Width - labelModel14.Width - 3
-    editControlModel14.Height = labelModel14.Height
-    editControlModel14.PositionX = labelModel14.Width
-    editControlModel14.PositionY = labelModel14.PositionY
-    editControlModel14.Name = "EditControl14"
-    editControlModel14.Text = config.get("fields", "adjustable")
-    pageModel1.insertByName("EditControl14", editControlModel14)
 
     buttonModel10 = pageModel1.createInstance(
         "com.sun.star.awt.UnoControlButtonModel"
@@ -807,6 +907,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         page0 = self.dialog.getControl("Tabs").getControl("Page0")
         page1 = self.dialog.getControl("Tabs").getControl("Page1")
         page2 = self.dialog.getControl("Tabs").getControl("Page2")
+        page3 = self.dialog.getControl("Tabs").getControl("Page3")
 
         # --------------------------------------------------------------------
         # Оптимальный вид
@@ -822,9 +923,6 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("spec", "source",
             page0.getControl("EditControl00").getText()
         )
-        config.set("spec", "empty rows between diff ref",
-            str(int(page0.getControl("EditControl01").getValue()))
-        )
         config.set("spec", "empty rows between diff type",
             str(int(page0.getControl("EditControl02").getValue()))
         )
@@ -837,7 +935,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("spec", "space before units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox01").getState()]
         )
-        config.set("spec", "concatenate same name groups",
+        config.set("spec", "separate group for each doc",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox02").getState()]
         )
         config.set("spec", "title with doc",
@@ -863,6 +961,38 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
 
         # --------------------------------------------------------------------
+        # Разделы
+        # --------------------------------------------------------------------
+
+        config.set("sections", "documentation",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox30").getState()]
+        )
+        config.set("sections", "assembly",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox31").getState()]
+        )
+        config.set("sections", "schematic",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox32").getState()]
+        )
+        config.set("sections", "index",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox33").getState()]
+        )
+        config.set("sections", "details",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox34").getState()]
+        )
+        config.set("sections", "pcb",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox35").getState()]
+        )
+        config.set("sections", "standard parts",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox36").getState()]
+        )
+        config.set("sections", "other parts",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox37").getState()]
+        )
+        config.set("sections", "materials",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox38").getState()]
+        )
+
+        # --------------------------------------------------------------------
         # Поля
         # --------------------------------------------------------------------
 
@@ -877,9 +1007,6 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("fields", "comment",
             page1.getControl("EditControl13").getText()
-        )
-        config.set("fields", "adjustable",
-            page1.getControl("EditControl14").getText()
         )
         config.set("settings", "compatibility mode",
             {0: "no", 1: "yes"}[page1.getControl("CheckBox10").getState()]
