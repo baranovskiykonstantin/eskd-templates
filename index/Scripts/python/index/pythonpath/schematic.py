@@ -566,6 +566,13 @@ class CompGroup():
         # Сформировать наименование
         if not nameDocList:
             return [currentType]
+        firstDoc = nameDocList[0][-1]
+        for name, doc in nameDocList:
+            if doc != firstDoc:
+                break
+        else:
+            # У всех компонентов один документ
+            return [currentType + ' ' + firstDoc]
         groupNames = []
         nameDocList.sort(key=lambda nameDoc: nameDoc[0])
         for nameDoc in nameDocList:
