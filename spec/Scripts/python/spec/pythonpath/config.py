@@ -49,6 +49,7 @@ def load():
                     "separate group for each doc": "no",
                     "title with doc": "no",
                     "every group has title": "no",
+                    "reserve position numbers": "no",
                     "empty row after group title": "no",
                     "empty rows between diff type": 1,
                     "prohibit titles at bottom": "no",

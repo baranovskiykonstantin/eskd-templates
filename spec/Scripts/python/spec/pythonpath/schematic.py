@@ -9,6 +9,27 @@ REF_REGEXP = re.compile(r"([^0-9?]+)([0-9]+)")
 class Component():
     """Данные о компоненте схемы."""
 
+    multipliersDict = {
+        'G': 'Г',
+        'M': 'М',
+        'k': 'к',
+        'm': 'м',
+        'μ': 'мк',
+        'u': 'мк',
+        'U': 'мк',
+        'n': 'н',
+        'p': 'п'
+    }
+    multipliers = set(list(multipliersDict.keys()) + list(multipliersDict.values()))
+    # 2u7, 2н7, 4m7, 5k1 ...
+    regexpr1 = re.compile(
+        r"^(\d+)({})(\d+)$".format('|'.join(multipliers))
+    )
+    # 2.7 u, 2700p, 4.7 m, 470u, 5.1 k, 510 ...
+    regexpr2 = re.compile(
+        r"^(\d+(?:[\.,]\d+)?)\s*({})?$".format('|'.join(multipliers))
+    )
+
     def __init__(self, schematic):
         self.schematic = schematic
         self.reference = ""
@@ -83,32 +104,12 @@ class Component():
             2u7 -> 2,7 мкФ
 
         """
-        multipliersDict = {
-            'G': 'Г',
-            'M': 'М',
-            'k': 'к',
-            'm': 'м',
-            'μ': 'мк',
-            'u': 'мк',
-            'U': 'мк',
-            'n': 'н',
-            'p': 'п'
-        }
         numValue = ""
         separator = ""
         if config.getboolean("spec", "space before units"):
             separator = ' '
         multiplier = ""
         units = ""
-        multipliers = set(list(multipliersDict.keys()) + list(multipliersDict.values()))
-        # 2u7, 2н7, 4m7, 5k1 ...
-        regexpr1 = re.compile(
-            r"^(\d+)({})(\d+)$".format('|'.join(multipliers))
-        )
-        # 2.7 u, 2700p, 4.7 m, 470u, 5.1 k, 510 ...
-        regexpr2 = re.compile(
-            r"^(\d+(?:[\.,]\d+)?)\s*({})?$".format('|'.join(multipliers))
-        )
         if self.getRefType().startswith('C') \
             and not self.value.endswith('Ф'):
                 units = 'Ф'
@@ -121,12 +122,12 @@ class Component():
                 else:
                     numValue = self.value.rstrip('F')
                     numValue = numValue.strip()
-                    if re.match(regexpr1, numValue):
-                        searchRes = re.search(regexpr1, numValue).groups()
+                    if re.match(Component.regexpr1, numValue):
+                        searchRes = re.search(Component.regexpr1, numValue).groups()
                         numValue = "{},{}".format(searchRes[0], searchRes[2])
                         multiplier = searchRes[1]
-                    elif re.match(regexpr2, numValue):
-                        searchRes = re.search(regexpr2, numValue).groups()
+                    elif re.match(Component.regexpr2, numValue):
+                        searchRes = re.search(Component.regexpr2, numValue).groups()
                         numValue = searchRes[0]
                         multiplier = searchRes[1]
                     else:
@@ -136,12 +137,12 @@ class Component():
                 units = "Гн"
                 numValue = self.value.rstrip('H')
                 numValue = numValue.strip()
-                if re.match(regexpr1, numValue):
-                    searchRes = re.search(regexpr1, numValue).groups()
+                if re.match(Component.regexpr1, numValue):
+                    searchRes = re.search(Component.regexpr1, numValue).groups()
                     numValue = "{},{}".format(searchRes[0], searchRes[2])
                     multiplier = searchRes[1]
-                elif re.match(regexpr2, numValue):
-                    searchRes = re.search(regexpr2, numValue).groups()
+                elif re.match(Component.regexpr2, numValue):
+                    searchRes = re.search(Component.regexpr2, numValue).groups()
                     numValue = searchRes[0]
                     if searchRes[1] is None:
                         multiplier = "мк"
@@ -160,12 +161,12 @@ class Component():
                     numValue = numValue.replace('R', "0,")
                 elif re.match(r"\d+R\d+", numValue):
                     numValue = numValue.replace('R', ',')
-                elif re.match(regexpr1, numValue):
-                    searchRes = re.search(regexpr1, numValue).groups()
+                elif re.match(Component.regexpr1, numValue):
+                    searchRes = re.search(Component.regexpr1, numValue).groups()
                     numValue = "{},{}".format(searchRes[0], searchRes[2])
                     multiplier = searchRes[1]
-                elif re.match(regexpr2, numValue):
-                    searchRes = re.search(regexpr2, numValue).groups()
+                elif re.match(Component.regexpr2, numValue):
+                    searchRes = re.search(Component.regexpr2, numValue).groups()
                     numValue = searchRes[0]
                     if searchRes[1] is not None:
                         multiplier = searchRes[1]
@@ -173,8 +174,8 @@ class Component():
                     numValue = ""
         if numValue:
             # Перевести множитель на русский
-            if multiplier in multipliersDict:
-                multiplier = multipliersDict[multiplier]
+            if multiplier in Component.multipliersDict:
+                multiplier = Component.multipliersDict[multiplier]
             numValue = numValue.replace('.', ',')
             return numValue + separator + multiplier + units
         return self.value
@@ -326,13 +327,111 @@ class Component():
             value = ""
         return value
 
+    def getExpandedValue(self):
+        """Вернуть значение без множителя.
+
+        Если компонент имеет значение физического характера (сопротивление,
+        ёмкость, индуктивность), то будет возвращено абсолютное значение с
+        учётом указанного множителя, например:
+        1к5 => 1500
+        0u33 => 0.00000033
+        120 => 120
+        и т.п.
+
+        Возвращаемое значение (float) -- абсолютное значение.
+
+        """
+        extValue = float("inf")
+        multiplierValues = {
+            'G': 1e9,
+            'Г': 1e9,
+            'M': 1e6,
+            'М': 1e6,
+            'k': 1e3,
+            'к': 1e3,
+            'm': 1e-3,
+            'м': 1e-3,
+            'μ': 1e-6,
+            'u': 1e-6,
+            'U': 1e-6,
+            'мк': 1e-6,
+            'n': 1e-9,
+            'н': 1e-9,
+            'p': 1e-12,
+            'п': 1e-12
+        }
+        if self.getRefType().startswith('C'):
+            value = self.value
+            value = value.rstrip('F')
+            value = value.rstrip('Ф')
+            value = value.strip()
+            if re.match(r"^\d+$", value):
+                extValue = float(value) * 1e-12
+            elif re.match(r"^\d+[\.,]\d+$", value):
+                extValue = float(value.replace(',', '.')) * 1e-6
+            elif re.match(Component.regexpr1, value):
+                searchRes = re.search(Component.regexpr1, value).groups()
+                numValue = "{}.{}".format(searchRes[0], searchRes[2])
+                multiplier = multiplierValues[searchRes[1]]
+                extValue = float(numValue) * multiplier
+            elif re.match(Component.regexpr2, value):
+                searchRes = re.search(Component.regexpr2, value).groups()
+                numValue = searchRes[0]
+                multiplier = multiplierValues[searchRes[1]]
+                extValue = float(numValue.replace(',', '.')) * multiplier
+        elif self.getRefType().startswith('L'):
+            value = self.value
+            value = value.rstrip('H')
+            value = value.replace("Гн", "")
+            value = value.strip()
+            if re.match(r"^\d+[\.,]\d+$", value):
+                extValue = float(value.replace(',', '.')) * 1e-6
+            elif re.match(Component.regexpr1, value):
+                searchRes = re.search(Component.regexpr1, value).groups()
+                numValue = "{}.{}".format(searchRes[0], searchRes[2])
+                multiplier = multiplierValues[searchRes[1]]
+                extValue = float(numValue) * multiplier
+            elif re.match(Component.regexpr2, value):
+                searchRes = re.search(Component.regexpr2, value).groups()
+                numValue = searchRes[0]
+                multiplier = multiplierValues[searchRes[1]]
+                extValue = float(numValue.replace(',', '.')) * multiplier
+        elif self.getRefType().startswith('R'):
+            value = self.value
+            value = value.rstrip('Ω')
+            value = value.replace("Ом", "")
+            value = value.replace("ohm", "")
+            value = value.replace("Ohm", "")
+            value = value.strip()
+            if re.match(r"R\d+", value):
+                numValue = value.replace('R', "0.")
+                extValue = float(numValue)
+            elif re.match(r"\d+R\d+", value):
+                numValue = value.replace('R', ".")
+                extValue = float(numValue)
+            elif re.match(Component.regexpr1, value):
+                searchRes = re.search(Component.regexpr1, value).groups()
+                numValue = "{}.{}".format(searchRes[0], searchRes[2])
+                multiplier = multiplierValues[searchRes[1]]
+                extValue = float(numValue) * multiplier
+            elif re.match(Component.regexpr2, value):
+                searchRes = re.search(Component.regexpr2, value).groups()
+                numValue = searchRes[0]
+                if searchRes[1] is not None:
+                    multiplier = multiplierValues[searchRes[1]]
+                else:
+                    multiplier = 1
+                extValue = float(numValue.replace(',', '.')) * multiplier
+
+        return extValue
+
 
 class CompRange(Component):
     """Множество компонентов с одинаковыми параметрами.
 
-    Этот класс описывает множество компонентов спецификации
-    элементов, которые имеют одинаковые тип, наименование, документ,
-    примечание, буквенную часть обозначения и следуют последовательно.
+    Этот класс описывает множество компонентов спецификации, которые
+    имеют одинаковые тип, наименование, документ и примечание
+    (отличаются только обозначением).
 
     """
 
@@ -370,8 +469,7 @@ class CompRange(Component):
         if not self._refRange:
             self.__init__(self.schematic, comp)
             return True
-        if self.getRefType() == comp.getRefType() \
-            and self.getSpecValue("type") == comp.getSpecValue("type") \
+        if self.getSpecValue("type") == comp.getSpecValue("type") \
             and self.getSpecValue("name") == comp.getSpecValue("name") \
             and self.getSpecValue("doc") == comp.getSpecValue("doc") \
             and self.getSpecValue("comment") == comp.getSpecValue("comment"):
@@ -382,19 +480,13 @@ class CompRange(Component):
     def getRefRangeString(self):
         """Вернуть перечень обозначений множества одинаковых компонентов."""
         refStr = ""
-        adjustable = False
-        adjustableField = config.get("fields", "adjustable")
-        if self.getFieldValue(adjustableField) is not None:
-            adjustable = True
         if len(self._refRange) > 1:
-            # "VD1, VD2", "C8-C11", "R7, R9-R14", "C8*-C11*" ...
+            # "VD1, VD2", "C8-C11", "R7, R9-R14" ...
             prevType = self.getRefType(self._refRange[0])
             prevNumber = self.getRefNumber(self._refRange[0])
             counter = 0
             separator = ", "
             refStr = prevType + str(prevNumber)
-            if adjustable:
-                refStr += '*'
             for nextRef in self._refRange[1:]:
                 currentType = self.getRefType(nextRef)
                 currentNumber = self.getRefNumber(nextRef)
@@ -408,39 +500,25 @@ class CompRange(Component):
                 else:
                     if counter > 0:
                         refStr += separator + prevType + str(prevNumber)
-                        if adjustable:
-                            refStr += '*'
                     separator = ', '
                     refStr += separator + currentType + str(currentNumber)
-                    if adjustable:
-                        refStr += '*'
                     prevType = currentType
                     prevNumber = currentNumber
                     counter = 0
             if counter > 0:
                 refStr += separator + prevType + str(prevNumber)
-                if adjustable:
-                    refStr += '*'
         else:
             # "R5"; "VT13" ...
             refStr = self.reference
-            if adjustable:
-                refStr += '*'
         return refStr
 
 
 class CompGroup():
     """Группа компонентов.
 
-    Группой считается множество CompRange, которые имеют однотипные
-    обозначения (например: R, C, DA и т.д.) и имеют одинаковый "Тип".
-
-    Если установлен параметр "concatenate same name groups", то
-    группы, идущие подряд и имеющие одинаковое наименование типа, но
-    отличающиеся обозначением - будут объединены. Например, компоненты типа
-    "Разъём (Разъёмы)", но с обозначениями "XP..." и "XS...", по умолчанию
-    формируют две отдельные группы с одинаковым заголовком. Но, с помощью выше
-    указанного параметра, эти группы могут быть объединены в одну.
+    Группой считается множество CompRange, которые имеют одинаковый тип.
+    Если установлен параметр "separate group for each doc", то компоненты
+    будут разбиваться на группы не только по типу, но и по документу.
 
     """
 
@@ -460,6 +538,9 @@ class CompGroup():
     def __len__(self):
         return len(self._compRanges)
 
+    def sort(self, key=None):
+        self._compRanges.sort(key=key)
+
     def append(self, compRange):
         """Добавить множество компонентов в группу.
 
@@ -474,10 +555,12 @@ class CompGroup():
         if not self._compRanges:
             self._compRanges.append(compRange)
             return True
-        skipRefType = config.getboolean("spec", "concatenate same name groups")
-        lastCompRange = self._compRanges[-1]
-        if (lastCompRange.getRefType() == compRange.getRefType() or skipRefType) \
-            and lastCompRange.getSpecValue("type") == compRange.getSpecValue("type"):
+        if self._compRanges[-1].getSpecValue("type") == compRange.getSpecValue("type"):
+            if config.getboolean("spec", "separate group for each doc"):
+                if self._compRanges[-1].getSpecValue("doc") == compRange.getSpecValue("doc"):
+                    self._compRanges.append(compRange)
+                    return True
+            else:
                 self._compRanges.append(compRange)
                 return True
         return False
@@ -566,6 +649,13 @@ class CompGroup():
         # Сформировать наименование
         if not nameDocList:
             return [currentType]
+        firstDoc = nameDocList[0][-1]
+        for name, doc in nameDocList:
+            if doc != firstDoc:
+                break
+        else:
+            # У всех компонентов один документ
+            return [currentType + ' ' + firstDoc]
         groupNames = []
         nameDocList.sort(key=lambda nameDoc: nameDoc[0])
         for nameDoc in nameDocList:
@@ -605,14 +695,14 @@ class Schematic():
                             self.typeNamesDict[singular] = plural
 
     def getGroupedComponents(self):
-        """Вернуть компоненты, сгруппированные по обозначению и типу."""
+        """Вернуть компоненты, сгруппированные по типу."""
         sortedComponents = sorted(
             self.components,
-            key=lambda comp: comp.getRefNumber()
+            key=lambda comp: comp.getSpecValue("name")
         )
         sortedComponents = sorted(
             sortedComponents,
-            key=lambda comp: comp.getRefType()
+            key=lambda comp: comp.getSpecValue("type")
         )
         groups = []
         compGroup = CompGroup(self)
@@ -629,4 +719,14 @@ class Schematic():
                 compGroup = CompGroup(self, compRange)
         if len(compGroup) > 0:
             groups.append(compGroup)
+
+        groups.sort(
+            key=lambda group: group.getTitle()[:1]
+        )
+
+        for index in range(len(groups)):
+            groups[index].sort(
+                key=lambda compRange: compRange.getExpandedValue()
+            )
+
         return groups

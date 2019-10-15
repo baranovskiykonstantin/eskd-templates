@@ -90,27 +90,17 @@ def fill(*args):
     # Наименование документа
     docTitle = schematic.title.replace('\\n', '\n')
     if config.getboolean("stamp", "convert doc title"):
-        titleParts = docTitle.rsplit("Схема электрическая ", 1)
-        schTypes = (
-            "структурная",
-            "функциональная",
-            "принципиальная",
-            "соединений",
-            "подключения",
-            "общая",
-            "расположения"
-        )
-        if len(titleParts) > 1 and titleParts[1] in schTypes:
-            # Оставить только наименование изделия
-            docTitle = titleParts[0]
-            docTitle = docTitle.rstrip('\n .')
+        tailPos = docTitle.find("Схема электрическая")
+        if tailPos > 0:
+            docTitle = docTitle[:tailPos]
+        docTitle = docTitle.strip()
     setFirstPageFrameValue("1 Наименование документа", docTitle)
     # Наименование организации
     setFirstPageFrameValue("9 Наименование организации", schematic.company)
     # Обозначение документа
     docId = schematic.number
     idParts = re.match(
-        r"([А-ЯA-Z0-9]+(?:[\.\-][0-9]+)+\s?)(Э[1-7])",
+        r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
         docId
     )
     if config.getboolean("stamp", "convert doc id") \

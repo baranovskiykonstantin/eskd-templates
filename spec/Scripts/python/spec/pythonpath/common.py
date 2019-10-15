@@ -6,6 +6,7 @@
 """
 
 import os
+import re
 import traceback
 import threading
 import uno
@@ -200,6 +201,64 @@ def getSchematicData():
             "Спецификация"
         )
     return None
+
+def getSchematicInfo():
+    """Считать формат листа и децимальный номер из файла схемы.
+
+    Файл схемы определяется на основе имени выбранного файла списка цепей.
+    Изымаются только данные о формате листа и децимальный номер (комментарий 1).
+
+    Возвращаемое значение -- кортеж с двумя значениями:
+        (формат листа, децимальный номер).
+
+    """
+    try:
+        sourcePath = config.get("spec", "source")
+        schPath = os.path.splitext(sourcePath)[0] + ".sch"
+        size = ""
+        number = ""
+        if os.path.exists(schPath):
+            with open(schPath, encoding="utf-8") as schematic:
+                sizePattern = r"^\$Descr ([^\s]+) \d.*$"
+                numberPattern = r"^Comment1 \"(.*)\"$"
+                for line in schematic:
+                    if re.match(sizePattern, line):
+                        size = re.search(sizePattern, line).group(1)
+                    elif re.match(numberPattern, line):
+                        number = re.search(numberPattern, line).group(1)
+                        break
+        return (size, number)
+    except:
+        return ("", "")
+
+def getPcbInfo():
+    """Считать формат листа и децимальный номер из файла печатной платы.
+
+    Файл схемы определяется на основе имени выбранного файла списка цепей.
+    Изымаются только данные о формате листа и децимальный номер (комментарий 1).
+
+    Возвращаемое значение -- кортеж с двумя значениями:
+        (формат листа, децимальный номер).
+
+    """
+    try:
+        sourcePath = config.get("spec", "source")
+        pcbPath = os.path.splitext(sourcePath)[0] + ".kicad_pcb"
+        size = ""
+        number = ""
+        if os.path.exists(pcbPath):
+            with open(pcbPath, encoding="utf-8") as pcbematic:
+                sizePattern = r"^\s*\(page \"?([^\s\"]+)\"?(?: portrait)?\)$"
+                numberPattern = r"^\s*\(comment 1 \"(.*)\"\)$"
+                for line in pcbematic:
+                    if re.match(sizePattern, line):
+                        size = re.search(sizePattern, line).group(1)
+                    elif re.match(numberPattern, line):
+                        number = re.search(numberPattern, line).group(1)
+                        break
+        return (size, number)
+    except:
+        return ("", "")
 
 def appendRevTable():
     """Добавить таблицу регистрации изменений."""

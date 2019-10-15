@@ -353,11 +353,31 @@ def setSettings(*args):
 если она состоит из одного компонента."""
     pageModel0.insertByName("CheckBox04", checkModel04)
 
+    checkModel09 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel09.PositionX = 5
+    checkModel09.PositionY = checkModel04.PositionY + checkModel00.Height
+    checkModel09.Width = tabsModel.Width - 10
+    checkModel09.Height = checkModel00.Height
+    checkModel09.Name = "CheckBox09"
+    checkModel09.State = \
+        {False: 0, True: 1}[config.getboolean("spec", "reserve position numbers")]
+    checkModel09.Label = "Резервировать номера позиций"
+    checkModel09.HelpText = """\
+По умолчанию, позиции в спецификации
+увеличиваются на единицу.
+Если отмечено, то для пустых строк,
+вставляемых между группами компонентов,
+будут зарезервированы номера позиций.
+"""
+    pageModel0.insertByName("CheckBox09", checkModel09)
+
     checkModel05 = pageModel0.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel05.PositionX = 5
-    checkModel05.PositionY = checkModel04.PositionY + checkModel00.Height
+    checkModel05.PositionY = checkModel09.PositionY + checkModel00.Height
     checkModel05.Width = tabsModel.Width - 10
     checkModel05.Height = checkModel00.Height
     checkModel05.Name = "CheckBox05"
@@ -943,6 +963,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("spec", "every group has title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox04").getState()]
+        )
+        config.set("spec", "reserve position numbers",
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox09").getState()]
         )
         config.set("spec", "empty row after group title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox05").getState()]

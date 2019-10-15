@@ -45,14 +45,14 @@ class IndexBuildingThread(threading.Thread):
 
         def fillRow(values, isTitle=False):
             normValues = list(values)
-            extraRow = ["", "", "", ""]
-            widthFactors = [100, 100, 100, 100]
             colNames = (
                 "Поз. обозначение",
                 "Наименование",
                 "Кол.",
                 "Примечание"
             )
+            widthFactors = [100] * len(values)
+            extraRow = [""] * len(values)
             extremeWidthFactor = config.getint("index", "extreme width factor")
             for index, value in enumerate(values):
                 widthFactors[index] = textwidth.getWidthFactor(
@@ -127,7 +127,7 @@ class IndexBuildingThread(threading.Thread):
                 )
 
             doc.lockControllers()
-            for i in range(4):
+            for i in range(len(values)):
                 cell = table.getCellByPosition(i, lastRow)
                 cellCursor = cell.createTextCursor()
                 if isTitle and i == 1:
@@ -147,8 +147,10 @@ class IndexBuildingThread(threading.Thread):
                     emptyRows = emptyRowsRef
                 else:
                     emptyRows = emptyRowsType
+                doc.lockControllers()
                 for _ in range(emptyRows):
                     nextRow()
+                doc.unlockControllers()
             if len(group) == 1 \
                 and not config.getboolean("index", "every group has title"):
                     compRef = group[0].getRefRangeString()
@@ -192,8 +194,7 @@ class IndexBuildingThread(threading.Thread):
                 )
             prevGroup = group
 
-        lastRow += 1
-        table.getRows().removeByIndex(lastRow, 1)
+        table.getRows().removeByIndex(lastRow, 2)
 
         if config.getboolean("index", "prohibit titles at bottom"):
             firstPageStyleName = doc.getText().createTextCursor().PageDescName
@@ -232,6 +233,7 @@ class IndexBuildingThread(threading.Thread):
                     firstRowCount = 27
             pos = firstRowCount
             while pos < tableRowCount:
+                doc.lockControllers()
                 while True:
                     rowIsEmpty = False
                     for i in range(4):
@@ -243,13 +245,14 @@ class IndexBuildingThread(threading.Thread):
                         rowIsEmpty = True
                     if not rowIsEmpty:
                         break
-                    doc.lockControllers()
                     table.getRows().removeByIndex(pos, 1)
-                    doc.unlockControllers()
                 pos += otherRowCount
+                doc.unlockControllers()
 
+        doc.lockControllers()
         for rowIndex in range(1, table.getRows().getCount()):
             table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+        doc.unlockControllers()
 
         if config.getboolean("index", "append rev table"):
             pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
@@ -324,8 +327,12 @@ def clean(*args, force=False):
         cell = table.getCellByName(cellName)
         cellCursor = cell.createTextCursor()
         cellCursor.ParaStyleName = "Заголовок графы таблицы"
-        cell.TopBorderDistance = 0
-        cell.BottomBorderDistance = 0
+        if cellName == "A1":
+            lineSpacing = uno.createUnoStruct("com.sun.star.style.LineSpacing")
+            lineSpacing.Height = 87
+            cellCursor.ParaLineSpacing = lineSpacing
+        cell.TopBorderDistance = 50
+        cell.BottomBorderDistance = 50
         cell.LeftBorderDistance = 50
         cell.RightBorderDistance = 50
         cell.VertOrient = uno.getConstantByName(
