@@ -519,9 +519,6 @@ class CompGroup():
 
         currentType = self._compRanges[0].getTypePlural()
 
-        if not currentType:
-            return []
-
         if not config.getboolean("index", "title with doc"):
             return [currentType]
 
@@ -572,15 +569,23 @@ class CompGroup():
                 break
         else:
             # У всех компонентов один документ
-            return [currentType + ' ' + firstDoc]
+            title = currentType
+            if title:
+                title += ' '
+            title += firstDoc
+            return [title]
         groupNames = []
         nameDocList.sort(key=lambda nameDoc: nameDoc[0])
         for nameDoc in nameDocList:
             name = currentType
             if nameDoc[0]:
-                name += ' ' + nameDoc[0]
+                if name:
+                    name += ' '
+                name += nameDoc[0]
             if nameDoc[1]:
-                name += ' ' + nameDoc[1]
+                if name:
+                    name += ' '
+                name += nameDoc[1]
             groupNames.append(name)
 
         return groupNames

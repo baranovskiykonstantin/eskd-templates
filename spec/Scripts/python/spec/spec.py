@@ -214,10 +214,11 @@ class SpecBuildingThread(threading.Thread):
                 else:
                     titleLines = group.getTitle()
                     for title in titleLines:
-                        fillRow(
-                            ["", "", "", "", title, "", ""],
-                            isTitle=True
-                        )
+                        if title:
+                            fillRow(
+                                ["", "", "", "", title, "", ""],
+                                isTitle=True
+                            )
                     if config.getboolean("spec", "empty row after group title"):
                         nextRow()
                         if config.getboolean("spec", "reserve position numbers"):

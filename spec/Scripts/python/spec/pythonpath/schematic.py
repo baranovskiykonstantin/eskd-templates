@@ -482,12 +482,20 @@ class CompRange(Component):
         refStr = ""
         if len(self._refRange) > 1:
             # "VD1, VD2", "C8-C11", "R7, R9-R14" ...
-            prevType = self.getRefType(self._refRange[0])
-            prevNumber = self.getRefNumber(self._refRange[0])
+            sortedRanges = sorted(
+                self._refRange,
+                key=lambda ref: self.getRefNumber(ref)
+            )
+            sortedRanges = sorted(
+                sortedRanges,
+                key=lambda ref: self.getRefType(ref)
+            )
+            prevType = self.getRefType(sortedRanges[0])
+            prevNumber = self.getRefNumber(sortedRanges[0])
             counter = 0
             separator = ", "
             refStr = prevType + str(prevNumber)
-            for nextRef in self._refRange[1:]:
+            for nextRef in sortedRanges[1:]:
                 currentType = self.getRefType(nextRef)
                 currentNumber = self.getRefNumber(nextRef)
                 if currentType == prevType \
@@ -555,14 +563,24 @@ class CompGroup():
         if not self._compRanges:
             self._compRanges.append(compRange)
             return True
-        if self._compRanges[-1].getSpecValue("type") == compRange.getSpecValue("type"):
+        lastCompRange = self._compRanges[-1]
+        if lastCompRange.getSpecValue("type") == compRange.getSpecValue("type"):
             if config.getboolean("spec", "separate group for each doc"):
-                if self._compRanges[-1].getSpecValue("doc") == compRange.getSpecValue("doc"):
-                    self._compRanges.append(compRange)
-                    return True
+                if lastCompRange.getSpecValue("doc") == compRange.getSpecValue("doc"):
+                    # Если тип и документ не указаны, формировать группы
+                    # на основе буквенной части обозначения.
+                    if compRange.getSpecValue("type") \
+                        or compRange.getSpecValue("doc") \
+                        or lastCompRange.getRefType() == compRange.getRefType():
+                            self._compRanges.append(compRange)
+                            return True
             else:
-                self._compRanges.append(compRange)
-                return True
+                # Если тип не указан, формировать группы на основе
+                # буквенной части обозначения.
+                if compRange.getSpecValue("type") \
+                    or lastCompRange.getRefType() == compRange.getRefType():
+                        self._compRanges.append(compRange)
+                        return True
         return False
 
     @staticmethod
@@ -601,9 +619,6 @@ class CompGroup():
             return []
 
         currentType = self._compRanges[0].getTypePlural()
-
-        if not currentType:
-            return []
 
         if not config.getboolean("spec", "title with doc"):
             return [currentType]
@@ -655,15 +670,23 @@ class CompGroup():
                 break
         else:
             # У всех компонентов один документ
-            return [currentType + ' ' + firstDoc]
+            title = currentType
+            if title:
+                title += ' '
+            title += firstDoc
+            return [title]
         groupNames = []
         nameDocList.sort(key=lambda nameDoc: nameDoc[0])
         for nameDoc in nameDocList:
             name = currentType
             if nameDoc[0]:
-                name += ' ' + nameDoc[0]
+                if name:
+                    name += ' '
+                name += nameDoc[0]
             if nameDoc[1]:
-                name += ' ' + nameDoc[1]
+                if name:
+                    name += ' '
+                name += nameDoc[1]
             groupNames.append(name)
 
         return groupNames
@@ -704,6 +727,10 @@ class Schematic():
             sortedComponents,
             key=lambda comp: comp.getSpecValue("type")
         )
+        sortedComponents = sorted(
+            sortedComponents,
+            key=lambda comp: "" if comp.getSpecValue("type") else comp.getRefType()
+        ) # Компоненты без типа сортировать оп буквенной части обозначения
         groups = []
         compGroup = CompGroup(self)
         compRange = CompRange(self)
@@ -720,13 +747,20 @@ class Schematic():
         if len(compGroup) > 0:
             groups.append(compGroup)
 
-        groups.sort(
-            key=lambda group: group.getTitle()[:1]
-        )
-
+        # Группы компонентов должны быть отсортированы по буквенной части
+        # обозначений.
+        # Если группы имеют одинаковые буквенные обозначения - сортировать
+        # по наименованию группы (тип или тип+документ).
+        # Внутри группы, элементы перечисляются в порядке возрастания значения.
         for index in range(len(groups)):
             groups[index].sort(
                 key=lambda compRange: compRange.getExpandedValue()
             )
+        groups.sort(
+            key=lambda group: group.getTitle()[:1]
+        )
+        groups.sort(
+            key=lambda group: group[0].getRefType()
+        )
 
         return groups

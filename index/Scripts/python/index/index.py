@@ -129,10 +129,11 @@ class IndexBuildingThread(threading.Thread):
             else:
                 titleLines = group.getTitle()
                 for title in titleLines:
-                    fillRow(
-                        ["", title, "", ""],
-                        isTitle=True
-                    )
+                    if title:
+                        fillRow(
+                            ["", title, "", ""],
+                            isTitle=True
+                        )
                 if config.getboolean("index", "empty row after group title"):
                     nextRow()
                 for compRange in group:
