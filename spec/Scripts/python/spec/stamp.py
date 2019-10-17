@@ -44,7 +44,11 @@ def setFirstPageFrameValue(name, value):
             if name in ("11 Разраб.", "11 Пров.", "11 Н. контр.", "11 Утв."):
                 frame.setString("")
                 cursor = frame.Text.createTextCursor()
-                cursor.CharScaleWidth = textwidth.getWidthFactor("ФИО", value)
+                cursor.CharScaleWidth = textwidth.getWidthFactor(
+                    value,
+                    cursor.CharHeight * 0.9, # см. свойства символов, положение
+                    22
+                )
             frame.setString(value)
 
 def clean(*args):

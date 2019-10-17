@@ -21,6 +21,67 @@ class IndexBuildingThread(threading.Thread):
         self.name = "IndexBuildingThread"
 
     def run(self):
+
+        def nextRow():
+            nonlocal lastRow
+            lastRow += 1
+            table.getRows().insertByIndex(lastRow, 1)
+
+        def getFontSize(col):
+            nonlocal lastRow
+            cell = table.getCellByPosition(col, lastRow)
+            cellCursor = cell.createTextCursor()
+            return cellCursor.CharHeight
+
+        def fillRow(values, isTitle=False):
+            colWidth = [19, 109, 9, 44]
+            extraRow = [""] * len(values)
+            extremeWidthFactor = config.getint("index", "extreme width factor")
+            for col in range(len(values)):
+                if '\n' in values[col]:
+                    text = values[col]
+                    lfPos = text.find('\n')
+                    values[col] = text[:lfPos]
+                    extraRow[col] = text[(lfPos + 1):]
+                widthFactor = textwidth.getWidthFactor(
+                    values[col],
+                    getFontSize(col),
+                    colWidth[col]
+                )
+                if widthFactor < extremeWidthFactor:
+                    text = values[col]
+                    extremePos = int(len(text) * widthFactor / extremeWidthFactor)
+                    # Первая попытка: определить длину не превышающую критическое
+                    # сжатие шрифта.
+                    pos = text.rfind(" ", 0, extremePos)
+                    if pos == -1:
+                        # Вторая попытка: определить длину, которая хоть и
+                        # превышает критическое значение, но всё же меньше
+                        # максимального.
+                        pos = text.find(" ", extremePos)
+                    if pos != -1:
+                        values[col] = text[:pos]
+                        extraRow[col] = text[(pos + 1):] + extraRow[col]
+                        widthFactor = textwidth.getWidthFactor(
+                            values[col],
+                            getFontSize(col),
+                            colWidth[col]
+                        )
+                doc.lockControllers()
+                cell = table.getCellByPosition(col, lastRow)
+                cellCursor = cell.createTextCursor()
+                if col == 1 and isTitle:
+                    cellCursor.ParaStyleName = "Наименование (заголовок)"
+                # Параметры символов необходимо устанавливать после
+                # параметров абзаца!
+                cellCursor.CharScaleWidth = widthFactor
+                cell.setString(values[col])
+                doc.unlockControllers()
+
+            nextRow()
+            if any(extraRow):
+                fillRow(extraRow, isTitle)
+
         schematic = common.getSchematicData()
         if schematic is None:
             return
@@ -37,108 +98,6 @@ class IndexBuildingThread(threading.Thread):
         # На её основе будут создаваться новые строки.
         # По окончанию, последняя строка будет удалена.
         table.getRows().insertByIndex(lastRow, 1)
-
-        def nextRow():
-            nonlocal lastRow
-            lastRow += 1
-            table.getRows().insertByIndex(lastRow, 1)
-
-        def fillRow(values, isTitle=False):
-            normValues = list(values)
-            colNames = (
-                "Поз. обозначение",
-                "Наименование",
-                "Кол.",
-                "Примечание"
-            )
-            widthFactors = [100] * len(values)
-            extraRow = [""] * len(values)
-            extremeWidthFactor = config.getint("index", "extreme width factor")
-            for index, value in enumerate(values):
-                widthFactors[index] = textwidth.getWidthFactor(
-                    colNames[index],
-                    value
-                )
-            # Поз. обозначение
-            if widthFactors[0] < extremeWidthFactor:
-                ref = values[0]
-                extremePos = int(len(ref) * widthFactors[0] / extremeWidthFactor)
-                # Первая попытка: определить длину не превышающую критическое
-                # сжатие шрифта.
-                pos1 = ref.rfind(", ", 0, extremePos)
-                pos2 = ref.rfind("-", 0, extremePos)
-                pos = max(pos1, pos2)
-                if pos == -1:
-                    # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое значение, но всё же меньше
-                    # максимального.
-                    pos1 = ref.find(", ", extremePos)
-                    pos2 = ref.find("-", extremePos)
-                    pos = max(pos1, pos2)
-                if pos != -1:
-                    separator = ref[pos]
-                    if separator == ",":
-                        normValues[0] = ref[:(pos + 1)]
-                        extraRow[0] = ref[(pos + 2):]
-                    elif separator == "-":
-                        normValues[0] = ref[:(pos + 1)]
-                        extraRow[0] = ref[pos:]
-                widthFactors[0] = textwidth.getWidthFactor(
-                    colNames[0],
-                    normValues[0]
-                )
-            # Наименование
-            if widthFactors[1] < extremeWidthFactor:
-                name = values[1]
-                extremePos = int(len(name) * widthFactors[1] / extremeWidthFactor)
-                # Первая попытка: определить длину не превышающую критическое
-                # сжатие шрифта.
-                pos = name.rfind(" ", 0, extremePos)
-                if pos == -1:
-                    # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое значение, но всё же меньше
-                    # максимального.
-                    pos = name.find(" ", extremePos)
-                if pos != -1:
-                    normValues[1] = name[:pos]
-                    extraRow[1] = name[(pos + 1):]
-                widthFactors[1] = textwidth.getWidthFactor(
-                    colNames[1],
-                    normValues[1]
-                )
-            # Примечание
-            if widthFactors[3] < extremeWidthFactor:
-                comment = values[3]
-                extremePos = int(len(comment) * widthFactors[3] / extremeWidthFactor)
-                # Первая попытка: определить длину не превышающую критическое
-                # сжатие шрифта.
-                pos = comment.rfind(" ", 0, extremePos)
-                if pos == -1:
-                    # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое значение, но всё же меньше
-                    # максимального.
-                    pos = comment.find(" ", extremePos)
-                if pos != -1:
-                    normValues[3] = comment[:pos]
-                    extraRow[3] = comment[(pos + 1):]
-                widthFactors[3] = textwidth.getWidthFactor(
-                    colNames[3],
-                    normValues[3]
-                )
-
-            doc.lockControllers()
-            for i in range(len(values)):
-                cell = table.getCellByPosition(i, lastRow)
-                cellCursor = cell.createTextCursor()
-                if isTitle and i == 1:
-                    cellCursor.ParaStyleName = "Наименование (заголовок)"
-                cellCursor.CharScaleWidth = widthFactors[i]
-                cell.setString(normValues[i])
-            nextRow()
-            doc.unlockControllers()
-
-            if any(extraRow):
-                fillRow(extraRow, isTitle)
 
         for group in compGroups:
             if prevGroup is not None:
@@ -165,33 +124,32 @@ class IndexBuildingThread(threading.Thread):
                         name += ' ' + compDoc
                     compComment = group[0].getIndexValue("comment")
                     fillRow(
-                        [compRef, name, "1", compComment]
+                        [compRef, name, str(len(group[0])), compComment]
                     )
-                    prevGroup = group
-                    continue
-            titleLines = group.getTitle()
-            for title in titleLines:
-                fillRow(
-                    ["", title, "", ""],
-                    isTitle=True
-                )
-            if config.getboolean("index", "empty row after group title"):
-                nextRow()
-            for compRange in group:
-                compRef = compRange.getRefRangeString()
-                compName = compRange.getIndexValue("name")
-                compDoc = compRange.getIndexValue("doc")
-                name = compName
-                if compDoc:
-                    for title in titleLines:
-                        if title.endswith(compDoc):
-                            break
-                    else:
-                        name += ' ' + compDoc
-                compComment = compRange.getIndexValue("comment")
-                fillRow(
-                    [compRef, name, str(len(compRange)), compComment]
-                )
+            else:
+                titleLines = group.getTitle()
+                for title in titleLines:
+                    fillRow(
+                        ["", title, "", ""],
+                        isTitle=True
+                    )
+                if config.getboolean("index", "empty row after group title"):
+                    nextRow()
+                for compRange in group:
+                    compRef = compRange.getRefRangeString()
+                    compName = compRange.getIndexValue("name")
+                    compDoc = compRange.getIndexValue("doc")
+                    name = compName
+                    if compDoc:
+                        for title in titleLines:
+                            if title.endswith(compDoc):
+                                break
+                        else:
+                            name += ' ' + compDoc
+                    compComment = compRange.getIndexValue("comment")
+                    fillRow(
+                        [compRef, name, str(len(compRange)), compComment]
+                    )
             prevGroup = group
 
         table.getRows().removeByIndex(lastRow, 2)

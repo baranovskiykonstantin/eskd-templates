@@ -22,6 +22,88 @@ class SpecBuildingThread(threading.Thread):
         self.name = "SpecBuildingThread"
 
     def run(self):
+
+        def nextRow():
+            nonlocal lastRow
+            lastRow += 1
+            table.getRows().insertByIndex(lastRow, 1)
+
+        def getFontSize(col):
+            nonlocal lastRow
+            cell = table.getCellByPosition(col, lastRow)
+            cellCursor = cell.createTextCursor()
+            return cellCursor.CharHeight
+
+        def fillSectionTitle(section):
+            doc.lockControllers()
+            cell = table.getCellByPosition(4, lastRow)
+            cellCursor = cell.createTextCursor()
+            cellCursor.ParaStyleName = "Наименование (заголовок раздела)"
+            cell.setString(section)
+            nextRow()
+            doc.unlockControllers()
+
+        def fillRow(values, isTitle=False, posIncrement=0):
+            colWidth = [5, 5, 7, 69, 62, 9, 21]
+            extraRow = [""] * len(values)
+            extremeWidthFactor = config.getint("spec", "extreme width factor")
+            for col in range(len(values)):
+                if '\n' in values[col]:
+                    text = values[col]
+                    lfPos = text.find('\n')
+                    values[col] = text[:lfPos]
+                    extraRow[col] = text[(lfPos + 1):]
+                widthFactor = textwidth.getWidthFactor(
+                    values[col],
+                    getFontSize(col),
+                    colWidth[col]
+                )
+                if widthFactor < extremeWidthFactor:
+                    text = values[col]
+                    extremePos = int(len(text) * widthFactor / extremeWidthFactor)
+                    # Первая попытка: определить длину не превышающую критическое
+                    # сжатие шрифта.
+                    pos = text.rfind(" ", 0, extremePos)
+                    if pos == -1:
+                        # Вторая попытка: определить длину, которая хоть и
+                        # превышает критическое значение, но всё же меньше
+                        # максимального.
+                        pos = text.find(" ", extremePos)
+                    if pos != -1:
+                        values[col] = text[:pos]
+                        extraRow[col] = text[(pos + 1):] + extraRow[col]
+                        widthFactor = textwidth.getWidthFactor(
+                            values[col],
+                            getFontSize(col),
+                            colWidth[col]
+                        )
+                doc.lockControllers()
+                cell = table.getCellByPosition(col, lastRow)
+                cellCursor = cell.createTextCursor()
+                if col == 4 and isTitle:
+                    cellCursor.ParaStyleName = "Наименование (заголовок группы)"
+                # Параметры символов необходимо устанавливать после
+                # параметров абзаца!
+                cellCursor.CharScaleWidth = widthFactor
+                if col == 2 and posIncrement:
+                    if doc.getTextFieldMasters().hasByName("com.sun.star.text.fieldmaster.SetExpression.Позиция"):
+                        posFieldMaster = doc.getTextFieldMasters().getByName("com.sun.star.text.fieldmaster.SetExpression.Позиция")
+                    else:
+                        posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
+                        posFieldMaster.SubType = 0
+                        posFieldMaster.Name = "Позиция"
+                    posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
+                    posField.Content = "Позиция+" + str(posIncrement)
+                    posField.attachTextFieldMaster(posFieldMaster)
+                    cell.getText().insertTextContent(cellCursor, posField, False)
+                else:
+                    cell.setString(values[col])
+                doc.unlockControllers()
+
+            nextRow()
+            if any(extraRow):
+                fillRow(extraRow, isTitle)
+
         schematic = common.getSchematicData()
         if schematic is None:
             return
@@ -37,137 +119,6 @@ class SpecBuildingThread(threading.Thread):
         # На её основе будут создаваться новые строки.
         # По окончанию, последняя строка будет удалена.
         table.getRows().insertByIndex(lastRow, 1)
-
-        def nextRow():
-            nonlocal lastRow
-            lastRow += 1
-            table.getRows().insertByIndex(lastRow, 1)
-
-        def fillSectionTitle(section):
-            doc.lockControllers()
-            cell = table.getCellByPosition(4, lastRow)
-            cellCursor = cell.createTextCursor()
-            cellCursor.ParaStyleName = "Наименование (заголовок раздела)"
-            cell.setString(section)
-            nextRow()
-            doc.unlockControllers()
-
-        def fillRow(values, isTitle=False, posIncrement=0):
-            colNames = (
-                "Формат",
-                "Зона",
-                "Поз.",
-                "Обозначение",
-                "Наименование",
-                "Кол.",
-                "Примечание"
-            )
-            widthFactors = [100] * len(values)
-            extraRow = [""] * len(values)
-            extremeWidthFactor = config.getint("spec", "extreme width factor")
-            for index, value in enumerate(values):
-                if '\n' in value:
-                    lfPos = value.find('\n')
-                    values[index] = value[:lfPos]
-                    extraRow[index] = value[(lfPos + 1):]
-            normValues = list(values)
-            for index, value in enumerate(normValues):
-                widthFactors[index] = textwidth.getWidthFactor(
-                    colNames[index],
-                    value
-                )
-            # Обозначение
-            if widthFactors[3] < extremeWidthFactor:
-                name = values[3]
-                extremePos = int(len(name) * widthFactors[3] / extremeWidthFactor)
-                # Первая попытка: определить длину не превышающую критическое
-                # сжатие шрифта.
-                pos = name.rfind(" ", 0, extremePos)
-                if pos == -1:
-                    # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое значение, но всё же меньше
-                    # максимального.
-                    pos = name.find(" ", extremePos)
-                if pos != -1:
-                    normValues[3] = name[:pos]
-                    extraRow[3] = name[(pos + 1):] + extraRow[3]
-                widthFactors[3] = textwidth.getWidthFactor(
-                    colNames[3],
-                    normValues[3]
-                )
-            # Наименование
-            if widthFactors[4] < extremeWidthFactor:
-                name = values[4]
-                extremePos = int(len(name) * widthFactors[4] / extremeWidthFactor)
-                # Первая попытка: определить длину не превышающую критическое
-                # сжатие шрифта.
-                pos = name.rfind(" ", 0, extremePos)
-                if pos == -1:
-                    # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое значение, но всё же меньше
-                    # максимального.
-                    pos = name.find(" ", extremePos)
-                if pos != -1:
-                    normValues[4] = name[:pos]
-                    extraRow[4] = name[(pos + 1):] + extraRow[4]
-                widthFactors[4] = textwidth.getWidthFactor(
-                    colNames[4],
-                    normValues[4]
-                )
-            # Примечание
-            if widthFactors[6] < extremeWidthFactor:
-                comment = values[6]
-                extremePos = int(len(comment) * widthFactors[6] / extremeWidthFactor)
-                # Первая попытка: определить длину не превышающую критическое
-                # сжатие шрифта.
-                pos1 = comment.rfind(" ", 0, extremePos)
-                pos2 = comment.rfind("-", 0, extremePos)
-                pos = max(pos1, pos2)
-                if pos == -1:
-                    # Вторая попытка: определить длину, которая хоть и
-                    # превышает критическое значение, но всё же меньше
-                    # максимального.
-                    pos1 = comment.find(" ", extremePos)
-                    pos2 = comment.find("-", extremePos)
-                    pos = max(pos1, pos2)
-                if pos != -1:
-                    separator = comment[pos]
-                    if separator == " ":
-                        normValues[6] = comment[:pos]
-                        extraRow[6] = comment[(pos + 1):] + extraRow[6]
-                    elif separator == "-":
-                        normValues[6] = comment[:(pos + 1)]
-                        extraRow[6] = comment[pos:] + extraRow[6]
-                widthFactors[6] = textwidth.getWidthFactor(
-                    colNames[6],
-                    normValues[6]
-                )
-
-            doc.lockControllers()
-            for i in range(len(values)):
-                cell = table.getCellByPosition(i, lastRow)
-                cellCursor = cell.createTextCursor()
-                if isTitle and i == 4:
-                    cellCursor.ParaStyleName = "Наименование (заголовок группы)"
-                cellCursor.CharScaleWidth = widthFactors[i]
-                if posIncrement and i == 2:
-                    if doc.getTextFieldMasters().hasByName("com.sun.star.text.fieldmaster.SetExpression.Позиция"):
-                        posFieldMaster = doc.getTextFieldMasters().getByName("com.sun.star.text.fieldmaster.SetExpression.Позиция")
-                    else:
-                        posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
-                        posFieldMaster.SubType = 0
-                        posFieldMaster.Name = "Позиция"
-                    posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
-                    posField.Content = "Позиция+" + str(posIncrement)
-                    posField.attachTextFieldMaster(posFieldMaster)
-                    cell.getText().insertTextContent(cellCursor, posField, False)
-                else:
-                    cell.setString(normValues[i])
-            nextRow()
-            doc.unlockControllers()
-
-            if any(extraRow):
-                fillRow(extraRow, isTitle)
 
         if config.getboolean("sections", "documentation"):
             if not config.getboolean("spec", "prohibit empty rows at top"):
@@ -257,44 +208,43 @@ class SpecBuildingThread(threading.Thread):
                         else:
                             comment = compComment
                         fillRow(
-                            ["", "", "", "", name, "1", comment],
+                            ["", "", "", "", name, str(len(group[0])), comment],
                             posIncrement=increment
                         )
-                        prevGroup = group
-                        continue
-                titleLines = group.getTitle()
-                for title in titleLines:
-                    fillRow(
-                        ["", "", "", "", title, "", ""],
-                        isTitle=True
-                    )
-                if config.getboolean("spec", "empty row after group title"):
-                    nextRow()
-                    if config.getboolean("spec", "reserve position numbers"):
-                        increment += 1
-                for compRange in group:
-                    compName = compRange.getSpecValue("name")
-                    compDoc = compRange.getSpecValue("doc")
-                    name = compName
-                    if compDoc:
-                        for title in titleLines:
-                            if title.endswith(compDoc):
-                                break
+                else:
+                    titleLines = group.getTitle()
+                    for title in titleLines:
+                        fillRow(
+                            ["", "", "", "", title, "", ""],
+                            isTitle=True
+                        )
+                    if config.getboolean("spec", "empty row after group title"):
+                        nextRow()
+                        if config.getboolean("spec", "reserve position numbers"):
+                            increment += 1
+                    for compRange in group:
+                        compName = compRange.getSpecValue("name")
+                        compDoc = compRange.getSpecValue("doc")
+                        name = compName
+                        if compDoc:
+                            for title in titleLines:
+                                if title.endswith(compDoc):
+                                    break
+                            else:
+                                name += ' ' + compDoc
+                        compRef = compRange.getRefRangeString()
+                        compComment = compRange.getSpecValue("comment")
+                        comment = compRef
+                        if comment:
+                            if compComment:
+                                comment = comment + '\n' + compComment
                         else:
-                            name += ' ' + compDoc
-                    compRef = compRange.getRefRangeString()
-                    compComment = compRange.getSpecValue("comment")
-                    comment = compRef
-                    if comment:
-                        if compComment:
-                            comment = comment + '\n' + compComment
-                    else:
-                        comment = compComment
-                    fillRow(
-                        ["", "", "", "", name, str(len(compRange)), comment],
-                        posIncrement=increment
-                    )
-                    increment = 1
+                            comment = compComment
+                        fillRow(
+                            ["", "", "", "", name, str(len(compRange)), comment],
+                            posIncrement=increment
+                        )
+                        increment = 1
                 prevGroup = group
 
         if config.getboolean("sections", "materials"):
