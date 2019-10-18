@@ -17,7 +17,7 @@ def show(*args):
         suffix=".html"
     )
     tempFileUrl = uno.systemPathToFileUrl(tempFile.name)
-    helpFileUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/index/doc/help.html".format(
+    helpFileUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/doc/help.html".format(
         XSCRIPTCONTEXT.getDocument().RuntimeUID
     )
     tempFile.close()

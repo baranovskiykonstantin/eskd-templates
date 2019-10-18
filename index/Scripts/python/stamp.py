@@ -1,7 +1,9 @@
 import re
-import common
-import config
-import textwidth
+import sys
+
+common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
+config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
+textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
 def syncCommonFields():
     """Обновить значения общих граф.
@@ -98,6 +100,9 @@ def fill(*args):
         if tailPos > 0:
             docTitle = docTitle[:tailPos]
         docTitle = docTitle.strip()
+        if docTitle:
+            docTitle += '\n'
+        docTitle += "Перечень элементов"
     setFirstPageFrameValue("1 Наименование документа", docTitle)
     # Наименование организации
     setFirstPageFrameValue("9 Наименование организации", schematic.company)
@@ -109,7 +114,7 @@ def fill(*args):
     )
     if config.getboolean("stamp", "convert doc id") \
         and idParts is not None:
-            docId = idParts.group(1).strip()
+            docId = 'П'.join(idParts.groups())
     setFirstPageFrameValue("2 Обозначение документа", docId)
     # Первое применение
     if config.getboolean("stamp", "fill first usage") \

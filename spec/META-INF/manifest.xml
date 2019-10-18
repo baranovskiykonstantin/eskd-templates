@@ -8,20 +8,19 @@
  <manifest:file-entry manifest:full-path="Pictures/10003111000052220000741E1EAD7DF78A081CEB.svg" manifest:media-type="image/svg+xml"/>
  <manifest:file-entry manifest:full-path="Pictures/10002B5A000052220000741E56562D4D2F83E937.svg" manifest:media-type="image/svg+xml"/>
  <manifest:file-entry manifest:full-path="Pictures/10002F79000052220000741E0FD23ADFEBE1A948.svg" manifest:media-type="image/svg+xml"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/pythonpath/common.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/pythonpath/config.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/pythonpath/kicadnet.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/pythonpath/schematic.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/pythonpath/textwidth.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/pythonpath/" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/doc/help.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/doc/help.html" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/doc/" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/spec.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/listener.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/settings.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/stamp.py" manifest:media-type="application/binary"/>
- <manifest:file-entry manifest:full-path="Scripts/python/spec/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/modules/common.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/modules/config.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/modules/kicadnet.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/modules/schematic.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/modules/textwidth.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/modules/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/doc/help.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/doc/help.html" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/doc/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/spec.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/listener.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/settings.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/stamp.py" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/python/" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Scripts/" manifest:media-type="application/binary"/>
  <manifest:file-entry manifest:full-path="Configurations2/toolbar/custom_spec.xml" manifest:media-type=""/>

@@ -2,6 +2,15 @@ import sys
 import uno
 import unohelper
 from com.sun.star.util import XModifyListener
+import zipimport
+
+EMBEDDED_MODULES = (
+    "textwidth",
+    "kicadnet",
+    "config",
+    "schematic",
+    "common",
+)
 
 # Декларация встроенных модулей. Они будут импортированы позже.
 common = None
@@ -14,7 +23,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
     def __init__(self,):
         doc = XSCRIPTCONTEXT.getDocument()
         self.prevFirstPageStyleName = doc.getText().createTextCursor().PageDescName
-        self.prevTableRowCount = doc.getTextTables().getByName("Перечень_элементов").getRows().getCount()
+        self.prevTableRowCount = doc.getTextTables().getByName("Спецификация").getRows().getCount()
         self.prevPageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
 
     def modified(self, event):
@@ -27,8 +36,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.removeModifyListener(self)
 
         firstPageStyleName = doc.getText().createTextCursor().PageDescName
-        if firstPageStyleName and doc.getTextTables().hasByName("Перечень_элементов"):
-            table = doc.getTextTables().getByName("Перечень_элементов")
+        if firstPageStyleName and doc.getTextTables().hasByName("Спецификация"):
+            table = doc.getTextTables().getByName("Спецификация")
             tableRowCount = table.getRows().getCount()
             if firstPageStyleName != self.prevFirstPageStyleName \
                 or tableRowCount != self.prevTableRowCount:
@@ -39,13 +48,13 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         # обрамление последней строки листа совпадало с верхней линией
                         # основной надписи.
                         # Данное действие выполняется только при редактировании таблицы
-                        # перечня вручную.
-                        # При автоматическом построении перечня высота строк и таблица
+                        # спецификации вручную.
+                        # При автоматическом построении специф. высота строк и таблица
                         # регистрации изменений обрабатываются отдельным образом
-                        # (см. index.py).
+                        # (см. spec.py).
                         doc.lockControllers()
                         for rowIndex in range(1, tableRowCount):
-                            table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+                            table.getRows().getByIndex(rowIndex).Height = common.getSpecRowHeight(rowIndex)
                         doc.unlockControllers()
 
                         # Автоматическое добавление/удаление
@@ -53,10 +62,10 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         pageCount = currentController.PageCount
                         if pageCount != self.prevPageCount:
                             self.prevPageCount = pageCount
-                            if config.getboolean("index", "append rev table"):
+                            if config.getboolean("spec", "append rev table"):
                                 if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
                                     pageCount -= 1
-                                if pageCount > config.getint("index", "pages rev table"):
+                                if pageCount > config.getint("spec", "pages rev table"):
                                     if common.appendRevTable():
                                         self.prevPageCount += 1
                                 else:
@@ -111,7 +120,7 @@ def importEmbeddedModules(*args):
             "com.sun.star.ui.dialogs.OfficeFilePicker",
             ctx
         )
-        filePicker.setTitle("Сохранение нового перечня элементов")
+        filePicker.setTitle("Сохранение новой спецификации")
         pickerType = uno.getConstantByName(
             "com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_SIMPLE"
         )
@@ -122,7 +131,7 @@ def importEmbeddedModules(*args):
         )
         homeDir = path.getSubstituteVariableValue("$(work)")
         filePicker.setDisplayDirectory(homeDir)
-        filePicker.setDefaultName("Перечень элементов.odt")
+        filePicker.setDefaultName("Спецификация.odt")
         result = filePicker.execute()
         OK = uno.getConstantByName(
             "com.sun.star.ui.dialogs.ExecutableDialogResults.OK"
@@ -159,13 +168,26 @@ def importEmbeddedModules(*args):
             if result == yes:
                 return importEmbeddedModules()
             return False
-    sys.path.append(uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL) + "/Scripts/python/index/pythonpath/")
+    docPath = uno.fileUrlToSystemPath(doc.URL)
+    docId = doc.RuntimeUID
+    modulePath = docPath + "/Scripts/python/modules/"
+    importer = zipimport.zipimporter(modulePath)
+    for moduleName in EMBEDDED_MODULES:
+        if moduleName in sys.modules:
+            # Если модуль с таким же именем был загружен ранее,
+            # его необходимо удалить из списка системы импорта,
+            # чтобы в последующем модуль был загружен строго из
+            # указанного места.
+            del sys.modules[moduleName]
+        module = importer.load_module(moduleName)
+        module.__name__ = moduleName + docId
+        module.init(XSCRIPTCONTEXT)
+        del sys.modules[moduleName]
+        sys.modules[moduleName + docId] = module
     global common
-    import common
-    common.XSCRIPTCONTEXT = XSCRIPTCONTEXT
+    common = sys.modules["common" + docId]
     global config
-    import config
-    config.XSCRIPTCONTEXT = XSCRIPTCONTEXT
+    config = sys.modules["config" + docId]
     return True
 
 
@@ -245,14 +267,22 @@ def init(*args):
                 )
         layoutManager = doc.getCurrentController().getFrame().LayoutManager
         toolbarPos = layoutManager.getElementPos(
-            "private:resource/toolbar/custom_index"
+            "private:resource/toolbar/custom_spec"
         )
         if toolbarPos.X == 0 and toolbarPos.Y == 0:
             toolbarPos.Y = 2147483647
             layoutManager.dockWindow(
-                "private:resource/toolbar/custom_index",
+                "private:resource/toolbar/custom_spec",
                 uno.Enum("com.sun.star.ui.DockingArea", "DOCKINGAREA_DEFAULT"),
                 toolbarPos
             )
 
-g_exportedScripts = init,
+def cleanup(*args):
+    """Удалить объекты встроенных модулей из системы импорта Python."""
+
+    for moduleName in EMBEDDED_MODULES:
+        moduleName += XSCRIPTCONTEXT.getDocument().RuntimeUID
+        if moduleName in sys.modules:
+            del sys.modules[moduleName]
+
+g_exportedScripts = init, cleanup

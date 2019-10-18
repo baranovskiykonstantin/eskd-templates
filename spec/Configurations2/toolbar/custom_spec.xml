@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE toolbar:toolbar PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "toolbar.dtd">
 <toolbar:toolbar xmlns:toolbar="http://openoffice.org/2001/toolbar" xmlns:xlink="http://www.w3.org/1999/xlink" toolbar:uiname="spec">
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec|spec.py$build?language=Python&amp;location=document" toolbar:text="Построить специф."/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec|spec.py$clean?language=Python&amp;location=document" toolbar:text="Очистить специф."/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec.py$build?language=Python&amp;location=document" toolbar:text="Построить специф."/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec.py$clean?language=Python&amp;location=document" toolbar:text="Очистить специф."/>
   <toolbar:toolbarseparator/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec|stamp.py$fill?language=Python&amp;location=document" toolbar:text="Заполнить осн. надпись"/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec|stamp.py$clean?language=Python&amp;location=document" toolbar:text="Очистить осн. надпись"/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:stamp.py$fill?language=Python&amp;location=document" toolbar:text="Заполнить осн. надпись"/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:stamp.py$clean?language=Python&amp;location=document" toolbar:text="Очистить осн. надпись"/>
   <toolbar:toolbarseparator/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec|spec.py$toggleRevTable?language=Python&amp;location=document" toolbar:text="Добавить/удалить лист рег. изм."/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec.py$toggleRevTable?language=Python&amp;location=document" toolbar:text="Добавить/удалить лист рег. изм."/>
   <toolbar:toolbarseparator/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec|settings.py$setSettings?language=Python&amp;location=document" toolbar:text="Параметры"/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:settings.py$setSettings?language=Python&amp;location=document" toolbar:text="Параметры"/>
   <toolbar:toolbarseparator/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:spec/doc|help.py$show?language=Python&amp;location=document" toolbar:text="Справка"/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:doc|help.py$show?language=Python&amp;location=document" toolbar:text="Справка"/>
 </toolbar:toolbar>

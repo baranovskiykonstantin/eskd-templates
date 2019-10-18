@@ -6,15 +6,25 @@
 """
 
 import os
+import sys
 import traceback
 import threading
 import uno
-import kicadnet
-import schematic
-import config
 
-# Глобальная переменная XSCRIPTCONTEXT устанавливается в listener.py:init()
 XSCRIPTCONTEXT = None
+kicadnet = None
+schematic = None
+config = None
+
+def init(scriptcontext):
+    global XSCRIPTCONTEXT
+    global kicadnet
+    global schematic
+    global config
+    XSCRIPTCONTEXT = scriptcontext
+    kicadnet = sys.modules["kicadnet" + scriptcontext.getDocument().RuntimeUID]
+    schematic = sys.modules["schematic" + scriptcontext.getDocument().RuntimeUID]
+    config = sys.modules["config" + scriptcontext.getDocument().RuntimeUID]
 
 STAMP_COMMON_FIELDS = (
     "2 Обозначение документа",

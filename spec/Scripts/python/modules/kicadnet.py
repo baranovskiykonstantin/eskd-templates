@@ -2,6 +2,9 @@
 
 import html
 
+def init(scriptcontext):
+    pass
+
 
 class ParseException(Exception):
     """Ошибка при разборе структуры файла списка цепей."""

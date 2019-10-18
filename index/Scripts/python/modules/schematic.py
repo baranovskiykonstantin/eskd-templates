@@ -1,7 +1,14 @@
 """Объектное представление схемы."""
 
 import re
-import config
+import sys
+
+config = None
+
+def init(scriptcontext):
+    global config
+    XSCRIPTCONTEXT = scriptcontext
+    config = sys.modules["config" + scriptcontext.getDocument().RuntimeUID]
 
 REF_REGEXP = re.compile(r"([^0-9?]+)([0-9]+)")
 

@@ -1,9 +1,11 @@
+import sys
 import threading
 import tempfile
 import uno
-import common
-import config
-import textwidth
+
+common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
+config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
+textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
 
 class IndexBuildingThread(threading.Thread):

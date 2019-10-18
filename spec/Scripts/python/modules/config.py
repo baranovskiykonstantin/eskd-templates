@@ -11,8 +11,11 @@ from configparser import ConfigParser
 import tempfile
 import uno
 
-# Глобальная переменная XSCRIPTCONTEXT устанавливается в listener.py:init()
 XSCRIPTCONTEXT = None
+
+def init(scriptcontext):
+    global XSCRIPTCONTEXT
+    XSCRIPTCONTEXT = scriptcontext
 
 SETTINGS = ConfigParser()
 
@@ -28,7 +31,7 @@ def load():
     fileAccess = ctx.ServiceManager.createInstance(
         "com.sun.star.ucb.SimpleFileAccess"
     )
-    configFileUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/index/settings.ini".format(doc.RuntimeUID)
+    configFileUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/spec/settings.ini".format(doc.RuntimeUID)
     if fileAccess.exists(configFileUrl):
         fileStream = fileAccess.openFileRead(configFileUrl)
         configInput = ctx.ServiceManager.createInstance(
@@ -42,28 +45,38 @@ def load():
     else:
         SETTINGS.read_dict(
             {
-                "index": {
+                "spec": {
                     "source": "",
                     "add units": "yes",
                     "space before units": "no",
-                    "concatenate same name groups": "no",
+                    "separate group for each doc": "no",
                     "title with doc": "no",
                     "every group has title": "no",
+                    "reserve position numbers": "no",
                     "empty row after group title": "no",
-                    "empty rows between diff ref": 1,
-                    "empty rows between diff type": 0,
+                    "empty rows between diff type": 1,
                     "prohibit titles at bottom": "no",
                     "prohibit empty rows at top": "no",
                     "extreme width factor": 80,
                     "append rev table": "no",
                     "pages rev table": 3,
                 },
+                "sections": {
+                    "documentation": "yes",
+                    "assembly": "no",
+                    "schematic": "yes",
+                    "index": "yes",
+                    "details": "yes",
+                    "pcb": "yes",
+                    "standard parts": "no",
+                    "other parts": "yes",
+                    "materials": "no",
+                },
                 "fields": {
                     "type": "Тип",
                     "name": "Наименование",
                     "doc": "Документ",
                     "comment": "Примечание",
-                    "adjustable": "Подбирают при регулировании",
                 },
                 "stamp": {
                     "convert doc title": "yes",
@@ -91,7 +104,7 @@ def save():
     fileAccess = serviceManager.createInstance(
         "com.sun.star.ucb.SimpleFileAccess"
     )
-    configPathUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/index/".format(doc.RuntimeUID)
+    configPathUrl = "vnd.sun.star.tdoc:/{}/Scripts/python/spec/".format(doc.RuntimeUID)
     if not fileAccess.exists(configPathUrl):
         fileAccess.createFolder(configPathUrl)
     configFileUrl = configPathUrl + "settings.ini"

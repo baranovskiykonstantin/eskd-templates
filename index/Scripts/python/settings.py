@@ -1,10 +1,11 @@
-from sys import platform
+import sys
 import uno
 import unohelper
 from com.sun.star.awt import XActionListener
 from com.sun.star.awt import XWindowListener
-import common
-import config
+
+common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
+config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
 def setSettings(*args):
     if common.isThreadWorking():
@@ -12,7 +13,7 @@ def setSettings(*args):
     context = XSCRIPTCONTEXT.getComponentContext()
 
     editControlHeight = 14
-    if platform == "linux":
+    if sys.platform == "linux":
         # Элементы управления GTK3 требуют больше места
         editControlHeight = 20
 
