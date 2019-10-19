@@ -36,7 +36,7 @@ STAMP_COMMON_FIELDS = (
 def isThreadWorking():
     """Работает ли макрос в отдельном потоке?"""
     for thread in threading.enumerate():
-        if thread.name == "IndexBuildingThread":
+        if thread.name == "BuildingThread":
             return True
     return False
 
@@ -165,9 +165,9 @@ def getSchematicData():
                 title_block = netlist.find("title_block", sheet)
                 for item in title_block.items:
                     if item.name == "title":
-                        schematicData.title = item.text
+                        schematicData.title = item.text if item.text is not None else ""
                     elif item.name == "company":
-                        schematicData.company = item.text
+                        schematicData.company = item.text if item.text is not None else ""
                     elif item.name == "comment":
                         if item.attributes["number"] == "1":
                             schematicData.number = item.attributes["value"]
@@ -185,15 +185,15 @@ def getSchematicData():
             component.reference = comp.attributes["ref"]
             for item in comp.items:
                 if item.name == "value":
-                    component.value = "" if item.text == "~" else item.text
+                    component.value = item.text if item.text is not None and item.text != "~" else ""
                 elif item.name == "footprint":
-                    component.footprint = "" if item.text == "~" else item.text
+                    component.footprint = item.text if item.text is not None and item.text != "~" else ""
                 elif item.name == "datasheet":
-                    component.datasheet = "" if item.text == "~" else item.text
+                    component.datasheet = item.text if item.text is not None and item.text != "~" else ""
                 elif item.name == "fields":
                     for field in item.items:
                         fieldName = field.attributes["name"]
-                        component.fields[fieldName] = field.text
+                        component.fields[fieldName] = field.text if field.text is not None and field.text != "~" else ""
             schematicData.components.append(component)
         return schematicData
     except kicadnet.ParseException as error:

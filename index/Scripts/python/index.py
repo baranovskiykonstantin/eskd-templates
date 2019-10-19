@@ -2,10 +2,20 @@ import sys
 import threading
 import tempfile
 import uno
+import unohelper
+from com.sun.star.awt import XActionListener
 
 common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
+
+
+class ButtonStopActionListener(unohelper.Base, XActionListener):
+    def __init__(self, stopEvent):
+        self.stopEvent = stopEvent
+
+    def actionPerformed(self, event):
+        self.stopEvent.set()
 
 
 class IndexBuildingThread(threading.Thread):
@@ -20,9 +30,105 @@ class IndexBuildingThread(threading.Thread):
     """
     def __init__(self):
         threading.Thread.__init__(self)
-        self.name = "IndexBuildingThread"
+        self.name = "BuildingThread"
+        self.stopEvent = threading.Event()
 
     def run(self):
+        # --------------------------------------------------------------------
+        # Диалоговое окно прогресса
+        # --------------------------------------------------------------------
+        context = XSCRIPTCONTEXT.getComponentContext()
+
+        dialogModel = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.awt.UnoControlDialogModel",
+            context
+        )
+        dialogModel.Width = 200
+        dialogModel.Height = 70
+        dialogModel.PositionX = 0
+        dialogModel.PositionY = 0
+        dialogModel.Title = "Прогресс: 0%"
+
+        labelModel = dialogModel.createInstance(
+            "com.sun.star.awt.UnoControlFixedTextModel"
+        )
+        labelModel.PositionX = 0
+        labelModel.PositionY = 0
+        labelModel.Width = dialogModel.Width
+        labelModel.Height = 30
+        labelModel.Align = 1
+        labelModel.VerticalAlign = uno.Enum(
+            "com.sun.star.style.VerticalAlignment",
+            "MIDDLE"
+        )
+        labelModel.Name = "Label"
+        labelModel.Label = "Выполняется построение перечня элементов"
+        dialogModel.insertByName("Label", labelModel)
+
+        progressBarModel = dialogModel.createInstance(
+            "com.sun.star.awt.UnoControlProgressBarModel"
+        )
+        progressBarModel.PositionX = 4
+        progressBarModel.PositionY = labelModel.Height
+        progressBarModel.Width = dialogModel.Width - 8
+        progressBarModel.Height = 12
+        progressBarModel.Name = "ProgressBar"
+        progressBarModel.ProgressValue = 0
+        progressBarModel.ProgressValueMin = 0
+        progressBarModel.ProgressValueMax = 1
+        dialogModel.insertByName("ProgressBar", progressBarModel)
+
+        bottonModelStop = dialogModel.createInstance(
+            "com.sun.star.awt.UnoControlButtonModel"
+        )
+        bottonModelStop.Width = 45
+        bottonModelStop.Height = 16
+        bottonModelStop.PositionX = (dialogModel.Width - bottonModelStop.Width) / 2
+        bottonModelStop.PositionY = dialogModel.Height - bottonModelStop.Height - 5
+        bottonModelStop.Name = "ButtonStop"
+        bottonModelStop.Label = "Прервать"
+        dialogModel.insertByName("ButtonStop", bottonModelStop)
+
+        dialog = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.awt.UnoControlDialog",
+            context
+        )
+        dialog.setVisible(False)
+        dialog.setModel(dialogModel)
+        dialog.getControl("ButtonStop").addActionListener(
+            ButtonStopActionListener(self.stopEvent)
+        )
+        toolkit = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.awt.Toolkit",
+            context
+        )
+        dialog.createPeer(toolkit, None)
+        # Установить диалоговое окно по центру
+        windowPosSize = XSCRIPTCONTEXT.getDocument().getCurrentController().getFrame().getContainerWindow().getPosSize()
+        dialogPosSize = dialog.getPosSize()
+        dialog.setPosSize(
+            (windowPosSize.Width - dialogPosSize.Width) / 2,
+            (windowPosSize.Height - dialogPosSize.Height) / 2,
+            dialogPosSize.Width,
+            dialogPosSize.Height,
+            uno.getConstantByName("com.sun.star.awt.PosSize.POS")
+        )
+
+        # --------------------------------------------------------------------
+        # Методы для построения таблицы
+        # --------------------------------------------------------------------
+
+        def kickProgress():
+            nonlocal progress
+            progress += 1
+            dialog.getControl("ProgressBar").setValue(progress)
+            dialog.setTitle("Прогресс: {:.0f}%".format(
+                100*progress/progressTotal
+            ))
+            if self.stopEvent.is_set():
+                dialog.dispose()
+                return False
+            return True
 
         def nextRow():
             nonlocal lastRow
@@ -84,9 +190,14 @@ class IndexBuildingThread(threading.Thread):
             if any(extraRow):
                 fillRow(extraRow, isTitle)
 
+        # --------------------------------------------------------------------
+        # Начало построения таблицы
+        # --------------------------------------------------------------------
+
         schematic = common.getSchematicData()
         if schematic is None:
             return
+        dialog.setVisible(True)
         clean(force=True)
         doc = XSCRIPTCONTEXT.getDocument()
         table = doc.getTextTables().getByName("Перечень_элементов")
@@ -100,6 +211,12 @@ class IndexBuildingThread(threading.Thread):
         # На её основе будут создаваться новые строки.
         # По окончанию, последняя строка будет удалена.
         table.getRows().insertByIndex(lastRow, 1)
+
+        progress = 0
+        progressTotal = 3
+        for group in compGroups:
+            progressTotal += len(group)
+        dialog.getControl("ProgressBar").setRange(0, progressTotal)
 
         for group in compGroups:
             if prevGroup is not None:
@@ -128,6 +245,8 @@ class IndexBuildingThread(threading.Thread):
                     fillRow(
                         [compRef, name, str(len(group[0])), compComment]
                     )
+                    if not kickProgress():
+                        return
             else:
                 titleLines = group.getTitle()
                 for title in titleLines:
@@ -153,9 +272,14 @@ class IndexBuildingThread(threading.Thread):
                     fillRow(
                         [compRef, name, str(len(compRange)), compComment]
                     )
+                    if not kickProgress():
+                        return
             prevGroup = group
 
         table.getRows().removeByIndex(lastRow, 2)
+
+        if not kickProgress():
+            return
 
         if config.getboolean("index", "prohibit titles at bottom"):
             firstPageStyleName = doc.getText().createTextCursor().PageDescName
@@ -184,6 +308,9 @@ class IndexBuildingThread(threading.Thread):
                             offset += 1
                 pos += otherRowCount
 
+        if not kickProgress():
+            return
+
         if config.getboolean("index", "prohibit empty rows at top"):
             firstPageStyleName = doc.getText().createTextCursor().PageDescName
             tableRowCount = table.getRows().getCount()
@@ -210,15 +337,23 @@ class IndexBuildingThread(threading.Thread):
                 pos += otherRowCount
                 doc.unlockControllers()
 
+        if not kickProgress():
+            return
+
         doc.lockControllers()
         for rowIndex in range(1, table.getRows().getCount()):
             table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
         doc.unlockControllers()
 
+        if not kickProgress():
+            return
+
         if config.getboolean("index", "append rev table"):
             pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
             if pageCount > config.getint("index", "pages rev table"):
                 common.appendRevTable()
+
+        dialog.dispose()
 
 
 def clean(*args, force=False):
