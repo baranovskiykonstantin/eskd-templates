@@ -117,7 +117,7 @@ def setSettings(*args):
         config.getint("settings", "pos y"),
         0,
         0,
-        3
+        uno.getConstantByName("com.sun.star.awt.PosSize.POS")
     )
 
     # ------------------------------------------------------------------------
