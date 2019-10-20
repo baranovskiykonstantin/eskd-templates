@@ -29,9 +29,10 @@ class SpecBuildingThread(threading.Thread):
     текстового редактора.
 
     """
-    def __init__(self):
+    def __init__(self, update=False):
         threading.Thread.__init__(self)
         self.name = "BuildingThread"
+        self.update = update
         self.stopEvent = threading.Event()
 
     def run(self):
@@ -63,7 +64,10 @@ class SpecBuildingThread(threading.Thread):
             "MIDDLE"
         )
         labelModel.Name = "Label"
-        labelModel.Label = "Выполняется построение спецификации"
+        if self.update:
+            labelModel.Label = "Выполняется обновление раздела \"Прочие изделия\""
+        else:
+            labelModel.Label = "Выполняется построение спецификации"
         dialogModel.insertByName("Label", labelModel)
 
         progressBarModel = dialogModel.createInstance(
@@ -219,91 +223,160 @@ class SpecBuildingThread(threading.Thread):
         schematic = common.getSchematicData()
         if schematic is None:
             return
-        dialog.setVisible(True)
-        clean(force=True)
         doc = XSCRIPTCONTEXT.getDocument()
+        if self.update:
+            if not doc.getTextTables().hasByName("Спецификация"):
+                common.showMessage(
+                    "Таблица спецификации не найдена!",
+                    "Ошибка"
+                )
+                return
+        else:
+            clean(force=True)
         table = doc.getTextTables().getByName("Спецификация")
+        tableRowCount = table.getRows().getCount()
+        lastRow = tableRowCount - 1
+        if self.update:
+            otherPartsFirstRow = 0
+            otherPartsLastRow = 0
+            for rowIndex in range(tableRowCount):
+                cell = table.getCellByPosition(4, rowIndex)
+                cellCursor = cell.createTextCursor()
+                if cellCursor.ParaStyleName == "Наименование (заголовок раздела)":
+                    if cell.getText().getString() == "Прочие изделия":
+                        otherPartsFirstRow = rowIndex
+                    elif otherPartsFirstRow != 0:
+                        # Следующий раздел после Прочих изделий
+                        otherPartsLastRow = rowIndex - 1
+                        break
+            else:
+                # Прочие изделия - последний раздел в спецификации
+                otherPartsLastRow = tableRowCount - 1
+            if otherPartsFirstRow == 0:
+                common.showMessage(
+                    "Раздел \"Прочие изделия\" не найден!",
+                    "Ошибка"
+                )
+                return
         compGroups = schematic.getGroupedComponents()
         prevGroup = None
         emptyRowsType = config.getint("spec", "empty rows between diff type")
-        lastRow = table.getRows().getCount() - 1
-        # В процессе заполнения специф., в конце таблицы всегда должна
-        # оставаться пустая строка с ненарушенным форматированием.
-        # На её основе будут создаваться новые строки.
-        # По окончанию, последняя строка будет удалена.
-        table.getRows().insertByIndex(lastRow, 1)
 
         progress = 0
-        progressTotal = 7
-        for group in compGroups:
-            progressTotal += len(group)
+        progressTotal = 5 if self.update else 7
+        if config.getboolean("sections", "other parts"):
+            for group in compGroups:
+                progressTotal += len(group)
         dialog.getControl("ProgressBar").setRange(0, progressTotal)
+        dialog.setVisible(True)
 
-        if config.getboolean("sections", "documentation"):
-            if not config.getboolean("spec", "prohibit empty rows at top"):
-                nextRow()
-            fillSectionTitle("Документация")
+        if self.update:
+            # Удалить содержимое раздела
+            table.getRows().removeByIndex(
+                otherPartsFirstRow + 1,
+                otherPartsLastRow - otherPartsFirstRow
+            )
 
-            if config.getboolean("sections", "assembly") \
-                or config.getboolean("sections", "schematic") \
-                or config.getboolean("sections", "index"):
+            if not kickProgress():
+                return
+
+            # Очистить содержимое и форматирование для дальнейшего заполнения
+            colStyles = (
+                "Формат",
+                "Зона",
+                "Поз.",
+                "Обозначение",
+                "Наименование",
+                "Кол.",
+                "Примечание"
+            )
+            for colIndex in range(len(colStyles)):
+                cell = table.getCellByPosition(colIndex, otherPartsFirstRow)
+                cell.getText().setString("")
+                cellCursor = cell.createTextCursor()
+                cellCursor.ParaStyleName = colStyles[colIndex]
+            # Если за прочими изделиями следует другой раздел,
+            # необходимо добавить пустую разделительную строку.
+            if otherPartsLastRow != tableRowCount - 1:
+                table.getRows().insertByIndex(otherPartsFirstRow, 1)
+            lastRow = otherPartsFirstRow
+
+            if not kickProgress():
+                return
+
+        # В процессе заполнения специф., после текущей строки всегда должна
+        # оставаться пустая строка с ненарушенным форматированием.
+        # На её основе будут создаваться новые строки.
+        # По окончанию, эта строка будет удалена.
+        table.getRows().insertByIndex(lastRow, 1)
+
+        if not self.update:
+            if config.getboolean("sections", "documentation"):
+                if not config.getboolean("spec", "prohibit empty rows at top"):
                     nextRow()
+                fillSectionTitle("Документация")
 
-            if config.getboolean("sections", "assembly"):
-                name = "Сборочный чертёж"
-                fillRow(
-                    ["", "", "", "", name, "", ""]
-                )
+                if config.getboolean("sections", "assembly") \
+                    or config.getboolean("sections", "schematic") \
+                    or config.getboolean("sections", "index"):
+                        nextRow()
 
-            if config.getboolean("sections", "schematic"):
-                size, ref = common.getSchematicInfo()
-                name = "Схема электрическая принципиальная"
-                fillRow(
-                    [size, "", "", ref, name, "", ""]
-                )
+                if config.getboolean("sections", "assembly"):
+                    name = "Сборочный чертёж"
+                    fillRow(
+                        ["", "", "", "", name, "", ""]
+                    )
 
-            if config.getboolean("sections", "index"):
-                size, ref = common.getSchematicInfo()
-                size = "A4"
-                refParts = re.match(
-                    r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
-                    ref
-                )
-                if refParts is not None:
-                    ref = 'П'.join(refParts.groups())
-                name = "Перечень элементов"
-                fillRow(
-                    [size, "", "", ref, name, "", ""]
-                )
+                if config.getboolean("sections", "schematic"):
+                    size, ref = common.getSchematicInfo()
+                    name = "Схема электрическая принципиальная"
+                    fillRow(
+                        [size, "", "", ref, name, "", ""]
+                    )
 
-        if not kickProgress():
-            return
+                if config.getboolean("sections", "index"):
+                    size, ref = common.getSchematicInfo()
+                    size = "A4"
+                    refParts = re.match(
+                        r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
+                        ref
+                    )
+                    if refParts is not None:
+                        ref = 'П'.join(refParts.groups())
+                    name = "Перечень элементов"
+                    fillRow(
+                        [size, "", "", ref, name, "", ""]
+                    )
 
-        if config.getboolean("sections", "details"):
-            nextRow()
-            fillSectionTitle("Детали")
+            if not kickProgress():
+                return
 
-            if config.getboolean("sections", "pcb"):
+            if config.getboolean("sections", "details"):
                 nextRow()
-                size, ref = common.getPcbInfo()
-                name = "Плата печатная"
-                fillRow(
-                    [size, "", "", ref, name, "", ""],
-                    posIncrement=1
-                )
+                fillSectionTitle("Детали")
 
-        if not kickProgress():
-            return
+                if config.getboolean("sections", "pcb"):
+                    nextRow()
+                    size, ref = common.getPcbInfo()
+                    name = "Плата печатная"
+                    fillRow(
+                        [size, "", "", ref, name, "", ""],
+                        posIncrement=1
+                    )
 
-        if config.getboolean("sections", "standard parts"):
-            nextRow()
-            fillSectionTitle("Стандартные изделия")
+            if not kickProgress():
+                return
 
-        if not kickProgress():
-            return
+            if config.getboolean("sections", "standard parts"):
+                nextRow()
+                fillSectionTitle("Стандартные изделия")
+
+            if not kickProgress():
+                return
 
         if config.getboolean("sections", "other parts"):
-            nextRow()
+            if not self.update:
+                nextRow()
             fillSectionTitle("Прочие изделия")
 
             nextRow()
@@ -380,13 +453,14 @@ class SpecBuildingThread(threading.Thread):
                             return
                 prevGroup = group
 
-        if config.getboolean("sections", "materials"):
-            nextRow()
-            fillSectionTitle("Материалы")
-            nextRow()
+        if not self.update:
+            if config.getboolean("sections", "materials"):
+                nextRow()
+                fillSectionTitle("Материалы")
+                nextRow()
 
-        if not kickProgress():
-            return
+            if not kickProgress():
+                return
 
         table.getRows().removeByIndex(lastRow, 2)
 
@@ -591,6 +665,18 @@ def build(*args):
         return
     specBuilder = SpecBuildingThread()
     specBuilder.start()
+
+def update(*args):
+    """Обновить "Прочие изделия".
+
+    Обновить раздел спецификации "Прочие изделия", не изменяя при этом
+    содержимого других разделов.
+
+    """
+    if common.isThreadWorking():
+        return
+    specUpdater = SpecBuildingThread(update=True)
+    specUpdater.start()
 
 def toggleRevTable(*args):
     """Добавить/удалить таблицу регистрации изменений"""
