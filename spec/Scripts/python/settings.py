@@ -787,6 +787,37 @@ def setSettings(*args):
     editControlModel13.Text = config.get("fields", "comment")
     pageModel1.insertByName("EditControl13", editControlModel13)
 
+    labelModel15 = pageModel1.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel15.PositionX = 0
+    labelModel15.PositionY = labelModel10.Height * 4
+    labelModel15.Width = labelModel10.Width
+    labelModel15.Height = labelModel10.Height
+    labelModel15.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel15.Name = "Label15"
+    labelModel15.Label = "Исключить:"
+    labelModel15.HelpText = """\
+Если компонент содержит
+поле с указанным именем,
+то он будет исключён из
+спецификации."""
+    pageModel1.insertByName("Label15", labelModel15)
+
+    editControlModel15 = pageModel1.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel15.Width = tabsModel.Width - labelModel15.Width - 3
+    editControlModel15.Height = labelModel15.Height
+    editControlModel15.PositionX = labelModel15.Width
+    editControlModel15.PositionY = labelModel15.PositionY
+    editControlModel15.Name = "EditControl15"
+    editControlModel15.Text = config.get("fields", "excluded")
+    pageModel1.insertByName("EditControl15", editControlModel15)
+
     buttonModel10 = pageModel1.createInstance(
         "com.sun.star.awt.UnoControlButtonModel"
     )
@@ -1053,6 +1084,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("fields", "comment",
             page1.getControl("EditControl13").getText()
         )
+        config.set("fields", "excluded",
+            page1.getControl("EditControl15").getText()
+        )
         config.set("settings", "compatibility mode",
             {0: "no", 1: "yes"}[page1.getControl("CheckBox10").getState()]
         )
@@ -1106,7 +1140,7 @@ class Button10ActionListener(unohelper.Base, XActionListener):
             ("EditControl11", "Наименование"),
             ("EditControl12", "Документ"),
             ("EditControl13", "Примечание"),
-            ("EditControl14", "Подбирают при регулировании"),
+            ("EditControl15", ""),
         )
         if event.Source.getModel().Name == "Button11":
             separators = {
@@ -1138,7 +1172,7 @@ class Button10ActionListener(unohelper.Base, XActionListener):
                 ("EditControl11", name),
                 ("EditControl12", "Стандарт"),
                 ("EditControl13", "Примечание"),
-                ("EditControl14", "Подбирают при регулировании"),
+                ("EditControl15", "Исключён из ПЭ"),
             )
             page1.getControl("CheckBox10").setState(1)
         else:

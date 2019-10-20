@@ -67,6 +67,7 @@ def load():
                     "doc": "Документ",
                     "comment": "Примечание",
                     "adjustable": "Подбирают при регулировании",
+                    "excluded": "",
                 },
                 "stamp": {
                     "convert doc title": "yes",

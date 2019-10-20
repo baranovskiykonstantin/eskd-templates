@@ -636,7 +636,10 @@ class Schematic():
         groups = []
         compGroup = CompGroup(self)
         compRange = CompRange(self)
+        excludedField = config.get("fields", "excluded")
         for comp in sortedComponents:
+            if excludedField and excludedField in comp.fields:
+                continue
             if not compRange.append(comp):
                 if not compGroup.append(compRange):
                     groups.append(compGroup)

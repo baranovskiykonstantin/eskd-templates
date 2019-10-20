@@ -78,6 +78,7 @@ def load():
                     "name": "Наименование",
                     "doc": "Документ",
                     "comment": "Примечание",
+                    "excluded": "",
                 },
                 "stamp": {
                     "convert doc title": "yes",
