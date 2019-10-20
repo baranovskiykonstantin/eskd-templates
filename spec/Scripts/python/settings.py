@@ -504,7 +504,7 @@ def setSettings(*args):
     checkModel31.Height = checkModel30.Height
     checkModel31.Name = "CheckBox31"
     checkModel31.State = {False: 0, True: 1}[
-        config.getboolean("sections", "assembly")
+        config.getboolean("sections", "assembly drawing")
     ]
     checkModel31.Label = "Сборочный чертёж"
     checkModel31.HelpText = """\
@@ -558,49 +558,49 @@ def setSettings(*args):
     checkModel34.Height = checkModel30.Height
     checkModel34.Name = "CheckBox34"
     checkModel34.State = {False: 0, True: 1}[
-        config.getboolean("sections", "details")
+        config.getboolean("sections", "assembly units")
     ]
-    checkModel34.Label = "Детали"
+    checkModel34.Label = "Сборочные единицы"
     checkModel34.HelpText = """\
 Если отмечено, то при формировании
 спецификации будет создан раздел
-"Детали"."""
+"Сборочные единицы"."""
     pageModel3.insertByName("CheckBox34", checkModel34)
 
     checkModel35 = pageModel3.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
-    checkModel35.PositionX = checkModel30.PositionX + 10
+    checkModel35.PositionX = checkModel30.PositionX
     checkModel35.PositionY = checkModel30.PositionY + checkModel30.Height * 5
     checkModel35.Width = checkModel30.Width
     checkModel35.Height = checkModel30.Height
     checkModel35.Name = "CheckBox35"
     checkModel35.State = {False: 0, True: 1}[
-        config.getboolean("sections", "pcb")
+        config.getboolean("sections", "details")
     ]
-    checkModel35.Label = "Плата печатная"
+    checkModel35.Label = "Детали"
     checkModel35.HelpText = """\
 Если отмечено, то при формировании
-спецификации в разделе "Детали"
-будет указана печатная плата."""
+спецификации будет создан раздел
+"Детали"."""
     pageModel3.insertByName("CheckBox35", checkModel35)
 
     checkModel36 = pageModel3.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
-    checkModel36.PositionX = checkModel30.PositionX
+    checkModel36.PositionX = checkModel30.PositionX + 10
     checkModel36.PositionY = checkModel30.PositionY + checkModel30.Height * 6
     checkModel36.Width = checkModel30.Width
     checkModel36.Height = checkModel30.Height
     checkModel36.Name = "CheckBox36"
     checkModel36.State = {False: 0, True: 1}[
-        config.getboolean("sections", "standard parts")
+        config.getboolean("sections", "pcb")
     ]
-    checkModel36.Label = "Стандартные изделия"
+    checkModel36.Label = "Плата печатная"
     checkModel36.HelpText = """\
 Если отмечено, то при формировании
-спецификации будет создан раздел
-"Стандартные изделия"."""
+спецификации в разделе "Детали"
+будет указана печатная плата."""
     pageModel3.insertByName("CheckBox36", checkModel36)
 
     checkModel37 = pageModel3.createInstance(
@@ -612,13 +612,13 @@ def setSettings(*args):
     checkModel37.Height = checkModel30.Height
     checkModel37.Name = "CheckBox37"
     checkModel37.State = {False: 0, True: 1}[
-        config.getboolean("sections", "other parts")
+        config.getboolean("sections", "standard parts")
     ]
-    checkModel37.Label = "Прочие изделия"
+    checkModel37.Label = "Стандартные изделия"
     checkModel37.HelpText = """\
 Если отмечено, то при формировании
 спецификации будет создан раздел
-"Прочие изделия"."""
+"Стандартные изделия"."""
     pageModel3.insertByName("CheckBox37", checkModel37)
 
     checkModel38 = pageModel3.createInstance(
@@ -630,14 +630,32 @@ def setSettings(*args):
     checkModel38.Height = checkModel30.Height
     checkModel38.Name = "CheckBox38"
     checkModel38.State = {False: 0, True: 1}[
-        config.getboolean("sections", "materials")
+        config.getboolean("sections", "other parts")
     ]
-    checkModel38.Label = "Материалы"
+    checkModel38.Label = "Прочие изделия"
     checkModel38.HelpText = """\
 Если отмечено, то при формировании
 спецификации будет создан раздел
-"Материалы"."""
+"Прочие изделия"."""
     pageModel3.insertByName("CheckBox38", checkModel38)
+
+    checkModel39 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel39.PositionX = checkModel30.PositionX
+    checkModel39.PositionY = checkModel30.PositionY + checkModel30.Height * 9
+    checkModel39.Width = checkModel30.Width
+    checkModel39.Height = checkModel30.Height
+    checkModel39.Name = "CheckBox39"
+    checkModel39.State = {False: 0, True: 1}[
+        config.getboolean("sections", "materials")
+    ]
+    checkModel39.Label = "Материалы"
+    checkModel39.HelpText = """\
+Если отмечено, то при формировании
+спецификации будет создан раздел
+"Материалы"."""
+    pageModel3.insertByName("CheckBox39", checkModel39)
 
     # ------------------------------------------------------------------------
     # Fields Tab Model
@@ -991,7 +1009,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("sections", "documentation",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox30").getState()]
         )
-        config.set("sections", "assembly",
+        config.set("sections", "assembly drawing",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox31").getState()]
         )
         config.set("sections", "schematic",
@@ -1000,20 +1018,23 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("sections", "index",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox33").getState()]
         )
-        config.set("sections", "details",
+        config.set("sections", "assembly units",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox34").getState()]
         )
-        config.set("sections", "pcb",
+        config.set("sections", "details",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox35").getState()]
         )
-        config.set("sections", "standard parts",
+        config.set("sections", "pcb",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox36").getState()]
         )
-        config.set("sections", "other parts",
+        config.set("sections", "standard parts",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox37").getState()]
         )
-        config.set("sections", "materials",
+        config.set("sections", "other parts",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox38").getState()]
+        )
+        config.set("sections", "materials",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox39").getState()]
         )
 
         # --------------------------------------------------------------------

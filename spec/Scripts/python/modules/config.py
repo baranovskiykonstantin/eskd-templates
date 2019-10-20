@@ -63,9 +63,10 @@ def load():
                 },
                 "sections": {
                     "documentation": "yes",
-                    "assembly": "no",
+                    "assembly drawing": "no",
                     "schematic": "yes",
                     "index": "yes",
+                    "assembly units": "no",
                     "details": "yes",
                     "pcb": "yes",
                     "standard parts": "no",

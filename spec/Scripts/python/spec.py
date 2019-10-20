@@ -263,7 +263,7 @@ class SpecBuildingThread(threading.Thread):
         emptyRowsType = config.getint("spec", "empty rows between diff type")
 
         progress = 0
-        progressTotal = 5 if self.update else 7
+        progressTotal = 5 if self.update else 8
         if config.getboolean("sections", "other parts"):
             for group in compGroups:
                 progressTotal += len(group)
@@ -316,12 +316,12 @@ class SpecBuildingThread(threading.Thread):
                     nextRow()
                 fillSectionTitle("Документация")
 
-                if config.getboolean("sections", "assembly") \
+                if config.getboolean("sections", "assembly drawing") \
                     or config.getboolean("sections", "schematic") \
                     or config.getboolean("sections", "index"):
                         nextRow()
 
-                if config.getboolean("sections", "assembly"):
+                if config.getboolean("sections", "assembly drawing"):
                     name = "Сборочный чертёж"
                     fillRow(
                         ["", "", "", "", name, "", ""]
@@ -347,6 +347,13 @@ class SpecBuildingThread(threading.Thread):
                     fillRow(
                         [size, "", "", ref, name, "", ""]
                     )
+
+            if not kickProgress():
+                return
+
+            if config.getboolean("sections", "assembly units"):
+                nextRow()
+                fillSectionTitle("Сборочные единицы")
 
             if not kickProgress():
                 return
