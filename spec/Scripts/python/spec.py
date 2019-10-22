@@ -156,6 +156,7 @@ class SpecBuildingThread(threading.Thread):
             doc.unlockControllers()
 
         def fillRow(values, isTitle=False, posIncrement=0):
+            nonlocal posValue
             colWidth = [5, 5, 7, 69, 62, 9, 21]
             extraRow = [""] * len(values)
             extremeWidthFactor = config.getint("spec", "extreme width factor")
@@ -208,6 +209,16 @@ class SpecBuildingThread(threading.Thread):
                     posField.Content = "Позиция+" + str(posIncrement)
                     posField.attachTextFieldMaster(posFieldMaster)
                     cell.getText().insertTextContent(cellCursor, posField, False)
+
+                    posValue += posIncrement
+                    widthFactor = textwidth.getWidthFactor(
+                        str(posValue),
+                        getFontSize(col),
+                        colWidth[col]
+                    )
+                    cellCursor = cell.createTextCursor()
+                    cellCursor.gotoEnd(True)
+                    cellCursor.CharScaleWidth = widthFactor
                 else:
                     cell.setString(values[col])
                 doc.unlockControllers()
@@ -236,10 +247,15 @@ class SpecBuildingThread(threading.Thread):
         table = doc.getTextTables().getByName("Спецификация")
         tableRowCount = table.getRows().getCount()
         lastRow = tableRowCount - 1
+        posValue = 0
         if self.update:
             otherPartsFirstRow = 0
             otherPartsLastRow = 0
             for rowIndex in range(tableRowCount):
+                if otherPartsFirstRow == 0:
+                    cellPos = table.getCellByPosition(2, rowIndex).getText().getString()
+                    if cellPos.isdecimal():
+                        posValue = int(cellPos)
                 cell = table.getCellByPosition(4, rowIndex)
                 cellCursor = cell.createTextCursor()
                 if cellCursor.ParaStyleName == "Наименование (заголовок раздела)":

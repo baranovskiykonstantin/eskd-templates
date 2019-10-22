@@ -21,10 +21,20 @@ def syncCommonFields():
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
+    doc.getUndoManager().lock()
+    doc.lockControllers()
     for name in common.STAMP_COMMON_FIELDS:
-        doc.getTextFrames().getByName("N." + name).setString(
-            doc.getTextFrames().getByName("1.1." + name).getString()
-    )
+        firstFrame = doc.getTextFrames().getByName("1.1." + name)
+        otherFrame = doc.getTextFrames().getByName("N." + name)
+        otherFrame.setString(firstFrame.getString())
+
+        firstCursor = firstFrame.createTextCursor()
+        otherCursor = otherFrame.createTextCursor()
+        otherCursor.gotoEnd(True)
+        otherCursor.CharHeight = firstCursor.CharHeight
+        otherCursor.CharScaleWidth = firstCursor.CharScaleWidth
+    doc.unlockControllers()
+    doc.getUndoManager().unlock()
 
 def setFirstPageFrameValue(name, value):
     """Установить значение поля форматной рамки первого листа.
@@ -39,19 +49,31 @@ def setFirstPageFrameValue(name, value):
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
+    firstPageStyleName = doc.getText().createTextCursor().PageDescName
+    doc.getUndoManager().lock()
+    doc.lockControllers()
     for i in range(1, 5):
         fullName = "1.{}.{}".format(i, name)
         if doc.getTextFrames().hasByName(fullName):
             frame = doc.getTextFrames().getByName(fullName)
-            if name in ("11 Разраб.", "11 Пров.", "11 Н. контр.", "11 Утв."):
-                frame.setString("")
-                cursor = frame.Text.createTextCursor()
-                cursor.CharScaleWidth = textwidth.getWidthFactor(
-                    value,
-                    cursor.CharHeight * 0.9, # см. свойства символов, положение
-                    22
-                )
+            # Записать в буфер действий для отмены
+            # только изменения текущего стиля
+            if firstPageStyleName.endswith(str(i)):
+                doc.getUndoManager().unlock()
             frame.setString(value)
+            if firstPageStyleName.endswith(str(i)):
+                doc.getUndoManager().lock()
+            if name in common.ITEM_WIDTHS:
+                cursor = frame.createTextCursor()
+                cursor.gotoEnd(True)
+                longestLine = max(value.splitlines(), key=len) if value else ""
+                cursor.CharScaleWidth = textwidth.getWidthFactor(
+                    longestLine,
+                    cursor.CharHeight * (cursor.CharEscapementHeight / 100),
+                    common.ITEM_WIDTHS[name] - 1
+                )
+    doc.unlockControllers()
+    doc.getUndoManager().unlock()
 
 def clean(*args):
     """Очистить основную надпись.
@@ -62,21 +84,26 @@ def clean(*args):
     if common.isThreadWorking():
         return
     doc = XSCRIPTCONTEXT.getDocument()
+    firstPageStyleName = doc.getText().createTextCursor().PageDescName
+    doc.getUndoManager().lock()
     doc.lockControllers()
     for frame in doc.getTextFrames():
         if frame.Name.startswith("1.") \
             and not frame.Name.endswith("(наименование)") \
             and not frame.Name.endswith(".7 Лист") \
             and not frame.Name.endswith(".8 Листов"):
+                # Записать в буфер действий для отмены
+                # только изменения текущего стиля
+                if firstPageStyleName[-1] == frame.Name[2]:
+                    doc.getUndoManager().unlock()
                 frame.setString("")
-                if frame.Name.endswith(".11 Разраб.") \
-                    or frame.Name.endswith(".11 Пров.") \
-                    or frame.Name.endswith(".11 Н. контр.") \
-                    or frame.Name.endswith(".11 Утв."):
-                        cursor = frame.Text.createTextCursor()
-                        cursor.CharScaleWidth = 100
+                if firstPageStyleName[-1] == frame.Name[2]:
+                    doc.getUndoManager().lock()
+                cursor = frame.createTextCursor()
+                cursor.CharScaleWidth = 100
     syncCommonFields()
     doc.unlockControllers()
+    doc.getUndoManager().unlock()
 
 def fill(*args):
     """Заполнить основную надпись.

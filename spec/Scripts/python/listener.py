@@ -15,6 +15,7 @@ EMBEDDED_MODULES = (
 # Декларация встроенных модулей. Они будут импортированы позже.
 common = None
 config = None
+textwidth = None
 
 
 class DocModifyListener(unohelper.Base, XModifyListener):
@@ -24,16 +25,17 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc = XSCRIPTCONTEXT.getDocument()
         self.prevFirstPageStyleName = doc.getText().createTextCursor().PageDescName
         self.prevTableRowCount = doc.getTextTables().getByName("Спецификация").getRows().getCount()
-        self.prevPageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
+        self.prevPageCount = doc.getCurrentController().PageCount
 
     def modified(self, event):
         """Приём сообщения об изменении в документе."""
-        doc = XSCRIPTCONTEXT.getDocument()
-        currentController = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController
+        doc = event.Source
+        currentController = doc.getCurrentController()
         # Чтобы избежать рекурсивного зацикливания,
         # необходимо сначала удалить, а после изменений,
         # снова добавить обработчик сообщений об изменениях.
         doc.removeModifyListener(self)
+        doc.getUndoManager().lock()
 
         firstPageStyleName = doc.getText().createTextCursor().PageDescName
         if firstPageStyleName and doc.getTextTables().hasByName("Спецификация"):
@@ -72,11 +74,40 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                                     if common.removeRevTable():
                                         self.prevPageCount -= 1
 
+        currentCell = currentController.ViewCursor.Cell
         currentFrame = currentController.ViewCursor.TextFrame
+        if currentCell or currentFrame:
+            if currentCell:
+                itemName = currentCell.createTextCursor().ParaStyleName
+                item = currentCell
+            else: # currentFrame
+                itemName = currentFrame.Name
+                item = currentFrame
+            itemCursor = item.createTextCursor()
+            itemFontSize = itemCursor.CharHeight * (itemCursor.CharEscapementHeight / 100)
+            itemText = item.getText().getString()
+            longestLine = max(itemText.splitlines(), key=len) if itemText else ""
+            for name in common.ITEM_WIDTHS:
+                if itemName.endswith(name):
+                    itemWidth = common.ITEM_WIDTHS[name]
+                    widthFactor = textwidth.getWidthFactor(
+                        longestLine,
+                        itemFontSize,
+                        itemWidth - 1
+                    )
+                    itemCursor.gotoEnd(True)
+                    itemCursor.CharScaleWidth = widthFactor
+
         if currentFrame is not None \
-            and currentFrame.Name.startswith("1."):
+            and currentFrame.Name.startswith("1.") \
+            and not currentFrame.Name.endswith(".7 Лист") \
+            and not currentFrame.Name.endswith(".8 Листов"):
                 # Обновить только текущую графу
                 name = currentFrame.Name[4:]
+                text = currentFrame.getString()
+                cursor = currentFrame.createTextCursor()
+                fontSize = cursor.CharHeight
+                widthFactor = cursor.CharScaleWidth
                 # Есть 4 варианта оформления первого листа
                 # в виде 4-х стилей страницы.
                 # Поля форматной рамки хранятся в нижнем колонтитуле
@@ -89,13 +120,24 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     otherName = "1.{}.{}".format(i, name)
                     if doc.getTextFrames().hasByName(otherName):
                         otherFrame = doc.getTextFrames().getByName(otherName)
-                        if not otherFrame.Name.endswith(".7 Лист") \
-                            and not otherFrame.Name.endswith(".8 Листов"):
-                                otherFrame.setString(currentFrame.getString())
+                        otherFrame.setString(text)
+                        otherCursor = otherFrame.createTextCursor()
+                        otherCursor.gotoEnd(True)
+                        otherCursor.CharHeight = fontSize
+                        otherCursor.CharScaleWidth = widthFactor
                 # А также, обновить поля на последующих листах
                 if name in common.STAMP_COMMON_FIELDS:
                     otherFrame = doc.getTextFrames().getByName("N." + name)
-                    otherFrame.setString(currentFrame.getString())
+                    otherFrame.setString(text)
+                    otherCursor = otherFrame.createTextCursor()
+                    otherCursor.gotoEnd(True)
+                    otherCursor.CharHeight = fontSize
+                    if name.endswith("2 Обозначение документа") \
+                        and widthFactor < 100:
+                            widthFactor *= 110 / 120
+                    otherCursor.CharScaleWidth = widthFactor
+
+        doc.getUndoManager().unlock()
         doc.addModifyListener(self)
 
 
@@ -188,6 +230,8 @@ def importEmbeddedModules(*args):
     common = sys.modules["common" + docId]
     global config
     config = sys.modules["config" + docId]
+    global textwidth
+    textwidth = sys.modules["textwidth" + docId]
     return True
 
 
