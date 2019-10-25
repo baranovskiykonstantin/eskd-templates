@@ -34,6 +34,7 @@ class IndexBuildingThread(threading.Thread):
         self.stopEvent = threading.Event()
 
     def run(self):
+        doc = XSCRIPTCONTEXT.getDocument()
         # --------------------------------------------------------------------
         # Диалоговое окно прогресса
         # --------------------------------------------------------------------
@@ -104,7 +105,7 @@ class IndexBuildingThread(threading.Thread):
         )
         dialog.createPeer(toolkit, None)
         # Установить диалоговое окно по центру
-        windowPosSize = XSCRIPTCONTEXT.getDocument().getCurrentController().getFrame().getContainerWindow().getPosSize()
+        windowPosSize = doc.CurrentController.Frame.ContainerWindow.getPosSize()
         dialogPosSize = dialog.getPosSize()
         dialog.setPosSize(
             (windowPosSize.Width - dialogPosSize.Width) / 2,
@@ -133,7 +134,7 @@ class IndexBuildingThread(threading.Thread):
         def nextRow():
             nonlocal lastRow
             lastRow += 1
-            table.getRows().insertByIndex(lastRow, 1)
+            table.Rows.insertByIndex(lastRow, 1)
 
         def getFontSize(col):
             nonlocal lastRow
@@ -183,7 +184,7 @@ class IndexBuildingThread(threading.Thread):
                 # Параметры символов необходимо устанавливать после
                 # параметров абзаца!
                 cellCursor.CharScaleWidth = widthFactor
-                cell.setString(values[col])
+                cell.String = values[col]
                 doc.unlockControllers()
 
             nextRow()
@@ -199,18 +200,17 @@ class IndexBuildingThread(threading.Thread):
             return
         dialog.setVisible(True)
         clean(force=True)
-        doc = XSCRIPTCONTEXT.getDocument()
-        table = doc.getTextTables().getByName("Перечень_элементов")
+        table = doc.TextTables["Перечень_элементов"]
         compGroups = schematic.getGroupedComponents()
         prevGroup = None
         emptyRowsRef = config.getint("index", "empty rows between diff ref")
         emptyRowsType = config.getint("index", "empty rows between diff type")
-        lastRow = table.getRows().getCount() - 1
+        lastRow = table.Rows.Count - 1
         # В процессе заполнения перечня, в конце таблицы всегда должна
         # оставаться пустая строка с ненарушенным форматированием.
         # На её основе будут создаваться новые строки.
         # По окончанию, последняя строка будет удалена.
-        table.getRows().insertByIndex(lastRow, 1)
+        table.Rows.insertByIndex(lastRow, 1)
 
         progress = 0
         progressTotal = 3
@@ -276,14 +276,14 @@ class IndexBuildingThread(threading.Thread):
                         return
             prevGroup = group
 
-        table.getRows().removeByIndex(lastRow, 2)
+        table.Rows.removeByIndex(lastRow, 2)
 
         if not kickProgress():
             return
 
         if config.getboolean("index", "prohibit titles at bottom"):
-            firstPageStyleName = doc.getText().createTextCursor().PageDescName
-            tableRowCount = table.getRows().getCount()
+            firstPageStyleName = doc.Text.createTextCursor().PageDescName
+            tableRowCount = table.Rows.Count
             firstRowCount = 28
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
@@ -294,15 +294,15 @@ class IndexBuildingThread(threading.Thread):
                 cell = table.getCellByPosition(1, pos)
                 cellCursor = cell.createTextCursor()
                 if cellCursor.ParaStyleName == "Наименование (заголовок)" \
-                    and cellCursor.getText().getString() != "":
+                    and cell.String != "":
                         offset = 1
                         while pos > offset:
                             cell = table.getCellByPosition(1, pos - offset)
                             cellCursor = cell.createTextCursor()
                             if cellCursor.ParaStyleName != "Наименование (заголовок)" \
-                                or cellCursor.getText().getString() == "":
+                                or cell.String == "":
                                     doc.lockControllers()
-                                    table.getRows().insertByIndex(pos - offset, offset)
+                                    table.Rows.insertByIndex(pos - offset, offset)
                                     doc.unlockControllers()
                                     break
                             offset += 1
@@ -312,8 +312,8 @@ class IndexBuildingThread(threading.Thread):
             return
 
         if config.getboolean("index", "prohibit empty rows at top"):
-            firstPageStyleName = doc.getText().createTextCursor().PageDescName
-            tableRowCount = table.getRows().getCount()
+            firstPageStyleName = doc.Text.createTextCursor().PageDescName
+            tableRowCount = table.Rows.Count
             firstRowCount = 29
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
@@ -327,13 +327,13 @@ class IndexBuildingThread(threading.Thread):
                     for i in range(4):
                         cell = table.getCellByPosition(i, pos)
                         cellCursor = cell.createTextCursor()
-                        if cellCursor.getText().getString() != "":
+                        if cell.String != "":
                             break
                     else:
                         rowIsEmpty = True
                     if not rowIsEmpty:
                         break
-                    table.getRows().removeByIndex(pos, 1)
+                    table.Rows.removeByIndex(pos, 1)
                 pos += otherRowCount
                 doc.unlockControllers()
 
@@ -341,15 +341,15 @@ class IndexBuildingThread(threading.Thread):
             return
 
         doc.lockControllers()
-        for rowIndex in range(1, table.getRows().getCount()):
-            table.getRows().getByIndex(rowIndex).Height = common.getIndexRowHeight(rowIndex)
+        for rowIndex in range(1, table.Rows.Count):
+            table.Rows[rowIndex].Height = common.getIndexRowHeight(rowIndex)
         doc.unlockControllers()
 
         if not kickProgress():
             return
 
         if config.getboolean("index", "append rev table"):
-            pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
+            pageCount = doc.CurrentController.PageCount
             if pageCount > config.getint("index", "pages rev table"):
                 common.appendRevTable()
 
@@ -367,10 +367,10 @@ def clean(*args, force=False):
         return
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
-    text = doc.getText()
+    text = doc.Text
     cursor = text.createTextCursor()
     firstPageStyleName = cursor.PageDescName
-    text.setString("")
+    text.String = ""
     cursor.ParaStyleName = "Пустой"
     cursor.PageDescName = firstPageStyleName
     # Если не оставить параграф перед таблицей, то при изменении форматирования
@@ -386,8 +386,8 @@ def clean(*args, force=False):
     # Таблица
     table = doc.createInstance("com.sun.star.text.TextTable")
     table.initialize(2, 4)
-    text.insertTextContent(text.getEnd(), table, False)
-    table.setName("Перечень_элементов")
+    text.insertTextContent(text.End, table, False)
+    table.Name = "Перечень_элементов"
     table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
     table.Width = 18500
     table.LeftMargin = 2000
@@ -411,8 +411,8 @@ def clean(*args, force=False):
     # Заголовок
     table.RepeatHeadline = True
     table.HeaderRowCount = 1
-    table.getRows().getByIndex(0).Height = 1500
-    table.getRows().getByIndex(0).IsAutoHeight = False
+    table.Rows[0].Height = 1500
+    table.Rows[0].IsAutoHeight = False
     headerNames = (
         ("A1", "Поз.\nобозна-\nчение"),
         ("B1", "Наименование"),
@@ -434,10 +434,10 @@ def clean(*args, force=False):
         cell.VertOrient = uno.getConstantByName(
             "com.sun.star.text.VertOrientation.CENTER"
         )
-        cell.setString(headerName)
+        cell.String = headerName
     # Строки
-    table.getRows().getByIndex(1).Height = 800
-    table.getRows().getByIndex(1).IsAutoHeight = False
+    table.Rows[1].Height = 800
+    table.Rows[1].IsAutoHeight = False
     cellStyles = (
         ("A2", "Поз. обозначение"),
         ("B2", "Наименование"),
@@ -475,7 +475,7 @@ def toggleRevTable(*args):
     doc = XSCRIPTCONTEXT.getDocument()
     config.set("index", "append rev table", "no")
     config.save()
-    if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+    if "Лист_регистрации_изменений" in doc.TextTables:
         common.removeRevTable()
     else:
         common.appendRevTable()

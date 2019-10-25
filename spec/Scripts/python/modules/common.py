@@ -81,10 +81,9 @@ def showMessage(text, title="Сообщение"):
     title -- заголовок окна сообщения.
 
     """
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    parent = desktop.getCurrentComponent().CurrentController.Frame.ContainerWindow
-    msgbox = parent.getToolkit().createMessageBox(
-        parent,
+    window = XSCRIPTCONTEXT.getDocument().CurrentController.Frame.ContainerWindow
+    msgbox = window.Toolkit.createMessageBox(
+        window,
         uno.Enum("com.sun.star.awt.MessageBoxType", "MESSAGEBOX"),
         uno.getConstantByName("com.sun.star.awt.MessageBoxButtons.BUTTONS_OK"),
         title,
@@ -106,7 +105,7 @@ def showFilePicker(filePath=""):
     if os.path.isfile(filePath):
         directory, file = os.path.split(filePath)
     else:
-        docUrl = XSCRIPTCONTEXT.getDocument().getURL()
+        docUrl = XSCRIPTCONTEXT.getDocument().URL
         if docUrl:
             directory = os.path.dirname(uno.fileUrlToSystemPath(docUrl))
         else:
@@ -130,7 +129,7 @@ def showFilePicker(filePath=""):
         "com.sun.star.ui.dialogs.ExecutableDialogResults.OK"
     )
     if result == OK:
-        sourcePath = uno.fileUrlToSystemPath(filePicker.getFiles()[0])
+        sourcePath = uno.fileUrlToSystemPath(filePicker.Files[0])
         return sourcePath
     return None
 
@@ -151,7 +150,7 @@ def getSourceFileName():
         return sourcePath
     sourceDir = ""
     sourceName = ""
-    docUrl = XSCRIPTCONTEXT.getDocument().getURL()
+    docUrl = XSCRIPTCONTEXT.getDocument().URL
     if docUrl:
         docPath = uno.fileUrlToSystemPath(docUrl)
         sourceDir = os.path.dirname(docPath)
@@ -305,12 +304,12 @@ def getPcbInfo():
 def appendRevTable():
     """Добавить таблицу регистрации изменений."""
     doc = XSCRIPTCONTEXT.getDocument()
-    if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+    if "Лист_регистрации_изменений" in doc.TextTables:
         return False
     doc.lockControllers()
-    text = doc.getText()
+    text = doc.Text
     text.insertControlCharacter(
-        text.getEnd(),
+        text.End,
         uno.getConstantByName(
             "com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK"
         ),
@@ -319,8 +318,8 @@ def appendRevTable():
     # Таблица
     table = doc.createInstance("com.sun.star.text.TextTable")
     table.initialize(4, 10)
-    text.insertTextContent(text.getEnd(), table, False)
-    table.setName("Лист_регистрации_изменений")
+    text.insertTextContent(text.End, table, False)
+    table.Name = "Лист_регистрации_изменений"
     table.BreakType = uno.Enum("com.sun.star.style.BreakType", "PAGE_BEFORE")
     table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
     table.Width = 18500
@@ -339,12 +338,12 @@ def appendRevTable():
     # Заголовок
     table.RepeatHeadline = True
     table.HeaderRowCount = 3
-    table.getRows().getByIndex(0).Height = 1030
-    table.getRows().getByIndex(0).IsAutoHeight = False
-    table.getRows().getByIndex(1).Height = 600
-    table.getRows().getByIndex(1).IsAutoHeight = False
-    table.getRows().getByIndex(2).Height = 1900
-    table.getRows().getByIndex(2).IsAutoHeight = False
+    table.Rows[0].Height = 1030
+    table.Rows[0].IsAutoHeight = False
+    table.Rows[1].Height = 600
+    table.Rows[1].IsAutoHeight = False
+    table.Rows[2].Height = 1900
+    table.Rows[2].IsAutoHeight = False
     cellCursor = table.createCursorByCellName("A1")
     cellCursor.gotoCellByName("J1", True)
     cellCursor.mergeRange()
@@ -408,7 +407,7 @@ def appendRevTable():
         cell.VertOrient = uno.getConstantByName(
             "com.sun.star.text.VertOrientation.CENTER"
         )
-        cell.setString(headerName)
+        cell.String = headerName
     # Обрамление
     border = table.TableBorder
     noLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
@@ -422,8 +421,8 @@ def appendRevTable():
     border.VerticalLine = normalLine
     table.TableBorder = border
     # Строки
-    table.getRows().getByIndex(3).Height = 815
-    table.getRows().getByIndex(3).IsAutoHeight = False
+    table.Rows[3].Height = 815
+    table.Rows[3].IsAutoHeight = False
     for i in range(10):
         cell = table.getCellByPosition(i, 3)
         cursor = cell.createTextCursor()
@@ -435,7 +434,7 @@ def appendRevTable():
         cell.VertOrient = uno.getConstantByName(
             "com.sun.star.text.VertOrientation.CENTER"
         )
-    table.getRows().insertByIndex(3, 28)
+    table.Rows.insertByIndex(3, 28)
     # Дабы избежать образования пустой страницы после листа рег.изм.
     cursor = text.createTextCursor()
     cursor.gotoEnd(False)
@@ -446,13 +445,13 @@ def appendRevTable():
 def removeRevTable():
     """Удалить таблицу регистрации изменений."""
     doc = XSCRIPTCONTEXT.getDocument()
-    if not doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+    if "Лист_регистрации_изменений" not in doc.TextTables:
         return False
-    doc.getTextTables().getByName("Лист_регистрации_изменений").dispose()
-    cursor = doc.getText().createTextCursor()
+    doc.TextTables["Лист_регистрации_изменений"].dispose()
+    cursor = doc.Text.createTextCursor()
     cursor.gotoEnd(False)
     cursor.goLeft(1, True)
-    cursor.setString("")
+    cursor.String = ""
     return True
 
 def getSpecRowHeight(rowIndex):
@@ -470,7 +469,7 @@ def getSpecRowHeight(rowIndex):
     """
     height = 800
     doc = XSCRIPTCONTEXT.getDocument()
-    firstPageStyleName = doc.getText().createTextCursor().PageDescName
+    firstPageStyleName = doc.Text.createTextCursor().PageDescName
     firstRowCount = 28
     otherRowCount = 32
     if firstPageStyleName.endswith("3") \

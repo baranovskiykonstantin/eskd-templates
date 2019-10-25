@@ -36,6 +36,7 @@ class SpecBuildingThread(threading.Thread):
         self.stopEvent = threading.Event()
 
     def run(self):
+        doc = XSCRIPTCONTEXT.getDocument()
         # --------------------------------------------------------------------
         # Диалоговое окно прогресса
         # --------------------------------------------------------------------
@@ -109,7 +110,7 @@ class SpecBuildingThread(threading.Thread):
         )
         dialog.createPeer(toolkit, None)
         # Установить диалоговое окно по центру
-        windowPosSize = XSCRIPTCONTEXT.getDocument().getCurrentController().getFrame().getContainerWindow().getPosSize()
+        windowPosSize = doc.CurrentController.Frame.ContainerWindow.getPosSize()
         dialogPosSize = dialog.getPosSize()
         dialog.setPosSize(
             (windowPosSize.Width - dialogPosSize.Width) / 2,
@@ -138,7 +139,7 @@ class SpecBuildingThread(threading.Thread):
         def nextRow():
             nonlocal lastRow
             lastRow += 1
-            table.getRows().insertByIndex(lastRow, 1)
+            table.Rows.insertByIndex(lastRow, 1)
 
         def getFontSize(col):
             nonlocal lastRow
@@ -151,7 +152,7 @@ class SpecBuildingThread(threading.Thread):
             cell = table.getCellByPosition(4, lastRow)
             cellCursor = cell.createTextCursor()
             cellCursor.ParaStyleName = "Наименование (заголовок раздела)"
-            cell.setString(section)
+            cell.String = section
             nextRow()
             doc.unlockControllers()
 
@@ -199,8 +200,8 @@ class SpecBuildingThread(threading.Thread):
                 # параметров абзаца!
                 cellCursor.CharScaleWidth = widthFactor
                 if col == 2 and posIncrement:
-                    if doc.getTextFieldMasters().hasByName("com.sun.star.text.fieldmaster.SetExpression.Позиция"):
-                        posFieldMaster = doc.getTextFieldMasters().getByName("com.sun.star.text.fieldmaster.SetExpression.Позиция")
+                    if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
+                        posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
                     else:
                         posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
                         posFieldMaster.SubType = 0
@@ -208,7 +209,7 @@ class SpecBuildingThread(threading.Thread):
                     posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
                     posField.Content = "Позиция+" + str(posIncrement)
                     posField.attachTextFieldMaster(posFieldMaster)
-                    cell.getText().insertTextContent(cellCursor, posField, False)
+                    cell.Text.insertTextContent(cellCursor, posField, False)
 
                     posValue += posIncrement
                     widthFactor = textwidth.getWidthFactor(
@@ -220,7 +221,7 @@ class SpecBuildingThread(threading.Thread):
                     cellCursor.gotoEnd(True)
                     cellCursor.CharScaleWidth = widthFactor
                 else:
-                    cell.setString(values[col])
+                    cell.String = values[col]
                 doc.unlockControllers()
 
             nextRow()
@@ -236,7 +237,7 @@ class SpecBuildingThread(threading.Thread):
             return
         doc = XSCRIPTCONTEXT.getDocument()
         if self.update:
-            if not doc.getTextTables().hasByName("Спецификация"):
+            if "Спецификация" not in doc.TextTables:
                 common.showMessage(
                     "Таблица спецификации не найдена!",
                     "Ошибка"
@@ -244,8 +245,8 @@ class SpecBuildingThread(threading.Thread):
                 return
         else:
             clean(force=True)
-        table = doc.getTextTables().getByName("Спецификация")
-        tableRowCount = table.getRows().getCount()
+        table = doc.TextTables["Спецификация"]
+        tableRowCount = table.Rows.Count
         lastRow = tableRowCount - 1
         posValue = 0
         if self.update:
@@ -253,13 +254,13 @@ class SpecBuildingThread(threading.Thread):
             otherPartsLastRow = 0
             for rowIndex in range(tableRowCount):
                 if otherPartsFirstRow == 0:
-                    cellPos = table.getCellByPosition(2, rowIndex).getText().getString()
+                    cellPos = table.getCellByPosition(2, rowIndex).String
                     if cellPos.isdecimal():
                         posValue = int(cellPos)
                 cell = table.getCellByPosition(4, rowIndex)
                 cellCursor = cell.createTextCursor()
                 if cellCursor.ParaStyleName == "Наименование (заголовок раздела)":
-                    if cell.getText().getString() == "Прочие изделия":
+                    if cell.String == "Прочие изделия":
                         otherPartsFirstRow = rowIndex
                     elif otherPartsFirstRow != 0:
                         # Следующий раздел после Прочих изделий
@@ -288,7 +289,7 @@ class SpecBuildingThread(threading.Thread):
 
         if self.update:
             # Удалить содержимое раздела
-            table.getRows().removeByIndex(
+            table.Rows.removeByIndex(
                 otherPartsFirstRow + 1,
                 otherPartsLastRow - otherPartsFirstRow
             )
@@ -308,13 +309,13 @@ class SpecBuildingThread(threading.Thread):
             )
             for colIndex in range(len(colStyles)):
                 cell = table.getCellByPosition(colIndex, otherPartsFirstRow)
-                cell.getText().setString("")
+                cell.String = ""
                 cellCursor = cell.createTextCursor()
                 cellCursor.ParaStyleName = colStyles[colIndex]
             # Если за прочими изделиями следует другой раздел,
             # необходимо добавить пустую разделительную строку.
             if otherPartsLastRow != tableRowCount - 1:
-                table.getRows().insertByIndex(otherPartsFirstRow, 1)
+                table.Rows.insertByIndex(otherPartsFirstRow, 1)
             lastRow = otherPartsFirstRow
 
             if not kickProgress():
@@ -324,7 +325,7 @@ class SpecBuildingThread(threading.Thread):
         # оставаться пустая строка с ненарушенным форматированием.
         # На её основе будут создаваться новые строки.
         # По окончанию, эта строка будет удалена.
-        table.getRows().insertByIndex(lastRow, 1)
+        table.Rows.insertByIndex(lastRow, 1)
 
         if not self.update:
             if config.getboolean("sections", "documentation"):
@@ -491,8 +492,8 @@ class SpecBuildingThread(threading.Thread):
             return
 
         if config.getboolean("spec", "prohibit titles at bottom"):
-            firstPageStyleName = doc.getText().createTextCursor().PageDescName
-            tableRowCount = table.getRows().getCount()
+            firstPageStyleName = doc.Text.createTextCursor().PageDescName
+            tableRowCount = table.Rows.Count
             firstRowCount = 28
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
@@ -503,15 +504,15 @@ class SpecBuildingThread(threading.Thread):
                 cell = table.getCellByPosition(4, pos)
                 cellCursor = cell.createTextCursor()
                 if cellCursor.ParaStyleName.startswith("Наименование (заголовок") \
-                    and cellCursor.getText().getString() != "":
+                    and cell.String != "":
                         offset = 1
                         while pos > offset:
                             cell = table.getCellByPosition(4, pos - offset)
                             cellCursor = cell.createTextCursor()
                             if not cellCursor.ParaStyleName.startswith("Наименование (заголовок") \
-                                or cellCursor.getText().getString() == "":
+                                or cell.String == "":
                                     doc.lockControllers()
-                                    table.getRows().insertByIndex(pos - offset, offset)
+                                    table.Rows.insertByIndex(pos - offset, offset)
                                     doc.unlockControllers()
                                     break
                             offset += 1
@@ -521,8 +522,8 @@ class SpecBuildingThread(threading.Thread):
             return
 
         if config.getboolean("spec", "prohibit empty rows at top"):
-            firstPageStyleName = doc.getText().createTextCursor().PageDescName
-            tableRowCount = table.getRows().getCount()
+            firstPageStyleName = doc.Text.createTextCursor().PageDescName
+            tableRowCount = table.Rows.Count
             firstRowCount = 29
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
@@ -536,13 +537,13 @@ class SpecBuildingThread(threading.Thread):
                     for i in range(7):
                         cell = table.getCellByPosition(i, pos)
                         cellCursor = cell.createTextCursor()
-                        if cellCursor.getText().getString() != "":
+                        if cell.String != "":
                             break
                     else:
                         rowIsEmpty = True
                     if not rowIsEmpty:
                         break
-                    table.getRows().removeByIndex(pos, 1)
+                    table.Rows.removeByIndex(pos, 1)
                 pos += otherRowCount
                 doc.unlockControllers()
 
@@ -550,15 +551,15 @@ class SpecBuildingThread(threading.Thread):
             return
 
         doc.lockControllers()
-        for rowIndex in range(1, table.getRows().getCount()):
-            table.getRows().getByIndex(rowIndex).Height = common.getSpecRowHeight(rowIndex)
+        for rowIndex in range(1, table.Rows.Count):
+            table.Rows[rowIndex].Height = common.getSpecRowHeight(rowIndex)
         doc.unlockControllers()
 
         if not kickProgress():
             return
 
         if config.getboolean("spec", "append rev table"):
-            pageCount = XSCRIPTCONTEXT.getDesktop().getCurrentComponent().CurrentController.PageCount
+            pageCount = doc.CurrentController.PageCount
             if pageCount > config.getint("spec", "pages rev table"):
                 common.appendRevTable()
 
@@ -576,10 +577,10 @@ def clean(*args, force=False):
         return
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
-    text = doc.getText()
+    text = doc.Text
     cursor = text.createTextCursor()
     firstPageStyleName = cursor.PageDescName
-    text.setString("")
+    text.String = ""
     cursor.ParaStyleName = "Пустой"
     cursor.PageDescName = firstPageStyleName
     # Если не оставить параграф перед таблицей, то при изменении форматирования
@@ -595,8 +596,8 @@ def clean(*args, force=False):
     # Таблица
     table = doc.createInstance("com.sun.star.text.TextTable")
     table.initialize(2, 7)
-    text.insertTextContent(text.getEnd(), table, False)
-    table.setName("Спецификация")
+    text.insertTextContent(text.End, table, False)
+    table.Name = "Спецификация"
     table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
     table.Width = 18500
     table.LeftMargin = 2000
@@ -623,8 +624,8 @@ def clean(*args, force=False):
     # Заголовок
     table.RepeatHeadline = True
     table.HeaderRowCount = 1
-    table.getRows().getByIndex(0).Height = 1500
-    table.getRows().getByIndex(0).IsAutoHeight = False
+    table.Rows[0].Height = 1500
+    table.Rows[0].IsAutoHeight = False
     headerNames = (
         ("A1", "Формат"),
         ("B1", "Зона"),
@@ -652,10 +653,10 @@ def clean(*args, force=False):
             if cellName in ("A1", "B1"):
                 cell.LeftBorderDistance = 0
                 cell.RightBorderDistance = 100
-        cell.setString(headerName)
+        cell.String = headerName
     # Строки
-    table.getRows().getByIndex(1).Height = 800
-    table.getRows().getByIndex(1).IsAutoHeight = False
+    table.Rows[1].Height = 800
+    table.Rows[1].IsAutoHeight = False
     cellStyles = (
         ("A2", "Формат"),
         ("B2", "Зона"),
@@ -708,7 +709,7 @@ def toggleRevTable(*args):
     doc = XSCRIPTCONTEXT.getDocument()
     config.set("spec", "append rev table", "no")
     config.save()
-    if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+    if "Лист_регистрации_изменений" in doc.TextTables:
         common.removeRevTable()
     else:
         common.appendRevTable()

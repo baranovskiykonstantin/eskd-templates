@@ -845,7 +845,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Оптимальный вид
         # --------------------------------------------------------------------
         config.set("settings", "set view options",
-            {0: "no", 1: "yes"}[self.dialog.getControl("CheckBoxSet").getState()]
+            {0: "no", 1: "yes"}[self.dialog.getControl("CheckBoxSet").State]
         )
 
         # --------------------------------------------------------------------
@@ -853,46 +853,46 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # --------------------------------------------------------------------
 
         config.set("index", "source",
-            page0.getControl("EditControl00").getText()
+            page0.getControl("EditControl00").Text
         )
         config.set("index", "empty rows between diff ref",
-            str(int(page0.getControl("EditControl01").getValue()))
+            str(int(page0.getControl("EditControl01").Value))
         )
         config.set("index", "empty rows between diff type",
-            str(int(page0.getControl("EditControl02").getValue()))
+            str(int(page0.getControl("EditControl02").Value))
         )
         config.set("index", "extreme width factor",
-            str(int(page0.getControl("EditControl03").getValue()))
+            str(int(page0.getControl("EditControl03").Value))
         )
         config.set("index", "add units",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox00").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox00").State]
         )
         config.set("index", "space before units",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox01").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox01").State]
         )
         config.set("index", "concatenate same name groups",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox02").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox02").State]
         )
         config.set("index", "title with doc",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox03").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox03").State]
         )
         config.set("index", "every group has title",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox04").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox04").State]
         )
         config.set("index", "empty row after group title",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox05").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox05").State]
         )
         config.set("index", "append rev table",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox06").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox06").State]
         )
         config.set("index", "pages rev table",
-            str(int(page0.getControl("EditControl04").getValue()))
+            str(int(page0.getControl("EditControl04").Value))
         )
         config.set("index", "prohibit titles at bottom",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox07").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox07").State]
         )
         config.set("index", "prohibit empty rows at top",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox08").getState()]
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox08").State]
         )
 
         # --------------------------------------------------------------------
@@ -900,25 +900,25 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # --------------------------------------------------------------------
 
         config.set("fields", "type",
-            page1.getControl("EditControl10").getText()
+            page1.getControl("EditControl10").Text
         )
         config.set("fields", "name",
-            page1.getControl("EditControl11").getText()
+            page1.getControl("EditControl11").Text
         )
         config.set("fields", "doc",
-            page1.getControl("EditControl12").getText()
+            page1.getControl("EditControl12").Text
         )
         config.set("fields", "comment",
-            page1.getControl("EditControl13").getText()
+            page1.getControl("EditControl13").Text
         )
         config.set("fields", "adjustable",
-            page1.getControl("EditControl14").getText()
+            page1.getControl("EditControl14").Text
         )
         config.set("fields", "excluded",
-            page1.getControl("EditControl15").getText()
+            page1.getControl("EditControl15").Text
         )
         config.set("settings", "compatibility mode",
-            {0: "no", 1: "yes"}[page1.getControl("CheckBox10").getState()]
+            {0: "no", 1: "yes"}[page1.getControl("CheckBox10").State]
         )
 
         # --------------------------------------------------------------------
@@ -926,13 +926,13 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # --------------------------------------------------------------------
 
         config.set("stamp", "convert doc title",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox20").getState()]
+            {0: "no", 1: "yes"}[page2.getControl("CheckBox20").State]
         )
         config.set("stamp", "convert doc id",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox21").getState()]
+            {0: "no", 1: "yes"}[page2.getControl("CheckBox21").State]
         )
         config.set("stamp", "fill first usage",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox22").getState()]
+            {0: "no", 1: "yes"}[page2.getControl("CheckBox22").State]
         )
 
         self.dialog.endExecute()
@@ -953,10 +953,10 @@ class Button00ActionListener(unohelper.Base, XActionListener):
     def actionPerformed(self, event):
         editControl = self.dialog.getControl("Tabs").getControl("Page0").getControl("EditControl00")
         source = common.showFilePicker(
-            editControl.getText()
+            editControl.Text
         )
         if source is not None:
-            editControl.setText(source)
+            editControl.Text = source
 
 
 class Button10ActionListener(unohelper.Base, XActionListener):
@@ -973,7 +973,7 @@ class Button10ActionListener(unohelper.Base, XActionListener):
             ("EditControl14", "Подбирают при регулировании"),
             ("EditControl15", ""),
         )
-        if event.Source.getModel().Name == "Button11":
+        if event.Source.Model.Name == "Button11":
             separators = {
                 "Марка":["", "-"],
                 "Значение":["", ""],
@@ -1006,8 +1006,8 @@ class Button10ActionListener(unohelper.Base, XActionListener):
                 ("EditControl14", "Подбирают при регулировании"),
                 ("EditControl15", "Исключён из ПЭ"),
             )
-            page1.getControl("CheckBox10").setState(1)
+            page1.getControl("CheckBox10").State = 1
         else:
-            page1.getControl("CheckBox10").setState(0)
+            page1.getControl("CheckBox10").State = 0
         for control, value in defaultValues:
-            page1.getControl(control).setText(value)
+            page1.getControl(control).Text = value

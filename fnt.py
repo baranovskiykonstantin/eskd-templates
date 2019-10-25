@@ -35,13 +35,15 @@ out = codecs.open('fnt.txt', 'w', 'utf-8')
 minWidth = 1e6
 maxWidth = 0
 out.write(u'CHARWIDTH_MM_PER_POINT = {\n')
+out.write(u"    '\\r': 0,\n")
+out.write(u"    '\\n': 0,\n")
 for char in chars:
     width = font.measure(unichr(char)) * mm_per_pix / 100
     if minWidth > width:
         minWidth = width
     if maxWidth < width:
         maxWidth = width
-    out.write(u'    "{}": {},\n'.format(unichr(char), width))
+    out.write(u"    '{}': {},\n".format(unichr(char), width))
 out.write(u'    "min": {},\n'.format(minWidth))
 out.write(u'    "max": {},\n'.format(maxWidth))
 out.write(u'}\n')

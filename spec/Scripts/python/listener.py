@@ -23,24 +23,23 @@ class DocModifyListener(unohelper.Base, XModifyListener):
 
     def __init__(self,):
         doc = XSCRIPTCONTEXT.getDocument()
-        self.prevFirstPageStyleName = doc.getText().createTextCursor().PageDescName
-        self.prevTableRowCount = doc.getTextTables().getByName("Спецификация").getRows().getCount()
-        self.prevPageCount = doc.getCurrentController().PageCount
+        self.prevFirstPageStyleName = doc.Text.createTextCursor().PageDescName
+        self.prevTableRowCount = doc.TextTables["Спецификация"].Rows.Count
+        self.prevPageCount = doc.CurrentController.PageCount
 
     def modified(self, event):
         """Приём сообщения об изменении в документе."""
         doc = event.Source
-        currentController = doc.getCurrentController()
         # Чтобы избежать рекурсивного зацикливания,
         # необходимо сначала удалить, а после изменений,
         # снова добавить обработчик сообщений об изменениях.
         doc.removeModifyListener(self)
-        doc.getUndoManager().lock()
+        doc.UndoManager.lock()
 
-        firstPageStyleName = doc.getText().createTextCursor().PageDescName
-        if firstPageStyleName and doc.getTextTables().hasByName("Спецификация"):
-            table = doc.getTextTables().getByName("Спецификация")
-            tableRowCount = table.getRows().getCount()
+        firstPageStyleName = doc.Text.createTextCursor().PageDescName
+        if firstPageStyleName and "Спецификация" in doc.TextTables:
+            table = doc.TextTables["Спецификация"]
+            tableRowCount = table.Rows.Count
             if firstPageStyleName != self.prevFirstPageStyleName \
                 or tableRowCount != self.prevTableRowCount:
                     self.prevFirstPageStyleName = firstPageStyleName
@@ -56,16 +55,16 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         # (см. spec.py).
                         doc.lockControllers()
                         for rowIndex in range(1, tableRowCount):
-                            table.getRows().getByIndex(rowIndex).Height = common.getSpecRowHeight(rowIndex)
+                            table.Rows[rowIndex].Height = common.getSpecRowHeight(rowIndex)
                         doc.unlockControllers()
 
                         # Автоматическое добавление/удаление
                         # таблицы регистрации изменений.
-                        pageCount = currentController.PageCount
+                        pageCount = doc.CurrentController.PageCount
                         if pageCount != self.prevPageCount:
                             self.prevPageCount = pageCount
                             if config.getboolean("spec", "append rev table"):
-                                if doc.getTextTables().hasByName("Лист_регистрации_изменений"):
+                                if "Лист_регистрации_изменений" in doc.TextTables:
                                     pageCount -= 1
                                 if pageCount > config.getint("spec", "pages rev table"):
                                     if common.appendRevTable():
@@ -74,70 +73,88 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                                     if common.removeRevTable():
                                         self.prevPageCount -= 1
 
-        currentCell = currentController.ViewCursor.Cell
-        currentFrame = currentController.ViewCursor.TextFrame
-        if currentCell or currentFrame:
-            if currentCell:
-                itemName = currentCell.createTextCursor().ParaStyleName
-                item = currentCell
-            else: # currentFrame
-                itemName = currentFrame.Name
-                item = currentFrame
-            itemCursor = item.createTextCursor()
-            itemFontSize = itemCursor.CharHeight * (itemCursor.CharEscapementHeight / 100)
-            itemText = item.getText().getString()
-            longestLine = max(itemText.splitlines(), key=len) if itemText else ""
-            for name in common.ITEM_WIDTHS:
-                if itemName.endswith(name):
-                    itemWidth = common.ITEM_WIDTHS[name]
-                    widthFactor = textwidth.getWidthFactor(
-                        longestLine,
-                        itemFontSize,
-                        itemWidth - 1
-                    )
-                    itemCursor.gotoEnd(True)
-                    itemCursor.CharScaleWidth = widthFactor
+        if not common.isThreadWorking():
+            currentTable = doc.CurrentController.ViewCursor.TextTable
+            currentCell = doc.CurrentController.ViewCursor.Cell
+            currentFrame = doc.CurrentController.ViewCursor.TextFrame
+            if currentCell or currentFrame:
+                if currentCell:
+                    itemName = currentCell.createTextCursor().ParaStyleName
+                    item = currentCell
+                else: # currentFrame
+                    itemName = currentFrame.Name
+                    item = currentFrame
+                itemCursor = item.createTextCursor()
+                for name in common.ITEM_WIDTHS:
+                    if itemName.endswith(name):
+                        itemWidth = common.ITEM_WIDTHS[name]
+                        if itemName == "Поз." \
+                            and currentTable.Name == "Спецификация":
+                                # Подстроить ширину всех позиционных номеров
+                                # при изменении хотя бы одного.
+                                doc.TextFields.refresh()
+                                for row in range(1, currentTable.Rows.Count):
+                                    cellPos = currentTable.getCellByName(
+                                        "C{}".format(row + 1)
+                                    )
+                                    for textContent in cellPos:
+                                        widthFactor = textwidth.getWidthFactor(
+                                            cellPos.String,
+                                            textContent.CharHeight,
+                                            itemWidth - 1
+                                        )
+                                        textContent.CharScaleWidth = widthFactor
+                        else:
+                            for line in item.String.splitlines(keepends=True):
+                                widthFactor = textwidth.getWidthFactor(
+                                    line,
+                                    itemCursor.CharHeight,
+                                    itemWidth - 1
+                                )
+                                itemCursor.goRight(len(line), True)
+                                itemCursor.CharScaleWidth = widthFactor
+                                itemCursor.collapseToEnd()
 
-        if currentFrame is not None \
-            and currentFrame.Name.startswith("1.") \
-            and not currentFrame.Name.endswith(".7 Лист") \
-            and not currentFrame.Name.endswith(".8 Листов"):
-                # Обновить только текущую графу
-                name = currentFrame.Name[4:]
-                text = currentFrame.getString()
-                cursor = currentFrame.createTextCursor()
-                fontSize = cursor.CharHeight
-                widthFactor = cursor.CharScaleWidth
-                # Есть 4 варианта оформления первого листа
-                # в виде 4-х стилей страницы.
-                # Поля форматной рамки хранятся в нижнем колонтитуле
-                # и для каждого стиля имеется свой набор полей.
-                # При редактировании, значения полей нужно синхронизировать
-                # между собой.
-                for i in range(1, 5):
-                    if currentFrame.Name[2] == str(i):
-                        continue
-                    otherName = "1.{}.{}".format(i, name)
-                    if doc.getTextFrames().hasByName(otherName):
-                        otherFrame = doc.getTextFrames().getByName(otherName)
-                        otherFrame.setString(text)
+            if currentFrame is not None \
+                and currentFrame.Name.startswith("1.") \
+                and not currentFrame.Name.endswith(".7 Лист") \
+                and not currentFrame.Name.endswith(".8 Листов"):
+                    # Обновить только текущую графу
+                    name = currentFrame.Name[4:]
+                    text = currentFrame.String
+                    cursor = currentFrame.createTextCursor()
+                    fontSize = cursor.CharHeight
+                    widthFactor = cursor.CharScaleWidth
+                    # Есть 4 варианта оформления первого листа
+                    # в виде 4-х стилей страницы.
+                    # Поля форматной рамки хранятся в нижнем колонтитуле
+                    # и для каждого стиля имеется свой набор полей.
+                    # При редактировании, значения полей нужно синхронизировать
+                    # между собой.
+                    for i in range(1, 5):
+                        if currentFrame.Name[2] == str(i):
+                            continue
+                        otherName = "1.{}.{}".format(i, name)
+                        if otherName in doc.TextFrames:
+                            otherFrame = doc.TextFrames[otherName]
+                            otherFrame.String = text
+                            otherCursor = otherFrame.createTextCursor()
+                            otherCursor.gotoEnd(True)
+                            otherCursor.CharHeight = fontSize
+                            otherCursor.CharScaleWidth = widthFactor
+                    # А также, обновить поля на последующих листах
+                    if name in common.STAMP_COMMON_FIELDS:
+                        otherFrame = doc.TextFrames["N." + name]
+                        otherFrame.String = text
                         otherCursor = otherFrame.createTextCursor()
                         otherCursor.gotoEnd(True)
                         otherCursor.CharHeight = fontSize
+                        if name.endswith("2 Обозначение документа") \
+                            and widthFactor < 100:
+                                widthFactor *= 110 / 120
                         otherCursor.CharScaleWidth = widthFactor
-                # А также, обновить поля на последующих листах
-                if name in common.STAMP_COMMON_FIELDS:
-                    otherFrame = doc.getTextFrames().getByName("N." + name)
-                    otherFrame.setString(text)
-                    otherCursor = otherFrame.createTextCursor()
-                    otherCursor.gotoEnd(True)
-                    otherCursor.CharHeight = fontSize
-                    if name.endswith("2 Обозначение документа") \
-                        and widthFactor < 100:
-                            widthFactor *= 110 / 120
-                    otherCursor.CharScaleWidth = widthFactor
 
-        doc.getUndoManager().unlock()
+        doc.UndoManager.unlock()
         doc.addModifyListener(self)
 
 
@@ -145,31 +162,27 @@ def importEmbeddedModules(*args):
     """Импорт встроенных в документ модулей.
 
     При создании нового документа из шаблона, его сразу же нужно сохранить,
-    чтобы получить доступ к содержимому. Пока новый документ не сохранён его
-    путь не определён и равен пустой строке.
-
-    После сохранения нового документа или при открытии ранее созданного
-    документа нужно добавить путь встроенных модулей к путям поиска модулей
-    python (sys.path). Это требуется выполнить один раз, после чего импорт
-    встроенных модулей станет возможным и в других файлах макросов.
+    чтобы получить доступ к содержимому.
+    Встроенные модули импортируются с помощью стандартного модуля zipimport.
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
     if not doc.URL:
-        ctx = XSCRIPTCONTEXT.getComponentContext()
+        context = XSCRIPTCONTEXT.getComponentContext()
+        frame = doc.CurrentController.Frame
 
-        filePicker = ctx.ServiceManager.createInstanceWithContext(
+        filePicker = context.ServiceManager.createInstanceWithContext(
             "com.sun.star.ui.dialogs.OfficeFilePicker",
-            ctx
+            context
         )
         filePicker.setTitle("Сохранение новой спецификации")
         pickerType = uno.getConstantByName(
             "com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_SIMPLE"
         )
         filePicker.initialize((pickerType,))
-        path = ctx.ServiceManager.createInstanceWithContext(
+        path = context.ServiceManager.createInstanceWithContext(
             "com.sun.star.util.PathSubstitution",
-            ctx
+            context
         )
         homeDir = path.getSubstituteVariableValue("$(work)")
         filePicker.setDisplayDirectory(homeDir)
@@ -181,24 +194,22 @@ def importEmbeddedModules(*args):
         if result == OK:
             fileUrl = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
             fileUrl.Name = "URL"
-            fileUrl.Value = filePicker.getFiles()[0]
+            fileUrl.Value = filePicker.Files[0]
 
-            dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
+            dispatchHelper = context.ServiceManager.createInstanceWithContext(
                 "com.sun.star.frame.DispatchHelper",
-                ctx
+                context
             )
             dispatchHelper.executeDispatch(
-                XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+                frame,
                 ".uno:SaveAs",
                 "",
                 0,
                 (fileUrl,)
             )
         if not doc.URL:
-            desktop = XSCRIPTCONTEXT.getDesktop()
-            parent = desktop.getCurrentComponent().CurrentController.Frame.ContainerWindow
-            msgbox = parent.getToolkit().createMessageBox(
-                parent,
+            msgbox = frame.ContainerWindow.Toolkit.createMessageBox(
+                frame.ContainerWindow,
                 uno.Enum("com.sun.star.awt.MessageBoxType", "MESSAGEBOX"),
                 uno.getConstantByName("com.sun.star.awt.MessageBoxButtons.BUTTONS_YES_NO"),
                 "Внимание!",
@@ -237,14 +248,16 @@ def importEmbeddedModules(*args):
 
 def init(*args):
     """Начальная настройка при открытии документа."""
-    ctx = XSCRIPTCONTEXT.getComponentContext()
-    dispatchHelper = ctx.ServiceManager.createInstanceWithContext(
+    context = XSCRIPTCONTEXT.getComponentContext()
+    dispatchHelper = context.ServiceManager.createInstanceWithContext(
         "com.sun.star.frame.DispatchHelper",
-        ctx
+        context
     )
+    doc = XSCRIPTCONTEXT.getDocument()
+    frame = doc.CurrentController.Frame
     if not importEmbeddedModules():
         dispatchHelper.executeDispatch(
-            XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+            frame,
             ".uno:CloseDoc",
             "",
             0,
@@ -252,7 +265,6 @@ def init(*args):
         )
         return
     config.load()
-    doc = XSCRIPTCONTEXT.getDocument()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
     if config.getboolean("settings", "set view options"):
@@ -288,9 +300,9 @@ def init(*args):
                 "command": ".uno:ActiveHelp"
             },
         )
-        configProvider = ctx.ServiceManager.createInstanceWithContext(
+        configProvider = context.ServiceManager.createInstanceWithContext(
             "com.sun.star.configuration.ConfigurationProvider",
-            ctx
+            context
         )
         nodePath = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
         nodePath.Name = "nodepath"
@@ -303,19 +315,18 @@ def init(*args):
             value = configAccess.getPropertyValue(op["prop"])
             if value != op["value"]:
                 dispatchHelper.executeDispatch(
-                    XSCRIPTCONTEXT.getDesktop().getCurrentFrame(),
+                    frame,
                     op["command"],
                     "",
                     0,
                     ()
                 )
-        layoutManager = doc.getCurrentController().getFrame().LayoutManager
-        toolbarPos = layoutManager.getElementPos(
+        toolbarPos = frame.LayoutManager.getElementPos(
             "private:resource/toolbar/custom_spec"
         )
         if toolbarPos.X == 0 and toolbarPos.Y == 0:
             toolbarPos.Y = 2147483647
-            layoutManager.dockWindow(
+            frame.LayoutManager.dockWindow(
                 "private:resource/toolbar/custom_spec",
                 uno.Enum("com.sun.star.ui.DockingArea", "DOCKINGAREA_DEFAULT"),
                 toolbarPos
