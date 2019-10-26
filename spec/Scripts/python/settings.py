@@ -370,8 +370,7 @@ def setSettings(*args):
 увеличиваются на единицу.
 Если отмечено, то для пустых строк,
 вставляемых между группами компонентов,
-будут зарезервированы номера позиций.
-"""
+будут зарезервированы номера позиций."""
     pageModel0.insertByName("CheckBox09", checkModel09)
 
     checkModel05 = pageModel0.createInstance(
