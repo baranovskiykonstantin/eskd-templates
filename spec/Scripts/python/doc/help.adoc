@@ -6,7 +6,7 @@
 :version-label: Версия
 :toclevels: 4
 :sectnumlevels: 4
-:icons: font
+:note-caption: !
 
 
 = Спецификация
