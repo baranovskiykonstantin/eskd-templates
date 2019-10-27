@@ -205,7 +205,7 @@ def importEmbeddedModules(*args):
             return False
     docPath = uno.fileUrlToSystemPath(doc.URL)
     docId = doc.RuntimeUID
-    modulePath = docPath + "/Scripts/python/modules/"
+    modulePath = docPath + "/Scripts/python/pythonpath/"
     importer = zipimport.zipimporter(modulePath)
     for moduleName in EMBEDDED_MODULES:
         if moduleName in sys.modules:
