@@ -161,6 +161,7 @@ class SpecBuildingThread(threading.Thread):
             colWidth = [5, 5, 7, 69, 62, 9, 21]
             extraRow = [""] * len(values)
             extremeWidthFactor = config.getint("spec", "extreme width factor")
+            doc.lockControllers()
             for col in range(len(values)):
                 if '\n' in values[col]:
                     text = values[col]
@@ -191,7 +192,6 @@ class SpecBuildingThread(threading.Thread):
                             getFontSize(col),
                             colWidth[col]
                         )
-                doc.lockControllers()
                 cell = table.getCellByPosition(col, lastRow)
                 cellCursor = cell.createTextCursor()
                 if col == 4 and isTitle:
@@ -222,7 +222,7 @@ class SpecBuildingThread(threading.Thread):
                     cellCursor.CharScaleWidth = widthFactor
                 else:
                     cell.String = values[col]
-                doc.unlockControllers()
+            doc.unlockControllers()
 
             nextRow()
             if any(extraRow):
@@ -407,12 +407,12 @@ class SpecBuildingThread(threading.Thread):
             for group in compGroups:
                 increment = 1
                 if prevGroup is not None:
-                    doc.lockControllers()
                     for _ in range(emptyRowsType):
+                        doc.lockControllers()
                         nextRow()
+                        doc.unlockControllers()
                         if config.getboolean("spec", "reserve position numbers"):
                             increment += 1
-                    doc.unlockControllers()
                 if len(group) == 1 \
                     and not config.getboolean("spec", "every group has title"):
                         compType = group[0].getTypeSingular()
@@ -493,14 +493,13 @@ class SpecBuildingThread(threading.Thread):
 
         if config.getboolean("spec", "prohibit titles at bottom"):
             firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            tableRowCount = table.Rows.Count
             firstRowCount = 28
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
                 or firstPageStyleName.endswith("4"):
                     firstRowCount = 26
             pos = firstRowCount
-            while pos < tableRowCount:
+            while pos < table.Rows.Count:
                 cell = table.getCellByPosition(4, pos)
                 cellCursor = cell.createTextCursor()
                 if cellCursor.ParaStyleName.startswith("Наименование (заголовок") \
@@ -523,14 +522,13 @@ class SpecBuildingThread(threading.Thread):
 
         if config.getboolean("spec", "prohibit empty rows at top"):
             firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            tableRowCount = table.Rows.Count
             firstRowCount = 29
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
                 or firstPageStyleName.endswith("4"):
                     firstRowCount = 27
             pos = firstRowCount
-            while pos < tableRowCount:
+            while pos < table.Rows.Count:
                 doc.lockControllers()
                 while True:
                     rowIsEmpty = False

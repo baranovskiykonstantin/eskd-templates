@@ -146,6 +146,7 @@ class IndexBuildingThread(threading.Thread):
             colWidth = [19, 109, 9, 44]
             extraRow = [""] * len(values)
             extremeWidthFactor = config.getint("index", "extreme width factor")
+            doc.lockControllers()
             for col in range(len(values)):
                 if '\n' in values[col]:
                     text = values[col]
@@ -176,7 +177,6 @@ class IndexBuildingThread(threading.Thread):
                             getFontSize(col),
                             colWidth[col]
                         )
-                doc.lockControllers()
                 cell = table.getCellByPosition(col, lastRow)
                 cellCursor = cell.createTextCursor()
                 if col == 1 and isTitle:
@@ -185,7 +185,7 @@ class IndexBuildingThread(threading.Thread):
                 # параметров абзаца!
                 cellCursor.CharScaleWidth = widthFactor
                 cell.String = values[col]
-                doc.unlockControllers()
+            doc.unlockControllers()
 
             nextRow()
             if any(extraRow):
@@ -225,10 +225,10 @@ class IndexBuildingThread(threading.Thread):
                     emptyRows = emptyRowsRef
                 else:
                     emptyRows = emptyRowsType
-                doc.lockControllers()
                 for _ in range(emptyRows):
+                    doc.lockControllers()
                     nextRow()
-                doc.unlockControllers()
+                    doc.unlockControllers()
             if len(group) == 1 \
                 and not config.getboolean("index", "every group has title"):
                     compRef = group[0].getRefRangeString()
@@ -283,14 +283,13 @@ class IndexBuildingThread(threading.Thread):
 
         if config.getboolean("index", "prohibit titles at bottom"):
             firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            tableRowCount = table.Rows.Count
             firstRowCount = 28
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
                 or firstPageStyleName.endswith("4"):
                     firstRowCount = 26
             pos = firstRowCount
-            while pos < tableRowCount:
+            while pos < table.Rows.Count:
                 cell = table.getCellByPosition(1, pos)
                 cellCursor = cell.createTextCursor()
                 if cellCursor.ParaStyleName == "Наименование (заголовок)" \
@@ -313,14 +312,13 @@ class IndexBuildingThread(threading.Thread):
 
         if config.getboolean("index", "prohibit empty rows at top"):
             firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            tableRowCount = table.Rows.Count
             firstRowCount = 29
             otherRowCount = 32
             if firstPageStyleName.endswith("3") \
                 or firstPageStyleName.endswith("4"):
                     firstRowCount = 27
             pos = firstRowCount
-            while pos < tableRowCount:
+            while pos < table.Rows.Count:
                 doc.lockControllers()
                 while True:
                     rowIsEmpty = False
