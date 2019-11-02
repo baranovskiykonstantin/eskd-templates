@@ -268,6 +268,7 @@ def init(*args):
     config.load()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
+    doc.CurrentController.ViewCursor.goDown(2, False)
     if config.getboolean("settings", "set view options"):
         options = (
             {
