@@ -26,7 +26,7 @@ def setSettings(*args):
         context
     )
     dialogModel.Width = 300
-    dialogModel.Height = 300
+    dialogModel.Height = 320
     dialogModel.PositionX = 0
     dialogModel.PositionY = 0
     dialogModel.Title = "Параметры перечня элементов"
@@ -286,11 +286,50 @@ def setSettings(*args):
 размещается на последующих строках."""
     pageModel0.insertByName("Label03", labelModel03)
 
+    labelModel04 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel04.PositionX = 0
+    labelModel04.PositionY = labelModel03.PositionY + labelModel03.Height
+    labelModel04.Width = 150
+    labelModel04.Height = 16
+    labelModel04.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel04.Name = "Label04"
+    labelModel04.Label = "Разделитель диапазона обозначений:"
+    pageModel0.insertByName("Label04", labelModel04)
+
+    radioButtonModel00 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlRadioButtonModel"
+    )
+    radioButtonModel00.PositionX = 150
+    radioButtonModel00.PositionY = labelModel04.PositionY
+    radioButtonModel00.Width = 75
+    radioButtonModel00.Height = labelModel04.Height
+    radioButtonModel00.Name = "RadioButton00"
+    radioButtonModel00.Label = "-"
+    radioButtonModel00.State = 1 if config.get("index", "ref separator") == '-' else 0
+    pageModel0.insertByName("RadioButton00", radioButtonModel00)
+
+    radioButtonModel01 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlRadioButtonModel"
+    )
+    radioButtonModel01.PositionX = radioButtonModel00.PositionX + radioButtonModel00.Width
+    radioButtonModel01.PositionY = radioButtonModel00.PositionY
+    radioButtonModel01.Width = radioButtonModel00.Width
+    radioButtonModel01.Height = radioButtonModel00.Height
+    radioButtonModel01.Name = "RadioButton01"
+    radioButtonModel01.Label = "…"
+    radioButtonModel01.State = 1 if config.get("index", "ref separator") == '…' else 0
+    pageModel0.insertByName("RadioButton01", radioButtonModel01)
+
     checkModel00 = pageModel0.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel00.PositionX = 5
-    checkModel00.PositionY = editControlModel03.PositionY + editControlModel03.Height + 5
+    checkModel00.PositionY = labelModel04.PositionY + labelModel04.Height + 5
     checkModel00.Width = tabsModel.Width - 10
     checkModel00.Height = 15
     checkModel00.Name = "CheckBox00"
@@ -864,6 +903,10 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("index", "extreme width factor",
             str(int(page0.getControl("EditControl03").Value))
         )
+        if page0.getControl("RadioButton00").State:
+            config.set("index", "ref separator", "-")
+        if page0.getControl("RadioButton01").State:
+            config.set("index", "ref separator", "…")
         config.set("index", "add units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox00").State]
         )

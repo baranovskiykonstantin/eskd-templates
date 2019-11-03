@@ -47,6 +47,7 @@ def load():
             {
                 "spec": {
                     "source": "",
+                    "ref separator": "-",
                     "add units": "yes",
                     "space before units": "no",
                     "separate group for each doc": "no",

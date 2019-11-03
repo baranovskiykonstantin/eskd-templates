@@ -510,7 +510,7 @@ class CompRange(Component):
                         prevNumber = currentNumber
                         counter += 1
                         if counter > 1:
-                            separator = '-'
+                            separator = config.get("spec", "ref separator")
                         continue
                 else:
                     if counter > 0:

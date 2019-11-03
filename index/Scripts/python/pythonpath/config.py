@@ -47,6 +47,7 @@ def load():
             {
                 "index": {
                     "source": "",
+                    "ref separator": "-",
                     "add units": "yes",
                     "space before units": "no",
                     "concatenate same name groups": "no",
