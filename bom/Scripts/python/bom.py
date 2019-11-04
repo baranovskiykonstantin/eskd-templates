@@ -256,7 +256,7 @@ class BomBuildingThread(threading.Thread):
                         increment += 1
             if len(group) == 1 \
                 and not config.getboolean("bom", "every group has title"):
-                    compType = group[0].getTypeSingular()
+                    compType = group[0].getBomValue("type", singular=True)
                     compName = group[0].getBomValue("name")
                     compCode = group[0].getBomValue("code")
                     compDoc = group[0].getBomValue("doc")
@@ -275,7 +275,7 @@ class BomBuildingThread(threading.Thread):
                     if not kickProgress():
                         return
             else:
-                title = group[0].getTypePlural()
+                title = group[0].getBomValue("type", plural=True)
                 if title:
                     fillRow(
                         ["", title, "", "", "", "", "", "", "", "", ""],

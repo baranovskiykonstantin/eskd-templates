@@ -232,7 +232,7 @@ class IndexBuildingThread(threading.Thread):
             if len(group) == 1 \
                 and not config.getboolean("index", "every group has title"):
                     compRef = group[0].getRefRangeString()
-                    compType = group[0].getTypeSingular()
+                    compType = group[0].getIndexValue("type", singular=True)
                     compName = group[0].getIndexValue("name")
                     compDoc = group[0].getIndexValue("doc")
                     name = ""

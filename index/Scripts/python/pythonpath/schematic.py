@@ -62,25 +62,45 @@ class Component():
         refNumber = re.search(REF_REGEXP, ref).group(2)
         return int(refNumber)
 
-    def _getTypeSingularAndPlural(self):
-        """Вернуть тип элемента в единственном и множественном числе."""
-        typeValue = self.getIndexValue("type")
-        singularAndPlural = re.match(r"^([^\s]+)\s*\(([^\s]+)\)$", typeValue)
-        if singularAndPlural:
-            return singularAndPlural.groups()
-        elif self.schematic.typeNamesDict:
-            for item in iter(self.schematic.typeNamesDict.items()):
-                if typeValue in item:
-                    return item
-        return (typeValue, typeValue)
+    def _convertSingularPlural(self, value, singular, plural):
+        """Привести переданное значение к единственному либо множественному числу.
 
-    def getTypeSingular(self):
-        """Вернуть тип элемента в единственном числе."""
-        return self._getTypeSingularAndPlural()[0]
+        Если параметр plural==True, то значение поля будет указано в
+        множественном числе.
+        Если параметр singular==True, то значение поля будет указано в
+        единственном числе.
+        Если значение поля имеет формат:
+        значение 1 {значение 2}
+        то "значение 1" воспринимается как значение поля в единственном числе,
+        а "значение 2" - как значение в множественном числе.
+        Если значение поля не соответствует указанному формату, то это значение
+        будет использоваться полностью как в единственном, так и в
+        множественном числе.
 
-    def getTypePlural(self):
-        """Вернуть тип элемента в множественном числе."""
-        return self._getTypeSingularAndPlural()[1]
+        Аргументы:
+        value (str) -- значение поля, которое необходимо обработать;
+        singular (boolean) -- привести к единственному числу;
+        plural (boolean) -- привести к множественному числу.
+
+        Возвращаемое значение (str) -- преобразованное значение.
+
+        """
+
+        if value and (singular or plural):
+            valueSingularAndPlural = re.match(r"^(.+)\s\{(.+)\}$", value)
+            if valueSingularAndPlural:
+                if singular:
+                    value = valueSingularAndPlural.group(1)
+                elif plural:
+                    value = valueSingularAndPlural.group(2)
+            elif self.schematic.typeNamesDict:
+                for item in iter(self.schematic.typeNamesDict.items()):
+                    if value in item:
+                        if singular:
+                            value = item[0]
+                        elif plural:
+                            value = item[1]
+        return value
 
     def getValueWithUnits(self):
         """Преобразовать значение к стандартному виду.
@@ -186,7 +206,7 @@ class Component():
             return numValue + separator + multiplier + units
         return self.value
 
-    def formatPattern(self, pattern, check=False):
+    def formatPattern(self, pattern, check=False, singular=False, plural=False):
         """Преобразовать шаблон.
 
         Шаблон представляет собой строку текста, в которой конструкции типа:
@@ -218,6 +238,14 @@ class Component():
         выполнена проверка - является ли переданная строка шаблоном. При первом
         обнаружении конструкции ${} будет возвращено значение True, при
         отсутствии такой конструкции - False.
+
+        Аргументы:
+        pattern (str) -- строка текста, которую следует обработать как шаблон;
+        check (boolean) -- проверить шаблон без преобразования;
+        singular (boolean) -- привести к единственному числу;
+        plural (boolean) -- привести к множественному числу.
+
+        Возвращаемое значение (str) -- преобразованное значение.
 
         """
         out = ""
@@ -285,6 +313,7 @@ class Component():
                             return True
                         fieldValue = self.getFieldValue(fieldName)
                         if fieldValue:
+                            fieldValue = self._convertSingularPlural(fieldValue, singular, plural)
                             out += prefix + fieldValue + suffix
                     substitution = temp = prefix = fieldName = suffix = ""
                 elif substitution == "prefix":
@@ -306,7 +335,7 @@ class Component():
             return False
         return out
 
-    def getIndexValue(self, name):
+    def getIndexValue(self, name, singular=False, plural=False):
         """Вернуть преобразованное значение для перечня.
 
         Вернуть приведённое к конечному виду значение одного из полей,
@@ -314,7 +343,9 @@ class Component():
 
         Аргументы:
         name (str) -- название требуемого значения; может быть одним из:
-            "type", "name", "doc", "comment".
+            "type", "name", "doc", "comment";
+        singular (boolean) -- привести к единственному числу;
+        plural (boolean) -- привести к множественному числу.
 
         Возвращаемое значение (str) -- итоговое значение.
 
@@ -324,11 +355,12 @@ class Component():
         fieldName = config.get("fields", name)
         value = ""
         if self.formatPattern(fieldName, check=True):
-            value = self.formatPattern(fieldName)
+            value = self.formatPattern(fieldName, singular=singular, plural=plural)
         else:
             value = self.getFieldValue(fieldName)
+            value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            return self.value
+            value = self.value
         if value is None:
             value = ""
         return value
@@ -524,7 +556,7 @@ class CompGroup():
         if len(self) == 0:
             return []
 
-        currentType = self._compRanges[0].getTypePlural()
+        currentType = self._compRanges[0].getIndexValue("type", plural=True)
 
         if not config.getboolean("index", "title with doc"):
             return [currentType]

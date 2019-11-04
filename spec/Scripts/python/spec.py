@@ -415,7 +415,7 @@ class SpecBuildingThread(threading.Thread):
                             increment += 1
                 if len(group) == 1 \
                     and not config.getboolean("spec", "every group has title"):
-                        compType = group[0].getTypeSingular()
+                        compType = group[0].getSpecValue("type", singular=True)
                         compName = group[0].getSpecValue("name")
                         compDoc = group[0].getSpecValue("doc")
                         name = ""
