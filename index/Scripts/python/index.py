@@ -421,14 +421,15 @@ def clean(*args, force=False):
         cell = table.getCellByName(cellName)
         cellCursor = cell.createTextCursor()
         cellCursor.ParaStyleName = "Заголовок графы таблицы"
-        if cellName == "A1":
-            lineSpacing = uno.createUnoStruct("com.sun.star.style.LineSpacing")
-            lineSpacing.Height = 87
-            cellCursor.ParaLineSpacing = lineSpacing
         cell.TopBorderDistance = 50
         cell.BottomBorderDistance = 50
         cell.LeftBorderDistance = 50
         cell.RightBorderDistance = 50
+        if cellName == "A1":
+            lineSpacing = uno.createUnoStruct("com.sun.star.style.LineSpacing")
+            lineSpacing.Height = 80
+            cellCursor.ParaLineSpacing = lineSpacing
+            cell.BottomBorderDistance = 0
         cell.VertOrient = uno.getConstantByName(
             "com.sun.star.text.VertOrientation.CENTER"
         )
