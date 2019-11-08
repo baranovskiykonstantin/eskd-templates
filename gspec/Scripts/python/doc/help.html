@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="author" content="Барановский Константин">
+<title>Групповая спецификация</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment @import statement to use as custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+abbr[title]{border-bottom:1px dotted}
+b,strong{font-weight:bold}
+dfn{font-style:italic}
+hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
+abbr{text-transform:none}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
+blockquote cite::before{content:"\2014 \0020"}
+blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+:not(pre)>code.nobreak{word-wrap:normal}
+:not(pre)>code.nowrap{white-space:nowrap}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:100%;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details>summary:first-of-type{cursor:pointer;display:list-item;outline:none;margin-bottom:.75em}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:inherit}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6)}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border-style:solid;border-width:1px;border-color:#dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;-webkit-border-radius:4px;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
+pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
+pre.pygments .lineno::before{content:"";margin-right:-.125em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
+table.tableblock{max-width:100%;border-collapse:separate}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+td.tableblock>.content>:last-child.sidebarblock{margin-bottom:0}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>thead>tr>.tableblock,table.grid-all>tbody>tr>.tableblock{border-width:0 1px 1px 0}
+table.grid-all>tfoot>tr>.tableblock{border-width:1px 1px 0 0}
+table.grid-cols>*>tr>.tableblock{border-width:0 1px 0 0}
+table.grid-rows>thead>tr>.tableblock,table.grid-rows>tbody>tr>.tableblock{border-width:0 0 1px}
+table.grid-rows>tfoot>tr>.tableblock{border-width:1px 0 0}
+table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last-child{border-right-width:0}
+table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
+table.frame-all{border-width:1px}
+table.frame-sides{border-width:0 1px}
+table.frame-topbot,table.frame-ends{border-width:1px 0}
+table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+ul.checklist{margin-left:.625em}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
+ul.inline{display:-ms-flexbox;display:-webkit-box;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table td.line-data{width:99%}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media print,amzn-kf8{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Групповая спецификация</h1>
+<div class="details">
+<span id="author" class="author">Барановский Константин</span><br>
+<span id="email" class="email"><a href="mailto:baranovskiykonstantin@gmail.com">baranovskiykonstantin@gmail.com</a></span><br>
+<span id="revnumber">версия 1.0</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Содержание</div>
+<ul class="sectlevel1">
+<li><a href="#_введение">Введение</a></li>
+<li><a href="#_поля_компонентов_схемы">Поля компонентов схемы</a>
+<ul class="sectlevel2">
+<li><a href="#_шаблоны">Шаблоны</a></li>
+</ul>
+</li>
+<li><a href="#_параметры">Параметры</a>
+<ul class="sectlevel2">
+<li><a href="#_спецификация">Спецификация</a></li>
+<li><a href="#_разделы">Разделы</a></li>
+<li><a href="#_поля">Поля</a></li>
+<li><a href="#_основная_надпись">Основная надпись</a></li>
+</ul>
+</li>
+<li><a href="#_панель_инструментов">Панель инструментов</a></li>
+<li><a href="#_оформление_документа">Оформление документа</a>
+<ul class="sectlevel2">
+<li><a href="#_стили_страниц">Стили страниц</a></li>
+<li><a href="#_основная_надпись_и_графы_форматной_рамки">Основная надпись и графы форматной рамки</a></li>
+<li><a href="#_таблица_спецификации">Таблица спецификации</a></li>
+<li><a href="#_начертание_текста">Начертание текста</a></li>
+<li><a href="#_размер_шрифта_таблицы">Размер шрифта таблицы</a></li>
+<li><a href="#_номера_позиций">Номера позиций</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Справочное руководство</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_введение">Введение</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Спецификация выполнена в виде текстового документа и оформлена согласно
+требованиям ЕСКД.<br>
+Документ построен таким образом, чтобы максимально упростить процесс заполнения
+спецификации и основной надписи:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>документ содержит макросы, позволяющие автоматически построить спецификацию и
+заполнить основную надпись (информация об элементах схемы и содержимое основной
+надписи извлекается из списка цепей проекта KiCad);</p>
+</li>
+<li>
+<p>имеется возможность обновить раздел <em>Прочие изделия</em> не затрагивая содержимое
+других разделов;</p>
+</li>
+<li>
+<p>имеется возможность добавить/удалить лист регистрации изменений;</p>
+</li>
+<li>
+<p>автоматически подстраивается высота строк таблицы спецификации;</p>
+</li>
+<li>
+<p>автоматически подстраивается масштаб текста по ширине графы спецификации или
+основной надписи;</p>
+</li>
+<li>
+<p>стили элементов документа имеют древовидную структуру, что позволяет
+изменять форматирование сразу группы однотипных элементов.</p>
+</li>
+<li>
+<p>графы таблицы имеют собственные автообновляемые стили, что позволяет
+применять форматирование ко всей графе сразу;</p>
+</li>
+<li>
+<p>в документ встроены необходимые шрифты.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Чтобы получить спецификацию для проекта KiCad нужно пройти следующие шаги:</p>
+</div>
+<div class="paragraph">
+<p>1) заполнить поля компонентов схемы должным образом и обновить список цепей;<br>
+2) на основе шаблона документа создать новую спецификацию и сохранить её в
+каталоге проекта KiCad;<br>
+3) настроить параметры формирования спецификации;<br>
+4) запустить макрос построения спецификации;<br>
+5) запустить макрос заполнения основной надписи;<br>
+6) при необходимости, поправить форматирование и содержимое спецификации.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_поля_компонентов_схемы">Поля компонентов схемы</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>При формировании спецификации для неподготовленного проекта KiCad будут
+использованы только два стандартных поля компонентов:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Обозначение </dt>
+<dd>
+<p>помещается в графу <em>Примечание</em></p>
+</dd>
+<dt class="hdlist1">Значение </dt>
+<dd>
+<p>помещается в графу <em>Наименование</em></p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">!</div>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Если поле компонента, соответствующее параметру <em>Поля&#8594;Наименование</em>, пусто или
+отсутствует, то вместо него используется поле <em>Значение</em>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Для получения полноценной спецификации, компонентам схемы следует добавить
+несколько пользовательских полей. Количество дополнительных полей и их
+содержимое зависит от типа компонента и от данных, которые должны быть
+отображены в спецификации. По умолчанию макросами используются следующие поля
+компонентов:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Обозначение </dt>
+<dd>
+<p>стандартное поле компонента, помещается в графу <em>Примечание</em>.</p>
+</dd>
+<dt class="hdlist1">Тип </dt>
+<dd>
+<p>пользовательское поле, в котором хранится описание типа компонента,
+например, <em>Резистор {Резисторы}</em>. Значение этого поля указывается в графе
+<em>Наименование</em> и выступает в виде заголовка однотипных компонентов.<br>
+В зависимости от параметров построения спецификации, тип компонента может
+указываться как в единственном, так и в множественном числе, поэтому формат
+поля <em>Тип</em> имеет сложный вид:<br>
+<code>Тип в единственном числе {Тип в множественном числе}</code><br>
+Сначала указывается форма в единственном числе, за которой через пробел и в
+фигурных скобках следует форма в множественном числе. Если содержимое не
+соответствует описанному формату, то оно будет использовано полностью, как в
+единственной, так и в множественной формах. Но при активном режиме
+совместимости с <em>kicadbom2spec</em>, будет предпринята попытка найти формы
+единственного и множественного числа в словаре групп из конфигурационного файла
+приложения <em>kicadbom2spec</em>.</p>
+</dd>
+<dt class="hdlist1">Наименование </dt>
+<dd>
+<p>пользовательское поле, в котором содержится полное наименование
+компонента. Содержимое этого поля помещается в графу <em>Наименование</em>. Если поле
+пусто или отсутствует, то вместо него используется стандартное поле <em>Значение</em>.</p>
+</dd>
+<dt class="hdlist1">Документ </dt>
+<dd>
+<p>пользовательское поле, в котором указывается ГОСТ, ТУ или другой
+документ, относящийся к компоненту. Так как в зависимости от параметров
+построения спецификации <em>Документ</em> может указываться как после <em>Наименования</em>
+компонента, так и в заголовке после <em>Типа</em>, то это значение хранится в
+отдельном поле.</p>
+</dd>
+<dt class="hdlist1">Примечание </dt>
+<dd>
+<p>пользовательское поле, содержимое которого помещается в одноимённую графу
+спецификации после перечня обозначений компонентов.</p>
+</dd>
+<dt class="hdlist1">Исключить </dt>
+<dd>
+<p>пользовательское поле. Если поле с указанным именем содержится в компоненте, то
+такой компонент будет исключён из спецификации. Значение самого поля не
+используется.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Предложенные наименования полей можно изменить на вкладке <em>Поля</em> диалогового
+окна параметров макросов.</p>
+</div>
+<div class="paragraph">
+<p>Значение поля компонента может включать содержимое других полей этого же
+компонента. Это реализуется с помощью <em>Шаблонов</em>&#8201;&#8212;&#8201;текстовых конструкций,
+которые обрабатываются особым образом.</p>
+</div>
+<div class="sect2">
+<h3 id="_шаблоны">Шаблоны</h3>
+<div class="paragraph">
+<p>Шаблоном называется строка текста, содержащая как минимум одну конструкцию
+следующего вида:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>${поле}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>или</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>${префикс|поле|суффикс}</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">префикс </dt>
+<dd>
+<p>символы между <code>{</code> и <code>|</code> будут добавлены к значению поля в виде префикса</p>
+</dd>
+<dt class="hdlist1">поле </dt>
+<dd>
+<p>наименование поля, значение которого должно быть подставлено вместо конструкции
+<code>${}</code></p>
+</dd>
+<dt class="hdlist1">суффикс </dt>
+<dd>
+<p>символы между <code>|</code> и <code>}</code> будут добавлены к значению поля в виде суффикса</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Внутри конструкции <code>${}</code> символы <code>{</code>, <code>|</code> и <code>}</code> нужно экранировать с помощью
+обратной косой черты: <code>\{</code>, <code>\|</code> или <code>\}</code>. За пределами конструкции <code>${}</code>
+экранирование не требуется. Например, в шаблоне<br>
+<code>| ${\{|Посад.место|\}} |</code><br>
+вертикальная черта в начале и конце строки экранирования не требует, так как
+находится за пределами конструкции <code>${}</code>, а вот фигурные скобки в качестве
+префикса и суффикса нужно экранировать.</p>
+</div>
+<div class="paragraph">
+<p>Шаблон может содержать несколько конструкций вида <code>${}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Если указанное поле пусто или отсутствует, то конструкция <code>${}</code> просто
+удаляется из текста.</p>
+</div>
+<div class="paragraph">
+<p>Поле, указанное в конструкции <code>${}</code>, тоже может содержать шаблон. Но эти
+шаблоны не должны ссылаться друг на друга, иначе возникнет рекурсивное
+зацикливание.</p>
+</div>
+<div class="paragraph">
+<p>Доступ к стандартным полям производится с помощью следующих имён:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Обозначение</strong></p>
+</li>
+<li>
+<p><strong>Значение</strong></p>
+</li>
+<li>
+<p><strong>Посад.место</strong></p>
+</li>
+<li>
+<p><strong>Документация</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Шаблоны в стандартных полях тоже обрабатываются.</p>
+</div>
+<div class="paragraph">
+<p>Рассмотрим пример шаблона для поля <em>Наименование</em> резистора:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>МЛТ-0,5-${Значение}${-|Класс точности|}-В</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Здесь имеются две конструкции <code>${}</code>, т.е. будут подставлены значения двух
+полей <em>Значение</em> и <em>Класс точности</em>. Значение не имеет ни префикса, ни
+суффикса, а к классу точности будет добавлен префикс <code>-</code>.<br>
+Предположим, сопротивление резистора равно <code>4,7кОм</code>, а класс точности <code>±5%</code>,
+тогда шаблон будет преобразован в строку следующего вида:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>МЛТ-0,5-4,7кОм-±5%-В</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Если класс точности не указан или такое поле отсутствует в компоненте, то
+строка будет следующей:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>МЛТ-0,5-4,7кОм-В</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>т.е. класс точности и его префикс отсутствует в итоговом значении.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_параметры">Параметры</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Оптимальный вид документа </dt>
+<dd>
+<p>Если отмечено, то при открытии документа параметры отображения будут настроены
+для обеспечения наилучшего вида содержимого:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>Границы текста</em>&#8201;&#8212;&#8201;скрыть</p>
+</li>
+<li>
+<p><em>Границы таблиц</em>&#8201;&#8212;&#8201;скрыть</p>
+</li>
+<li>
+<p><em>Затенение полей</em>&#8201;&#8212;&#8201;отключить</p>
+</li>
+<li>
+<p><em>Скрытые абзацы</em>&#8201;&#8212;&#8201;скрыть</p>
+</li>
+<li>
+<p><em>Подробные всплывающие подсказки</em>&#8201;&#8212;&#8201;включить</p>
+</li>
+<li>
+<p><em>Панель инструментов</em>&#8201;&#8212;&#8201;расположить под стандартными</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div class="sect2">
+<h3 id="_спецификация">Спецификация</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Файл с данными о схеме </dt>
+<dd>
+<p>В случае с KiCad, источником данных о схеме является файл списка цепей.<br>
+Если файл не указан, то при запуске макроса <code>Построить специф.</code> или
+<code>Заполнить осн. надпись</code> будет предпринята попытка найти файл списка цепей по
+имени файла проекта (ищется файл <em>*.pro</em>, заменяется расширение <em>pro</em> на <em>net</em>
+и проверяется наличие файла с полученным именем и расширением). Если файл
+списка цепей найти не удастся, будет показан диалог выбора файла.<br>
+Поддерживаются файлы с расширением:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>*.net</em>&#8201;&#8212;&#8201;формат Pcbnew <code>Eeschema &#8594; Экспорт &#8594; Экспорт списка цепей&#8230;&#8203;</code></p>
+</li>
+<li>
+<p><em>*.xml</em>&#8201;&#8212;&#8201;вспомогательный <code>Eeschema &#8594; Инструменты &#8594; Сформировать
+перечень элементов&#8230;&#8203;</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">!</div>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Вспомогательный файл списка цепей создаётся перед формированием перечня
+элементов средствами <em>Eeschema</em> и остаётся в каталоге проекта как побочный. В
+<em>*.net</em>-файле и <em>*.xml</em>-файле содержатся одни и те же данные, только в
+разных форматах.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Количество пустых строк между компонентами разного типа </dt>
+<dd>
+<p>Указанное количество пустых строк будет вставлено между компонентами различного
+типа в разделе <em>Прочие изделия</em>.</p>
+</dd>
+<dt class="hdlist1">Минимально допустимый масштаб по ширине (%) </dt>
+<dd>
+<p>Если текст не помещается в графе таблицы, то уменьшается масштаб символов по
+ширине. Когда масштаб становится меньше указанного значения, текст разбивается
+на части и размещается на последующих строках.</p>
+</dd>
+<dt class="hdlist1">Разделитель диапазона обозначений </dt>
+<dd>
+<p>Параметр позволяет выбрать один из двух возможных разделителей для диапазона
+обозначений компонентов:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>дефис <code>-</code></p>
+</li>
+<li>
+<p>многоточие <code>…</code></p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1">Добавить единицы измерения </dt>
+<dd>
+<p>Если для резисторов, конденсаторов или индуктивностей указаны только значения и
+данная опция включена, то к значениям будут добавлены соответствующие единицы
+измерения (Ом, Ф, Гн). При этом, множители приводятся к общему виду:</p>
+</dd>
+</dl>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 40%;">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">На схеме</th>
+<th class="tableblock halign-left valign-top">В спецификации</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top" colspan="2"><p class="tableblock"><strong>Конденсаторы</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,2мкФ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1200</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1200пФ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1н2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,2нФ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12 μF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12мкФ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120u</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120мкФ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top" colspan="2"><p class="tableblock"><strong>Резисторы</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7Ом</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4R7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7Ом</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R47</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0,47Ом</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">470</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">470Ом</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7k</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7кОм</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.7 kOhm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7кОм</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7 kΩ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7кОм</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4M7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4,7МОм</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top" colspan="2"><p class="tableblock"><strong>Дроссели</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910мкГн</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910u</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910мкГн</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910мк</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910мкГн</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9m1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9,1мГн</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910 uH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">910мкГн</p></td>
+</tr>
+</tbody>
+</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Вставить пробел перед единицами измерения </dt>
+<dd>
+<p>Если отмечено, то между цифровой частью значения и единицами измерения (включая
+множитель) будет вставлен пробел.</p>
+</dd>
+<dt class="hdlist1">Формировать отдельную группу для каждого документа </dt>
+<dd>
+<p>По умолчанию, группы компонентов формируются по их типу, например: <em>Резисторы</em>,
+<em>Конденсаторы</em> и т.д.<br>
+Если отмечено, то группы компонентов будут разбиваться ещё и по документу,
+например: <em>Резисторы ГОСТ&#8230;&#8203;</em>, <em>Резисторы ТУ&#8230;&#8203;</em> и т.д.</p>
+</dd>
+<dt class="hdlist1">Указать документ в заголовке группы </dt>
+<dd>
+<p>По умолчанию, в качестве заголовка группы компонентов выступает <em>Тип</em> в
+множественном числе.<br>
+Если отмечено, то в заголовке, после <em>Типа</em>, будет указан <em>Документ</em> (ГОСТ, ТУ,
+&#8230;&#8203;). Если в группе компоненты имеют разные документы, то перед каждым
+документом в заголовке будет указана часть наименования, необходимая для
+идентификации соответствующих компонентов.</p>
+</dd>
+<dt class="hdlist1">Формировать заголовок для каждой группы </dt>
+<dd>
+<p>По умолчанию, заголовок формируется только если группа содержит более чем один
+компонент.<br>
+Если же группа состоит из одного компонента, заголовок не формируется, а <em>Тип</em>,
+в единственном числе, указывается перед <em>Наименованием</em>. Если отмечено, то
+заголовок будет сформирован для каждой группы, даже если она состоит из одного
+компонента.</p>
+</dd>
+<dt class="hdlist1">Резервировать номера позиций </dt>
+<dd>
+<p>По умолчанию, позиции в спецификации увеличиваются на единицу.<br>
+Если отмечено, то для пустых строк, вставляемых между группами компонентов,
+будут зарезервированы номера позиций.</p>
+</dd>
+<dt class="hdlist1">Добавить пустую строку после заголовка группы </dt>
+<dd>
+<p>Если отмечено, то между заголовком и первым компонентом группы будет вставлена
+одна пустая строка.</p>
+</dd>
+<dt class="hdlist1">Добавить лист регистрации изменений, если количество листов больше &#8230;&#8203; </dt>
+<dd>
+<p>Если отмечено и количество листов документа превышает указанное число, то в
+конец документа будет добавлен лист регистрации изменений. Если в процессе
+редактирования количество листов станет меньше указанного значения, то лист
+регистрации изменения будет удалён.</p>
+</dd>
+<dt class="hdlist1">Запретить заголовки групп внизу страницы </dt>
+<dd>
+<p>Если отмечено, то заголовки групп, находящиеся внизу страницы без единого
+элемента, будут перемещены на следующую страницу.</p>
+</dd>
+<dt class="hdlist1">Запретить пустые строки вверху страницы </dt>
+<dd>
+<p>Если отмечено, то пустые строки вверху страницы будут удалены.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_разделы">Разделы</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Документация </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации будет создан раздел
+<em>Документация</em>.</p>
+</dd>
+<dt class="hdlist1">Сборочный чертёж </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации в разделе <em>Документация</em> будет
+указан сборочный чертёж.</p>
+</dd>
+<dt class="hdlist1">Схема электрическая принципиальная </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации в разделе <em>Документация</em> будет
+указана принципиальная схема.</p>
+</dd>
+</dl>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Если имя файла схемы совпадает с именем файла списка цепей (отличаются только
+расширением), то формат страницы и децимальный номер будут изъяты из файла
+схемы и помещены в графы <em>Формат</em> и <em>Обозначение</em> соответственно.</p>
+</div>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Перечень элементов </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации в разделе <em>Документация</em> будет
+указан перечень элементов.</p>
+</dd>
+</dl>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Для перечня элементов всегда указывается формат <em>А4</em>.<br>
+В графе <em>Обозначение</em> указывается децимальный номер схемы с добавлением буквы
+<code>П</code> перед кодом документа.</p>
+</div>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Сборочные единицы </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации будет создан раздел <em>Сборочные
+единицы</em>.</p>
+</dd>
+<dt class="hdlist1">Детали </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации будет создан раздел <em>Детали</em>.</p>
+</dd>
+<dt class="hdlist1">Плата печатная </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации в разделе <em>Детали</em> будет
+указана печатная плата.</p>
+</dd>
+</dl>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Если имя файла платы совпадает с именем файла списка цепей (отличаются только
+расширением), то формат страницы и децимальный номер будут изъяты из файла
+платы и помещены в графы <em>Формат</em> и <em>Обозначение</em> соответственно.</p>
+</div>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Стандартные изделия </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации будет создан раздел
+<em>Стандартные изделия</em>.</p>
+</dd>
+<dt class="hdlist1">Прочие изделия </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации будет создан раздел <em>Прочие
+изделия</em>.</p>
+</dd>
+<dt class="hdlist1">Материалы </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации будет создан раздел
+<em>Материалы</em>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_поля">Поля</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Тип </dt>
+<dd>
+<p>Значение поля с указанным именем будет использовано для обозначения типа
+компонента, например, <em>Резистор {Резисторы}</em>.</p>
+</dd>
+<dt class="hdlist1">Наименование </dt>
+<dd>
+<p>Значение поля с указанным именем будет помещено в графу <em>Наименование</em>.</p>
+</dd>
+<dt class="hdlist1">Документ </dt>
+<dd>
+<p>Значение поля с указанным именем будет добавлено к <em>Наименованию</em>, указывая на
+ГОСТ, ТУ или прочий документ.</p>
+</dd>
+<dt class="hdlist1">Примечание </dt>
+<dd>
+<p>Значение поля с указанным именем будет помещено в графу <em>Примечание</em>.</p>
+</dd>
+</dl>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>В обозначенных выше полях допускается использование <em>шаблонов</em>. Благодаря этому
+можно комбинировать значения нескольких полей.</p>
+</div>
+<div class="paragraph">
+<p>Если значение, указанное в поле параметра, не содержит конструкций <code>${}</code>, то
+оно воспринимается как наименование поля и в спецификации будет использовано
+значение данного поля.</p>
+</div>
+<div class="paragraph">
+<p>Если же в значении параметра имеется хотя бы одна конструкция <code>${}</code>, то такое
+значение будет обработано как <em>шаблон</em> и в спецификацию попадёт преобразованный
+текст с подставленными значениями указанных полей.</p>
+</div>
+<div class="paragraph">
+<p><strong>Примечание:</strong> если значение для поля <em>Тип</em> указано в виде шаблона, то к
+единственному/множественному числу будет приведено каждое значение из указанных
+полей. Если содержимое поля не соответствует формату <code>тип в единственном числе
+{тип в множественном числе}</code>, то это содержимое будет использоваться полностью
+как в единственном, так и в множественном числе.</p>
+</div>
+<div class="paragraph">
+<p>Для примера можно рассмотреть <em>Наименование</em> в режиме совместимости с
+<em>kicadbom2spec</em>:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>${|Марка|-}${Значение}${-|Класс точности|}${-|Тип|}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Здесь наименование состоит из нескольких частей, каждая из которых храниться в
+отдельном поле компонента.</p>
+</div>
+<div class="paragraph">
+<p><strong>Примечание:</strong> при нажатии кнопки <code>Установить значения, совместимые с
+kicadbom2spec</code> шаблон <em>Наименования</em> будет построен с учётом разделителей,
+указанных в конфигурационном файле приложения <em>kicadbom2spec</em> (если он
+существует).</p>
+</div>
+<div class="paragraph">
+<p>Обратите внимание, значения:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Наименование</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>и</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>${Наименование}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>в итоге дадут одинаковый результат&#8201;&#8212;&#8201;значение поля с именем <em>Наименование</em>. Но
+обработаны они будут по разному, в первом случае&#8201;&#8212;&#8201;значение воспринимается как
+название поля, а во втором&#8201;&#8212;&#8201;как шаблон.</p>
+</div>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Исключить </dt>
+<dd>
+<p>Если компонент содержит поле с указанным именем, то он будет исключён из
+спецификации.</p>
+</dd>
+<dt class="hdlist1">Установить значения по умолчанию </dt>
+<dd>
+<p>Установить параметрам полей значения по умолчанию.</p>
+</dd>
+<dt class="hdlist1">Установить значения, совместимые с kicadbom2spec </dt>
+<dd>
+<p>Настроить параметры полей так, чтобы обеспечить формирование спецификации для
+проектов, оформленных с помощью приложения <em>kicadbom2spec</em>.</p>
+</dd>
+<dt class="hdlist1">Режим совместимости с kicadbom2spec </dt>
+<dd>
+<p>Если отмечено, то при формировании спецификации из файла настроек приложения
+<em>kicadbom2spec</em> будут использованы данные о разделителях и словарь наименований
+групп.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_основная_надпись">Основная надпись</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Преобразовать наименование документа </dt>
+<dd>
+<p>Если отмечено, тип схемы в наименовании документа будет удалён.<br>
+В противном случае, наименование останется без изменений.</p>
+</dd>
+<dt class="hdlist1">Преобразовать обозначение документа </dt>
+<dd>
+<p>Если отмечено, тип схемы в обозначении документа будет удалён.<br>
+В противном случае, обозначение останется без изменений.</p>
+</dd>
+<dt class="hdlist1">Автоматически заполнить графу <em>Перв. примен.</em> </dt>
+<dd>
+<p>Если отмечено, в графу первичной применяемости будет записано обозначение
+документа без кода документа.<br>
+В противном случае, графа останется без изменений.</p>
+</dd>
+<dt class="hdlist1">Поместить децимальный номер в заголовок графы <em>Кол. на исполнение</em> </dt>
+<dd>
+<p>Если отмечено, при заполнении основной надписи в заголовке графы <em>Кол. на
+исполнение</em> будет указано обозначение документа.<br>
+В противном случае, графа останется без изменений.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_панель_инструментов">Панель инструментов</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Построить специф. </dt>
+<dd>
+<p>запустить макрос построения спецификации. Содержимое таблицы будет
+перезаписано.</p>
+</dd>
+<dt class="hdlist1">Очистить специф. </dt>
+<dd>
+<p>запустить макрос очистки спецификации. Таблица будет удалена и построена
+заново.</p>
+</dd>
+</dl>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Обновить "Прочие изделия" </dt>
+<dd>
+<p>запустить макрос обновления раздела <em>Прочие изделия</em>. Раздел <em>Прочие изделия</em>
+будет полностью удалён и построен заново. Содержимое других разделов не
+затрагивается.</p>
+</dd>
+</dl>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Заполнить осн. надпись </dt>
+<dd>
+<p>запустить макрос заполнения основной надписи. Данные для заполнения будут взяты
+из файла списка цепей.</p>
+</dd>
+<dt class="hdlist1">Очистить осн. надпись </dt>
+<dd>
+<p>запустить макрос очистки основной надписи. Содержимое граф основной надписи и
+форматной рамки будет удалено, а форматирование установлено к значениям по
+умолчанию.<br>
+Графы <em>Лист</em> и <em>Листов</em> данным макросом не затрагиваются.</p>
+</dd>
+</dl>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Добавить/удалить лист регистрации изменений </dt>
+<dd>
+<p>запустить макрос создания/удаления листа регистрации изменений.<br>
+Если лист регистрации изменений отсутствует в документе, то он будет создан в
+виде последней страницы и отделён от таблицы спецификации разрывом страниц.<br>
+В противном случае&#8201;&#8212;&#8201;лист регистрации изменений будет удалён из документа.</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">!</div>
+</td>
+<td class="content">
+При выполнении данной команды отключается параметр <em>Добавить лист
+регистрации изменений, если количество листов больше &#8230;&#8203;</em>!
+</td>
+</tr>
+</table>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Параметры </dt>
+<dd>
+<p>показать диалоговое окно для ввода параметров формирования спецификации.</p>
+</dd>
+</dl>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Справка </dt>
+<dd>
+<p>открыть справочное руководство в вэб-браузере.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_оформление_документа">Оформление документа</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_стили_страниц">Стили страниц</h3>
+<div class="paragraph">
+<p>Внешний вид первого листа можно изменить путём выбора стиля страницы.<br>
+В документе для этого имеется четыре специальных стиля:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Первый лист 1</strong>&#8201;&#8212;&#8201;первый лист без дополнительных граф</p>
+</li>
+<li>
+<p><strong>Первый лист 2</strong>&#8201;&#8212;&#8201;первый лист с дополнительными графами <em>Справ. №</em> и
+<em>Перв. примен.</em></p>
+</li>
+<li>
+<p><strong>Первый лист 3</strong>&#8201;&#8212;&#8201;первый лист с дополнительными графами заказчика</p>
+</li>
+<li>
+<p><strong>Первый лист 4</strong>&#8201;&#8212;&#8201;первый лист со всеми дополнительными графами</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Чтобы применить нужный стиль, нужно выполнить команду меню
+<code>Стили &#8594; Управление стилями (F11)</code>, выбрать <code>Стили страниц</code> и двойным
+щелчком левой кнопки мыши установить один из выше перечисленных стилей. При
+смене стиля форматной рамки с заполненной основной надписью&#8201;&#8212;&#8201;данные
+сохраняются.</p>
+</div>
+<div class="paragraph">
+<p>Для второго и последующих листов всегда используется стиль <strong>Последующие листы</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Во всех перечисленных стилях страниц, в качестве форматной рамки выступает
+фоновое изображение.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_основная_надпись_и_графы_форматной_рамки">Основная надпись и графы форматной рамки</h3>
+<div class="paragraph">
+<p>Графы основной надписи и форматной рамки построены из врезок. Заголовки граф
+защищены от перемещения, изменения размера и редактирования. Графы,
+предназначенные для ввода текста, защищены только от перемещения и изменения
+размера. Не все графы форматной рамки имеют врезки для ввода текста. Например,
+графы <em>Подп. и дата</em>, у левого края форматной рамки, врезок для ввода текста не
+имеют.</p>
+</div>
+<div class="paragraph">
+<p>Все врезки основной надписи и форматной рамки принадлежат нижнему колонтитулу и
+хранятся в стиле страницы. Каждый стиль первого листа имеет свой собственный
+набор врезок. При внесении изменений в графу основной надписи или форматной
+рамки, соответствующие врезки остальных стилей синхронизируются посредством
+макросов. Это позволяет изменять вид первого листа без потери данных.</p>
+</div>
+<div class="paragraph">
+<p>Структура стиля второго и последующих листов аналогична. Но здесь все графы
+защищены от записи. Их значения синхронизируются с соответствующими врезками
+первого листа с помощью макросов.</p>
+</div>
+<div class="paragraph">
+<p>Номера и количество страниц подставляются автоматически средствами LibreOffice
+(используются <em>поля</em>). Если в документе лишь одна страница, то графа <em>Листов</em>,
+основной надписи первого листа, остаётся пустой. Это реализовано на основе
+<em>скрытого абзаца</em> с условием.</p>
+</div>
+<div class="paragraph">
+<p>Автоматический подбор масштаба шрифта по ширине работает как при заполнении
+основной надписи с помощью команды <code>Заполнить осн. надпись</code>, так и при вводе
+текста вручную. Текст обрабатывается построчно.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_таблица_спецификации">Таблица спецификации</h3>
+<div class="paragraph">
+<p>Спецификация представляет собой таблицу, которая занимает всю ширину документа.
+Количество строк таблицы зависит от количества элементов схемы. Если таблица не
+помещается на странице, то создаётся новый лист и она продолжается на новой
+странице. Заголовок таблицы повторяется на каждом листе. Это обеспечивается
+средствами LibreOffice.</p>
+</div>
+<div class="paragraph">
+<p>С помощью макросов высота строк регулируется таким образом, чтобы нижняя линия
+обрамления последней строки на странице совпадала с верхней линией основной
+надписи.</p>
+</div>
+<div class="paragraph">
+<p>В каждой графе таблицы используется отдельный стиль абзаца, соответствующий
+наименованию графы. Кроме того, для графы <em>Наименование</em> создано несколько
+стилей абзацев: <em>Наименование</em>, <em>Наименование (заголовок группы)</em> и
+<em>Наименование (заголовок раздела)</em>. Это сделано для того, чтобы можно было
+задать форматирование заголовков отличное от остального содержимого.</p>
+</div>
+<div class="paragraph">
+<p>Стили абзацев таблицы являются <em>автообновляемыми</em>. То есть, при изменении
+форматирования одной ячейки, автоматически изменяется форматирование остальных
+ячеек этой графы. Например, по умолчанию в графе <em>Примечание</em> текст
+выровнен по левому краю. Если установить курсор в одну из ячеек этой графы
+(любую) и задать выравнивание по центру, то все позиционные обозначения станут
+выровненными по центру.</p>
+</div>
+<div class="paragraph">
+<p>Не все команды форматирования применяются к целому абзацу. К примеру,
+подчёркивание применяется к символам. Чтобы подобные изменения были
+автоматически отражены на остальных ячейках с таким же стелем, нужно применить
+форматирование ко всему содержимому ячейки.<br>
+По умолчанию, наименование группы элементов (заголовок) имеет обычное
+начертание. Чтобы сделать его подчёркнутым, нужно установить курсор в ячейку с
+любым заголовком, выделить всё содержимое ячейки с помощью мыши или нажатием
+комбинации клавиш <code>Ctrl+A</code> и выполнить команду меню <code>Формат &#8594; Текст &#8594;
+Подчёркнутый (Ctrl+U)</code>. Заголовки всех групп элементов станут подчёркнутыми.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">!</div>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Открытый формат документов для офисных приложений (ODF) имеет несколько
+особенностей о которых стоит упомянуть.</p>
+</div>
+<div class="paragraph">
+<p>После таблицы обязательно должен быть как минимум один абзац. То есть, документ
+не может заканчиваться таблицей.<br>
+В случае со спецификацией возникает следующая ситуация. Если таблица
+спецификации занимает всю страницу так, что обрамление последней строки
+совпадает с верхней линией основной надписи, то абзац после таблицы (который
+нельзя удалить) переносится на новую чистую страницу. Чтобы избежать подобного,
+последнему абзацу присвоен особый стиль <em>Пустой</em>, который имеет минимально
+возможную высоту (приблизительно 0.5 мм), а отступ между нижним колонтитулом и
+содержимым документа уменьшен на величину данного абзаца. В таком варианте
+абзац после таблицы не переносится на следующую страницу, а просто
+накладывается на нижний колонтитул с основной надписью. Это не влияет на
+внешний вид, но при редактировании документа вручную, об этом следует помнить.</p>
+</div>
+<div class="paragraph">
+<p>Ещё одна особенность была выявлена при создании шаблона. Если таблица находится
+в самом начале документа и в ячейках используются автообновляемые стили
+абзацев, то при первом же редактировании таких ячеек, стиль страницы
+сбрасывается на стиль по умолчанию.<br>
+Чтобы избежать подобного поведения, перед таблицей добавляется специальный
+<em>Пустой</em> абзац, а поле первой страницы расширено вверх на величину данного
+абзаца, чтобы таблица начиналась у верхнего края форматной рамки.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_начертание_текста">Начертание текста</h3>
+<div class="paragraph">
+<p>Графы таблицы спецификации и графы форматной рамки имеют собственные стили
+абзацев. Но все они происходят от одного общего стиля&#8201;&#8212;&#8201;<em>Текст</em> и наследуют
+его свойства.</p>
+</div>
+<div class="paragraph">
+<p>Чтобы изменить начертание текста во всём документе необходимо открыть окно
+управления стилями, выполнив команду меню <code>Стили &#8594; Управление стилями (F11)</code>,
+и нажать кнопку <code>Стили абзацев</code>. В списке стилей нажать правой кнопкой мыши на
+пункте <em>Текст</em> и в контекстном меню выбрать команду <code>Изменить&#8230;&#8203;</code>. В
+открывшемся диалоговом окне, на вкладке <em>Шрифт</em>, можно установить необходимое
+начертание текста в поле <em>Стиль</em>. <em>Обычный</em> стиль соответствует прямому
+начертанию, а <em>Курсив</em>&#8201;&#8212;&#8201;наклонному. После применения изменений все надписи в
+документе будут отображаться с указанным начертанием.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_размер_шрифта_таблицы">Размер шрифта таблицы</h3>
+<div class="paragraph">
+<p>По умолчанию, размер шрифта заголовка и содержимого таблицы спецификации
+составляет 16 пунктов.<br></p>
+</div>
+<div class="paragraph">
+<p>При желании, размер шрифта содержимого таблицы можно изменить, например,
+уменьшить до 14 пунктов. Для этого нужно открыть окно управления стилями,
+выполнив команду меню <code>Стили &#8594; Управление стилями (F11)</code>, и нажать кнопку
+<code>Стили абзацев</code>. В списке стилей нажать правой кнопкой мыши на пункте <em>Значение
+графы таблицы</em> и в контекстном меню выбрать команду <code>Изменить&#8230;&#8203;</code>. В
+открывшемся диалоговом окне, на вкладке <em>Шрифт</em>, можно установить желаемый
+размер шрифта в поле <em>Кегль</em>.</p>
+</div>
+<div class="paragraph">
+<p>Автоматическая подстройка ширины текста будет нормально работать с новым
+размером шрифта при вводе новых данных. Но если спецификация была построена
+до изменения размера шрифта, потребуется сформировать спецификацию заново,
+чтобы макрос автоматически подобрал масштаб шрифта по ширине, а при
+необходимости разбил содержимое на несколько строк.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_номера_позиций">Номера позиций</h3>
+<div class="paragraph">
+<p>Номера позиций в спецификации выполнены с помощью <em>полей</em>. Значение поля
+формируется с применением переменной <em>Позиция</em>. По умолчанию поле позиции имеет
+значение <code>Позиция+1</code>, то есть номер позиции увеличивается на единицу по
+отношению к предыдущей. Если установлен параметр <em>Резервировать номера
+позиций</em>, то позиция после нескольких пустых строк будет увеличена не на
+единицу, на количество пустых строк плюс 1.</p>
+</div>
+<div class="paragraph">
+<p>Чтобы исправить номер позиции нужно дважды щёлкнуть левой кнопки мыши по нему и
+в открывшемся диалоговом окне поправить инкремент в поле <em>Значение</em>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Версия 1.0<br>
+Редакция от 2019-11-07 17:25:20 +0200
+</div>
+</div>
+</body>
+</html>
