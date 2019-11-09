@@ -384,7 +384,7 @@ class SpecBuildingThread(threading.Thread):
                     size, ref = common.getPcbInfo()
                     name = "Плата печатная"
                     fillRow(
-                        [size, "", "", ref, name, "", ""],
+                        [size, "", "", ref, name, "1", ""],
                         posIncrement=1
                     )
 
