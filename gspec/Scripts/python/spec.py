@@ -163,6 +163,8 @@ class SpecBuildingThread(threading.Thread):
             extremeWidthFactor = config.getint("spec", "extreme width factor")
             doc.lockControllers()
             for col in range(len(values)):
+                if values[col] == "" and not (col == 2 and posIncrement != 0):
+                    continue
                 if '\n' in values[col]:
                     text = values[col]
                     lfPos = text.find('\n')
@@ -220,7 +222,7 @@ class SpecBuildingThread(threading.Thread):
                     cellCursor = cell.createTextCursor()
                     cellCursor.gotoEnd(True)
                     cellCursor.CharScaleWidth = widthFactor
-                else:
+                elif values[col]:
                     cell.String = values[col]
             doc.unlockControllers()
 
