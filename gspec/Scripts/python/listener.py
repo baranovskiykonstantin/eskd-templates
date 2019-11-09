@@ -266,9 +266,10 @@ def init(*args):
         )
         return
     config.load()
+    if "Спецификация" not in doc.TextTables:
+        common.rebuildTable()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
-    doc.CurrentController.ViewCursor.goDown(2, False)
     if config.getboolean("settings", "set view options"):
         options = (
             {

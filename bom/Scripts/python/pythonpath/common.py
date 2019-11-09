@@ -501,3 +501,151 @@ def getBomRowHeight(rowIndex):
     else:
         height = 815
     return height
+
+def rebuildTable():
+    """Построить новую пустую таблицу."""
+    doc = XSCRIPTCONTEXT.getDocument()
+    doc.lockControllers()
+    text = doc.Text
+    cursor = text.createTextCursor()
+    firstPageStyleName = cursor.PageDescName
+    text.String = ""
+    cursor.ParaStyleName = "Пустой"
+    cursor.PageDescName = firstPageStyleName
+    # Если не оставить параграф перед таблицей, то при изменении форматирования
+    # в ячейках с автоматическими стилями будет сбрасываться стиль страницы на
+    # стиль по умолчанию.
+    text.insertControlCharacter(
+        cursor,
+        uno.getConstantByName(
+            "com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK"
+        ),
+        False
+    )
+    # Таблица
+    table = doc.createInstance("com.sun.star.text.TextTable")
+    table.initialize(3, 11)
+    text.insertTextContent(text.End, table, False)
+    table.Name = "Ведомость_покупных_изделий"
+    table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
+    table.Width = 39500
+    table.LeftMargin = 2000
+    columnSeparators = table.TableColumnSeparators
+    columnSeparators[0].Position = 177   # int((7)/395*10000)
+    columnSeparators[1].Position = 1695  # int((7+60)/395*10000)
+    columnSeparators[2].Position = 2834  # int((7+60+45)/395*10000)
+    columnSeparators[3].Position = 4606  # int((7+60+45+70)/395*10000)
+    columnSeparators[4].Position = 5998  # int((7+60+45+70+55)/395*10000)
+    columnSeparators[5].Position = 7770  # int((7+60+45+70+55+70)/395*10000)
+    columnSeparators[6].Position = 8175  # int((7+60+45+70+55+70+16)/395*10000)
+    columnSeparators[7].Position = 8580  # int((7+60+45+70+55+70+16+16)/395*10000)
+    columnSeparators[8].Position = 8985  # int((7+60+45+70+55+70+16+16+16)/395*10000)
+    columnSeparators[9].Position = 9390  # int((7+60+45+70+55+70+16+16+16+16)/395*10000)
+    table.TableColumnSeparators = columnSeparators
+    # Обрамление
+    border = table.TableBorder
+    noLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    normalLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    normalLine.OuterLineWidth = 50
+    border.TopLine = noLine
+    border.LeftLine = noLine
+    border.RightLine = noLine
+    border.BottomLine = normalLine
+    border.HorizontalLine = normalLine
+    border.VerticalLine = normalLine
+    table.TableBorder = border
+    # Заголовок
+    table.RepeatHeadline = True
+    table.HeaderRowCount = 2
+    table.Rows[0].Height = 900
+    table.Rows[0].IsAutoHeight = False
+    table.Rows[1].Height = 1800
+    table.Rows[1].IsAutoHeight = False
+    cellCursor = table.createCursorByCellName("A1")
+    cellCursor.gotoCellByName("A2", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("B1", False)
+    cellCursor.gotoCellByName("B2", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("C1", False)
+    cellCursor.gotoCellByName("C2", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("D1", False)
+    cellCursor.gotoCellByName("D2", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("E1", False)
+    cellCursor.gotoCellByName("E2", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("F1", False)
+    cellCursor.gotoCellByName("F2", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("G1", False)
+    cellCursor.gotoCellByName("J1", True)
+    cellCursor.mergeRange()
+    cellCursor.gotoCellByName("H1", False)
+    cellCursor.gotoCellByName("K2", True)
+    cellCursor.mergeRange()
+    headerNames = (
+        ("A1", "№ строки"),
+        ("B1", "Наименование"),
+        ("C1", "Код\nпродукции"),
+        ("D1", "Обозначение\nдокумента на\nпоставку"),
+        ("E1", "Поставщик"),
+        ("F1", "Куда входит\n(обозначение)"),
+        ("G1", "Количество"),
+        ("G2", "на из-\nделие"),
+        ("H2", "в ком-\nплекты"),
+        ("I2", "на ре-\nгулир."),
+        ("J2", "всего"),
+        ("H1", "Приме-\nчание")
+    )
+    for cellName, headerName in headerNames:
+        cell = table.getCellByName(cellName)
+        cellCursor = cell.createTextCursor()
+        cellCursor.ParaStyleName = "Заголовок графы таблицы"
+        cell.TopBorderDistance = 50
+        cell.BottomBorderDistance = 50
+        cell.LeftBorderDistance = 50
+        cell.RightBorderDistance = 50
+        cell.VertOrient = uno.getConstantByName(
+            "com.sun.star.text.VertOrientation.CENTER"
+        )
+        if cellName.endswith("1"):
+            cellCursor.CharHeight = 18
+        if cellName == "A1":
+            cellCursor.CharRotation = 900
+            cell.LeftBorderDistance = 0
+            cell.RightBorderDistance = 100
+        cell.String = headerName
+    # Строки
+    table.Rows[2].Height = 800
+    table.Rows[2].IsAutoHeight = False
+    cellStyles = (
+        ("A3", "№ строки"),
+        ("B3", "Наименование"),
+        ("C3", "Код продукции"),
+        ("D3", "Обозначение документа на поставку"),
+        ("E3", "Поставщик"),
+        ("F3", "Куда входит (обозначение)"),
+        ("G3", "Кол. на изделие"),
+        ("H3", "Кол. в комплекты"),
+        ("I3", "Кол. на регулир."),
+        ("J3", "Кол. всего"),
+        ("K3", "Примечание")
+    )
+    for cellName, cellStyle in cellStyles:
+        cell = table.getCellByName(cellName)
+        cursor = cell.createTextCursor()
+        cursor.ParaStyleName = cellStyle
+        cell.TopBorderDistance = 0
+        cell.BottomBorderDistance = 0
+        cell.LeftBorderDistance = 50
+        cell.RightBorderDistance = 50
+        cell.VertOrient = uno.getConstantByName(
+            "com.sun.star.text.VertOrientation.CENTER"
+        )
+    doc.refresh()
+    viewCursor = doc.CurrentController.ViewCursor
+    viewCursor.gotoStart(False)
+    viewCursor.goDown(2, False)
+    doc.unlockControllers()

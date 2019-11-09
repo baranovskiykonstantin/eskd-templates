@@ -247,9 +247,10 @@ def init(*args):
         )
         return
     config.load()
+    if "Перечень_элементов" not in doc.TextTables:
+        common.rebuildTable()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
-    doc.CurrentController.ViewCursor.goDown(4, False)
     if config.getboolean("settings", "set view options"):
         options = (
             {

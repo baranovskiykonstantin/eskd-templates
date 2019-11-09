@@ -434,3 +434,102 @@ def getIndexRowHeight(rowIndex):
     else:
         height = 801
     return height
+
+def rebuildTable():
+    """Построить новую пустую таблицу."""
+    doc = XSCRIPTCONTEXT.getDocument()
+    doc.lockControllers()
+    text = doc.Text
+    cursor = text.createTextCursor()
+    firstPageStyleName = cursor.PageDescName
+    text.String = ""
+    cursor.ParaStyleName = "Пустой"
+    cursor.PageDescName = firstPageStyleName
+    # Если не оставить параграф перед таблицей, то при изменении форматирования
+    # в ячейках с автоматическими стилями будет сбрасываться стиль страницы на
+    # стиль по умолчанию.
+    text.insertControlCharacter(
+        cursor,
+        uno.getConstantByName(
+            "com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK"
+        ),
+        False
+    )
+    # Таблица
+    table = doc.createInstance("com.sun.star.text.TextTable")
+    table.initialize(2, 4)
+    text.insertTextContent(text.End, table, False)
+    table.Name = "Перечень_элементов"
+    table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
+    table.Width = 18500
+    table.LeftMargin = 2000
+    columnSeparators = table.TableColumnSeparators
+    columnSeparators[0].Position = 1081  # int((20)/185*10000)
+    columnSeparators[1].Position = 7027  # int((20+110)/185*10000)
+    columnSeparators[2].Position = 7567  # int((20+110+10)/185*10000)
+    table.TableColumnSeparators = columnSeparators
+    # Обрамление
+    border = table.TableBorder
+    noLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    normalLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    normalLine.OuterLineWidth = 50
+    border.TopLine = noLine
+    border.LeftLine = noLine
+    border.RightLine = noLine
+    border.BottomLine = normalLine
+    border.HorizontalLine = normalLine
+    border.VerticalLine = normalLine
+    table.TableBorder = border
+    # Заголовок
+    table.RepeatHeadline = True
+    table.HeaderRowCount = 1
+    table.Rows[0].Height = 1500
+    table.Rows[0].IsAutoHeight = False
+    headerNames = (
+        ("A1", "Поз.\nобозна-\nчение"),
+        ("B1", "Наименование"),
+        ("C1", "Кол."),
+        ("D1", "Примечание")
+    )
+    for cellName, headerName in headerNames:
+        cell = table.getCellByName(cellName)
+        cellCursor = cell.createTextCursor()
+        cellCursor.ParaStyleName = "Заголовок графы таблицы"
+        cell.TopBorderDistance = 50
+        cell.BottomBorderDistance = 50
+        cell.LeftBorderDistance = 50
+        cell.RightBorderDistance = 50
+        if cellName == "A1":
+            lineSpacing = uno.createUnoStruct("com.sun.star.style.LineSpacing")
+            lineSpacing.Height = 80
+            cellCursor.ParaLineSpacing = lineSpacing
+            cell.BottomBorderDistance = 0
+        cell.VertOrient = uno.getConstantByName(
+            "com.sun.star.text.VertOrientation.CENTER"
+        )
+        cell.String = headerName
+    # Строки
+    table.Rows[1].Height = 800
+    table.Rows[1].IsAutoHeight = False
+    cellStyles = (
+        ("A2", "Поз. обозначение"),
+        ("B2", "Наименование"),
+        ("C2", "Кол."),
+        ("D2", "Примечание")
+    )
+    for cellName, cellStyle in cellStyles:
+        cell = table.getCellByName(cellName)
+        cursor = cell.createTextCursor()
+        cursor.ParaStyleName = cellStyle
+        cell.TopBorderDistance = 0
+        cell.BottomBorderDistance = 0
+        cell.LeftBorderDistance = 50
+        cell.RightBorderDistance = 50
+        cell.VertOrient = uno.getConstantByName(
+            "com.sun.star.text.VertOrientation.CENTER"
+        )
+    doc.refresh()
+    viewCursor = doc.CurrentController.ViewCursor
+    viewCursor.gotoStart(False)
+    viewCursor.goDown(4, False)
+    doc.unlockControllers()
