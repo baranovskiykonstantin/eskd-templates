@@ -323,5 +323,8 @@ def cleanup(*args):
         moduleName += XSCRIPTCONTEXT.getDocument().RuntimeUID
         if moduleName in sys.modules:
             del sys.modules[moduleName]
+    docPath = uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL)
+    if docPath in zipimport._zip_directory_cache:
+        del zipimport._zip_directory_cache[docPath]
 
 g_exportedScripts = init, cleanup
