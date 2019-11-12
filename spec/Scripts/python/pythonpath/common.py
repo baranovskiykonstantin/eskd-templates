@@ -444,6 +444,11 @@ def appendRevTable():
     cursor = text.createTextCursor()
     cursor.gotoEnd(False)
     cursor.ParaStyleName = "Пустой"
+    doc.refresh()
+    viewCursor = doc.CurrentController.ViewCursor
+    viewCursor.gotoEnd(False) # Конец строки
+    viewCursor.gotoEnd(False) # Конец документа
+    viewCursor.goUp(29, False)
     doc.unlockControllers()
     return True
 
@@ -452,11 +457,17 @@ def removeRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" not in doc.TextTables:
         return False
+    doc.lockControllers()
     doc.TextTables["Лист_регистрации_изменений"].dispose()
     cursor = doc.Text.createTextCursor()
     cursor.gotoEnd(False)
     cursor.goLeft(1, True)
     cursor.String = ""
+    doc.refresh()
+    viewCursor = doc.CurrentController.ViewCursor
+    viewCursor.gotoStart(False)
+    viewCursor.goDown(2, False)
+    doc.unlockControllers()
     return True
 
 def getSpecRowHeight(rowIndex):
