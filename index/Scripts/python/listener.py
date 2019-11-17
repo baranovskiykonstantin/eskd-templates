@@ -29,6 +29,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
 
     def modified(self, event):
         """Приём сообщения об изменении в документе."""
+        if common.SKIP_MODIFY_EVENTS:
+            return
         doc = event.Source
         # Чтобы избежать рекурсивного зацикливания,
         # необходимо сначала удалить, а после изменений,

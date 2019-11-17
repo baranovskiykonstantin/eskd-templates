@@ -71,6 +71,8 @@ ITEM_WIDTHS = {
     "Примечание": 22,
 }
 
+SKIP_MODIFY_EVENTS = False
+
 def isThreadWorking():
     """Работает ли макрос в отдельном потоке?"""
     for thread in threading.enumerate():
@@ -311,6 +313,7 @@ def appendRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" in doc.TextTables:
         return False
+    SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
     text = doc.Text
     text.insertControlCharacter(
@@ -450,6 +453,7 @@ def appendRevTable():
     viewCursor.gotoEnd(False) # Конец документа
     viewCursor.goUp(29, False)
     doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
     return True
 
 def removeRevTable():
@@ -457,6 +461,7 @@ def removeRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" not in doc.TextTables:
         return False
+    SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
     doc.TextTables["Лист_регистрации_изменений"].dispose()
     cursor = doc.Text.createTextCursor()
@@ -468,6 +473,7 @@ def removeRevTable():
     viewCursor.gotoStart(False)
     viewCursor.goDown(2, False)
     doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
     return True
 
 def getSpecRowHeight(rowIndex):
@@ -510,6 +516,7 @@ def getSpecRowHeight(rowIndex):
 
 def rebuildTable():
     """Построить новую пустую таблицу."""
+    SKIP_MODIFY_EVENTS = True
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
     text = doc.Text
@@ -617,3 +624,4 @@ def rebuildTable():
     viewCursor.gotoStart(False)
     viewCursor.goDown(2, False)
     doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
