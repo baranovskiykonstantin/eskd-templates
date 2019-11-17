@@ -69,7 +69,12 @@ ITEM_WIDTHS = {
     "Наименование": 63,
     "Кол.": 10,
     "Примечание": 33,
+
+    "Лит.": 5,
+    "Код": 20,
 }
+
+SKIP_MODIFY_EVENTS = False
 
 def isThreadWorking():
     """Работает ли макрос в отдельном потоке?"""
@@ -311,6 +316,7 @@ def appendRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" in doc.TextTables:
         return False
+    SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
     text = doc.Text
     text.insertControlCharacter(
@@ -451,6 +457,7 @@ def appendRevTable():
     viewCursor.gotoEnd(False) # Конец документа
     viewCursor.goUp(29, False)
     doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
     return True
 
 def removeRevTable():
@@ -458,6 +465,7 @@ def removeRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" not in doc.TextTables:
         return False
+    SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
     doc.TextTables["Лист_регистрации_изменений"].dispose()
     cursor = doc.Text.createTextCursor()
@@ -469,6 +477,7 @@ def removeRevTable():
     viewCursor.gotoStart(False)
     viewCursor.goDown(2, False)
     doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
     return True
 
 def getSpecRowHeight(rowIndex):
@@ -487,22 +496,35 @@ def getSpecRowHeight(rowIndex):
     height = 800
     doc = XSCRIPTCONTEXT.getDocument()
     firstPageStyleName = doc.Text.createTextCursor().PageDescName
-    firstRowCount = 17
+    varTableIsPresent = doc.TextFrames.hasByName("Наименования_исполнений")
+    if varTableIsPresent:
+        firstRowCount = 12
+    else:
+        firstRowCount = 17
     otherRowCount = 19
     if firstPageStyleName.endswith("3") \
         or firstPageStyleName.endswith("4"):
-            firstRowCount = 14
+            if varTableIsPresent:
+                firstRowCount = 10
+            else:
+                firstRowCount = 14
     if rowIndex <= firstRowCount:
         if firstPageStyleName.endswith("1") \
             or firstPageStyleName.endswith("2"):
             # без граф заказчика:
-            height = 810
+            if varTableIsPresent:
+                height = 859
+            else:
+                height = 810
         else:
             # с графами заказчика:
-            if rowIndex == firstRowCount:
-                height = 833
+            if varTableIsPresent:
+                height = 804
             else:
-                height = 827
+                if rowIndex == firstRowCount:
+                    height = 833
+                else:
+                    height = 827
     elif (rowIndex - firstRowCount) % otherRowCount == 0:
         height = 817
     else:
@@ -511,6 +533,7 @@ def getSpecRowHeight(rowIndex):
 
 def rebuildTable():
     """Построить новую пустую таблицу."""
+    SKIP_MODIFY_EVENTS = True
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
     text = doc.Text
@@ -633,7 +656,7 @@ def rebuildTable():
                 cell.RightBorderDistance = 100
         cell.String = headerName
     # Строки
-    table.Rows[2].Height = 800
+    table.Rows[2].Height = getSpecRowHeight(2)
     table.Rows[2].IsAutoHeight = False
     cellStyles = (
         ("A3", "Формат"),
@@ -669,3 +692,168 @@ def rebuildTable():
     viewCursor.gotoStart(False)
     viewCursor.goDown(2, False)
     doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
+
+def addVarTable():
+    """Добавить таблицу наименований исполнений."""
+    doc = XSCRIPTCONTEXT.getDocument()
+    if "Наименования_исполнений" in doc.TextFrames:
+        return
+    SKIP_MODIFY_EVENTS = True
+    doc.lockControllers()
+    # Врезка
+    frame = doc.createInstance("com.sun.star.text.TextFrame")
+    doc.Text.insertTextContent(doc.Text.End, frame, False)
+    frame.Name = "Наименования_исполнений"
+    frame.AnchorType = uno.Enum(
+        "com.sun.star.text.TextContentAnchorType",
+        "AT_PAGE"
+    )
+    frame.AnchorPageNo = 1
+    frame.FrameIsAutomaticHeight = False
+    frame.Height = 3500
+    frame.Width = 14300
+    frame.BorderDistance = 0
+    frame.VertOrientRelation = uno.getConstantByName(
+        "com.sun.star.text.RelOrientation.PAGE_FRAME"
+    )
+    frame.VertOrient = 0
+    frame.HoriOrient = 0
+    frame.HoriOrientPosition = 14900
+    noLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    frame.TopBorder = noLine
+    frame.LeftBorder = noLine
+    frame.RightBorder = noLine
+    frame.BottomBorder = noLine
+    frame.TopMargin = 0
+    frame.LeftMargin = 0
+    frame.RightMargin = 0
+    frame.BottomMargin = 0
+    frame.SizeProtected = True
+    frame.PositionProtected = True
+    updateVarTablePosition()
+    # Таблица
+    table = doc.createInstance("com.sun.star.text.TextTable")
+    table.initialize(4, 12)
+    frame.Text.insertTextContent(frame.Text.Start, table, False)
+    table.Name = "Таблица_наименований_исполнений"
+    table.HoriOrient = uno.getConstantByName(
+        "com.sun.star.text.HoriOrientation.FULL"
+    )
+    table.Rows[0].Height = 500
+    table.Rows[0].IsAutoHeight = False
+    table.Rows[1].Height = 500
+    table.Rows[1].IsAutoHeight = False
+    table.Rows[2].Height = 500
+    table.Rows[2].IsAutoHeight = False
+    table.Rows[3].Height = 2000
+    table.Rows[3].IsAutoHeight = False
+    columnSeparators = table.TableColumnSeparators
+    columnSeparators[0].Position = 695
+    columnSeparators[1].Position = 1393
+    columnSeparators[2].Position = 2093
+    columnSeparators[3].Position = 2791
+    columnSeparators[4].Position = 3489
+    columnSeparators[5].Position = 4187
+    columnSeparators[6].Position = 4887
+    columnSeparators[7].Position = 5585
+    columnSeparators[8].Position = 6283
+    columnSeparators[9].Position = 6981
+    columnSeparators[10].Position = 7680
+    table.TableColumnSeparators = columnSeparators
+    border = table.TableBorder
+    normalLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    normalLine.OuterLineWidth = 50
+    border.TopLine = noLine
+    border.LeftLine = normalLine
+    border.RightLine = noLine
+    border.BottomLine = normalLine
+    border.HorizontalLine = normalLine
+    border.VerticalLine = normalLine
+    table.TableBorder = border
+    cellCursor = table.createCursorByCellName("A1")
+    cellCursor.gotoCellByName("A3", True)
+    cellCursor.mergeRange()
+    headerNames = (
+        ("A1", "Лит."),
+        ("A4", "Код")
+    )
+    for cellName, headerName in headerNames:
+        cell = table.getCellByName(cellName)
+        cellCursor = cell.createTextCursor()
+        cellCursor.ParaStyleName = "Заголовок графы таблицы"
+        cellCursor.CharHeight = 16
+        cellCursor.ParaAdjust = uno.Enum(
+            "com.sun.star.style.ParagraphAdjust",
+            "CENTER"
+        )
+        cellCursor.CharRotation = 900
+        cell.TopBorderDistance = 0
+        cell.BottomBorderDistance = 0
+        cell.LeftBorderDistance = 0
+        cell.RightBorderDistance = 0
+        cell.VertOrient = uno.getConstantByName(
+            "com.sun.star.text.VertOrientation.CENTER"
+        )
+        cell.String = headerName
+    for row in "1234":
+        for col in "BCDEFGHIJKL":
+            cell = table.getCellByName(col + row)
+            cellCursor = cell.createTextCursor()
+            if row == '4':
+                cellCursor.ParaStyleName = "Код"
+            else:
+                cellCursor.ParaStyleName = "Лит."
+            cell.TopBorderDistance = 0
+            cell.BottomBorderDistance = 0
+            cell.LeftBorderDistance = 0
+            cell.RightBorderDistance = 0
+            cell.VertOrient = uno.getConstantByName(
+                "com.sun.star.text.VertOrientation.CENTER"
+            )
+    for i in "1234":
+        doc.StyleFamilies["PageStyles"]["Первый лист " + i].FooterHeight += 3500
+        for litera in "123":
+            literaFrameName = "1.{}.4 Лит.{}".format(i, litera)
+            doc.TextFrames[literaFrameName].String = '-'
+    doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
+
+def removeVarTable():
+    """Удалить таблицу наименований исполнений."""
+    SKIP_MODIFY_EVENTS = True
+    doc = XSCRIPTCONTEXT.getDocument()
+    if "Таблица_наименования_исполнений" in doc.TextTables:
+        doc.lockControllers()
+        doc.TextTables["Таблица_наименования_исполнений"].dispose()
+        doc.unlockControllers()
+    if "Наименования_исполнений" in doc.TextFrames:
+        doc.lockControllers()
+        doc.TextFrames["Наименования_исполнений"].dispose()
+        doc.unlockControllers()
+    for i in "1234":
+        doc.StyleFamilies["PageStyles"]["Первый лист " + i].FooterHeight -= 3500
+        for litera in "123":
+            literaFrameName = "1.{}.4 Лит.{}".format(i, litera)
+            doc.TextFrames[literaFrameName].String = ''
+    SKIP_MODIFY_EVENTS = False
+
+def updateVarTablePosition():
+    """Обновить положение таблицы наименований исполнений."""
+    SKIP_MODIFY_EVENTS = True
+    doc = XSCRIPTCONTEXT.getDocument()
+    if "Наименования_исполнений" in doc.TextFrames:
+        pageVariant = doc.Text.createTextCursor().PageDescName[-1]
+        tableRowCount = doc.TextTables["Спецификация"].Rows.Count
+        if pageVariant in "12":
+            position = 12966
+            offset = 13 - tableRowCount
+            if offset > 0:
+                position -= offset * 859
+        else:
+            position = 10770
+            offset = 11 - tableRowCount
+            if offset > 0:
+                position -= offset * 804
+        doc.TextFrames["Наименования_исполнений"].VertOrientPosition = position
+    SKIP_MODIFY_EVENTS = False

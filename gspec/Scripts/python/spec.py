@@ -563,6 +563,7 @@ class SpecBuildingThread(threading.Thread):
             if pageCount > config.getint("spec", "pages rev table"):
                 common.appendRevTable()
 
+        common.updateVarTablePosition()
         dialog.dispose()
 
 
@@ -601,7 +602,7 @@ def update(*args):
     specUpdater.start()
 
 def toggleRevTable(*args):
-    """Добавить/удалить таблицу регистрации изменений"""
+    """Добавить/удалить таблицу регистрации изменений."""
     if common.isThreadWorking():
         return
     doc = XSCRIPTCONTEXT.getDocument()
@@ -611,3 +612,13 @@ def toggleRevTable(*args):
         common.removeRevTable()
     else:
         common.appendRevTable()
+
+def toggleVarTable(*args):
+    """Добавить/удалить таблицу наименований исполнений."""
+    if common.isThreadWorking():
+        return
+    doc = XSCRIPTCONTEXT.getDocument()
+    if "Наименования_исполнений" in doc.TextFrames:
+        common.removeVarTable()
+    else:
+        common.addVarTable()

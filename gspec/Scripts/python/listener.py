@@ -26,9 +26,12 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         self.prevFirstPageStyleName = doc.Text.createTextCursor().PageDescName
         self.prevTableRowCount = doc.TextTables["Спецификация"].Rows.Count
         self.prevPageCount = doc.CurrentController.PageCount
+        self.prevVarTableIsPresent = False
 
     def modified(self, event):
         """Приём сообщения об изменении в документе."""
+        if common.SKIP_MODIFY_EVENTS:
+            return
         doc = event.Source
         # Чтобы избежать рекурсивного зацикливания,
         # необходимо сначала удалить, а после изменений,
@@ -37,13 +40,16 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.UndoManager.lock()
 
         firstPageStyleName = doc.Text.createTextCursor().PageDescName
+        varTableIsPresent = doc.TextFrames.hasByName("Наименования_исполнений")
         if firstPageStyleName and "Спецификация" in doc.TextTables:
             table = doc.TextTables["Спецификация"]
             tableRowCount = table.Rows.Count
             if firstPageStyleName != self.prevFirstPageStyleName \
-                or tableRowCount != self.prevTableRowCount:
+                or tableRowCount != self.prevTableRowCount \
+                or varTableIsPresent != self.prevVarTableIsPresent:
                     self.prevFirstPageStyleName = firstPageStyleName
                     self.prevTableRowCount = tableRowCount
+                    self.prevVarTableIsPresent = varTableIsPresent
                     if not common.isThreadWorking():
                         # Высота строк подстраивается автоматически так, чтобы нижнее
                         # обрамление последней строки листа совпадало с верхней линией
@@ -72,6 +78,11 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                                 else:
                                     if common.removeRevTable():
                                         self.prevPageCount -= 1
+
+                        # Позиция таблицы наименований исполнений
+                        # непосредственно под основной таблицей,
+                        # но только на первом листе.
+                        common.updateVarTablePosition()
 
         if not common.isThreadWorking():
             currentTable = doc.CurrentController.ViewCursor.TextTable
