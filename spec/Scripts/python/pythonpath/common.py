@@ -590,7 +590,7 @@ def rebuildTable():
                 cell.RightBorderDistance = 100
         cell.String = headerName
     # Строки
-    table.Rows[1].Height = 800
+    table.Rows[1].Height = getSpecRowHeight(1)
     table.Rows[1].IsAutoHeight = False
     cellStyles = (
         ("A2", "Формат"),
