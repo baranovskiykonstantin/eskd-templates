@@ -7,7 +7,7 @@ from com.sun.star.awt import XWindowListener
 common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
-def setSettings(*args):
+def setup(*args):
     if common.isThreadWorking():
         return
     context = XSCRIPTCONTEXT.getComponentContext()

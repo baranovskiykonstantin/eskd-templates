@@ -9,7 +9,7 @@
   <toolbar:toolbarseparator/>
   <toolbar:toolbaritem xlink:href="vnd.sun.star.script:bom.py$toggleRevTable?language=Python&amp;location=document" toolbar:text="Добавить/удалить лист рег. изм."/>
   <toolbar:toolbarseparator/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:settings.py$setSettings?language=Python&amp;location=document" toolbar:text="Параметры"/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:settings.py$setup?language=Python&amp;location=document" toolbar:text="Параметры"/>
   <toolbar:toolbarseparator/>
   <toolbar:toolbaritem xlink:href="vnd.sun.star.script:doc|help.py$show?language=Python&amp;location=document" toolbar:text="Справка"/>
 </toolbar:toolbar>
