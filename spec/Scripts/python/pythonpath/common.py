@@ -98,12 +98,14 @@ def showMessage(text, title="Сообщение"):
     )
     msgbox.execute()
 
-def showFilePicker(filePath=""):
+def showFilePicker(filePath="", **fileFilters):
     """Показать диалоговое окно выбора файла.
 
     Аргументы:
 
-    filePath -- имя файла по умолчанию.
+    filePath -- имя файла по умолчанию;
+    fileFilters -- перечень фильтров для выбора файлов в формате:
+        {"Текстовые файлы": "*.txt", "Документы": "*.odt;*.ods"}
 
     Возвращаемое значение -- полное имя файла или None, если файл не выбран.
 
@@ -131,6 +133,11 @@ def showFilePicker(filePath=""):
         uno.systemPathToFileUrl(directory)
     )
     filePicker.setDefaultName(file)
+    for filterTitle, filterValue in fileFilters.items():
+        filePicker.appendFilter(filterTitle, filterValue)
+        if not filePicker.getCurrentFilter():
+            # Установить первый фильтр в качестве фильтра по умолчанию.
+            filePicker.setCurrentFilter(filterTitle)
     result = filePicker.execute()
     OK = uno.getConstantByName(
         "com.sun.star.ui.dialogs.ExecutableDialogResults.OK"
@@ -171,7 +178,8 @@ def getSourceFileName():
                 config.save()
                 return sourcePath
     sourcePath = showFilePicker(
-        os.path.join(sourceDir, sourceName)
+        os.path.join(sourceDir, sourceName),
+        **{"Список цепей KiCad": "*.net;*.xml", "Все файлы": "*.*"}
     )
     if sourcePath is not None:
         config.set("spec", "source", sourcePath)
@@ -295,10 +303,10 @@ def getPcbInfo():
         size = ""
         number = ""
         if os.path.exists(pcbPath):
-            with open(pcbPath, encoding="utf-8") as pcbematic:
+            with open(pcbPath, encoding="utf-8") as pcb:
                 sizePattern = r"^\s*\(page \"?([^\s\"]+)\"?(?: portrait)?\)$"
                 numberPattern = r"^\s*\(comment 1 \"(.*)\"\)$"
-                for line in pcbematic:
+                for line in pcb:
                     if re.match(sizePattern, line):
                         size = re.search(sizePattern, line).group(1)
                     elif re.match(numberPattern, line):

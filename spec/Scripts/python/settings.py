@@ -144,8 +144,8 @@ def setup(*args):
     labelModel00.Name = "Label00"
     labelModel00.Label = "Файл с данными о схеме:"
     labelModel00.HelpText = """\
-В случае с KiCad, источником данных
-о схеме является файл списка цепей.
+Источником данных о схеме является
+файл списка цепей KiCad.
 Поддерживаются файлы с расширением
 *.net (Pcbnew) и с расширением
 *.xml (вспомогательный)."""
@@ -1165,7 +1165,8 @@ class Button00ActionListener(unohelper.Base, XActionListener):
     def actionPerformed(self, event):
         editControl = self.dialog.getControl("Tabs").getControl("Page0").getControl("EditControl00")
         source = common.showFilePicker(
-            editControl.Text
+            editControl.Text,
+            **{"Список цепей KiCad": "*.net;*.xml", "Все файлы": "*.*"}
         )
         if source is not None:
             editControl.Text = source
