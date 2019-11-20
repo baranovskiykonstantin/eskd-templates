@@ -494,12 +494,7 @@ class SpecBuildingThread(threading.Thread):
             return
 
         if config.getboolean("spec", "prohibit titles at bottom"):
-            firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            firstRowCount = 17
-            otherRowCount = 19
-            if firstPageStyleName.endswith("3") \
-                or firstPageStyleName.endswith("4"):
-                    firstRowCount = 14
+            _, firstRowCount, otherRowCount, _ = getFirstPageInfo()
             pos = firstRowCount
             while pos < table.Rows.Count:
                 cell = table.getCellByPosition(4, pos)
@@ -523,13 +518,8 @@ class SpecBuildingThread(threading.Thread):
             return
 
         if config.getboolean("spec", "prohibit empty rows at top"):
-            firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            firstRowCount = 18
-            otherRowCount = 19
-            if firstPageStyleName.endswith("3") \
-                or firstPageStyleName.endswith("4"):
-                    firstRowCount = 15
-            pos = firstRowCount
+            _, firstRowCount, otherRowCount, _ = getFirstPageInfo()
+            pos = firstRowCount + 1
             while pos < table.Rows.Count:
                 doc.lockControllers()
                 while True:

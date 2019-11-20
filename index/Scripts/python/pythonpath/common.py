@@ -422,6 +422,21 @@ def removeRevTable():
     SKIP_MODIFY_EVENTS = False
     return True
 
+def getFirstPageInfo():
+    """Информация о первом листе.
+
+    Возвращаемое значение -- кортеж из трёх значений:
+        (номер варианта первого листа,
+         кол. строк на первом листе,
+         кол. строк на последующих листах)
+
+    """
+    doc = XSCRIPTCONTEXT.getDocument()
+    firstPageVariant = doc.Text.createTextCursor().PageDescName[-1]
+    firstRowCount = 28 if firstPageVariant in "12" else 26
+    otherRowCount = 32
+    return (firstPageVariant, firstRowCount, otherRowCount)
+
 def getIndexRowHeight(rowIndex):
     """Вычислить высоту строки перечня элементов.
 
@@ -436,16 +451,9 @@ def getIndexRowHeight(rowIndex):
 
     """
     height = 800
-    doc = XSCRIPTCONTEXT.getDocument()
-    firstPageStyleName = doc.Text.createTextCursor().PageDescName
-    firstRowCount = 28
-    otherRowCount = 32
-    if firstPageStyleName.endswith("3") \
-        or firstPageStyleName.endswith("4"):
-            firstRowCount = 26
+    firstPageVariant, firstRowCount, otherRowCount = getFirstPageInfo()
     if rowIndex <= firstRowCount:
-        if firstPageStyleName.endswith("1") \
-            or firstPageStyleName.endswith("2"):
+        if firstPageVariant in "12":
             # без граф заказчика:
                 height = 827
         else:

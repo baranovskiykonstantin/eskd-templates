@@ -53,16 +53,16 @@ def setFirstPageFrameValue(name, value):
     firstPageStyleName = doc.Text.createTextCursor().PageDescName
     doc.UndoManager.lock()
     doc.lockControllers()
-    for i in range(1, 5):
-        fullName = "1.{}.{}".format(i, name)
+    for firstPageVariant in "1234":
+        fullName = "1.{}.{}".format(firstPageVariant, name)
         if fullName in doc.TextFrames:
             frame = doc.TextFrames[fullName]
             # Записать в буфер действий для отмены
             # только изменения текущего стиля
-            if firstPageStyleName.endswith(str(i)):
+            if firstPageStyleName.endswith(firstPageVariant):
                 doc.UndoManager.unlock()
             frame.String = value
-            if firstPageStyleName.endswith(str(i)):
+            if firstPageStyleName.endswith(firstPageVariant):
                 doc.UndoManager.lock()
             if name in common.ITEM_WIDTHS:
                 cursor = frame.createTextCursor()

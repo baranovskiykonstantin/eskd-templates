@@ -310,12 +310,7 @@ class BomBuildingThread(threading.Thread):
             return
 
         if config.getboolean("bom", "prohibit titles at bottom"):
-            firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            firstRowCount = 28
-            otherRowCount = 30
-            if firstPageStyleName.endswith("3") \
-                or firstPageStyleName.endswith("4"):
-                    firstRowCount = 25
+            _, firstRowCount, otherRowCount = common.getFirstPageInfo()
             pos = firstRowCount
             while pos < table.Rows.Count:
                 cell = table.getCellByPosition(1, pos)
@@ -339,13 +334,8 @@ class BomBuildingThread(threading.Thread):
             return
 
         if config.getboolean("bom", "prohibit empty rows at top"):
-            firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            firstRowCount = 29
-            otherRowCount = 30
-            if firstPageStyleName.endswith("3") \
-                or firstPageStyleName.endswith("4"):
-                    firstRowCount = 26
-            pos = firstRowCount
+            _, firstRowCount, otherRowCount = common.getFirstPageInfo()
+            pos = firstRowCount + 1
             while pos < table.Rows.Count:
                 doc.lockControllers()
                 while True:

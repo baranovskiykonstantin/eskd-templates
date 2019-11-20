@@ -284,12 +284,7 @@ class IndexBuildingThread(threading.Thread):
             return
 
         if config.getboolean("index", "prohibit titles at bottom"):
-            firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            firstRowCount = 28
-            otherRowCount = 32
-            if firstPageStyleName.endswith("3") \
-                or firstPageStyleName.endswith("4"):
-                    firstRowCount = 26
+            _, firstRowCount, otherRowCount = getFirstPageInfo()
             pos = firstRowCount
             while pos < table.Rows.Count:
                 cell = table.getCellByPosition(1, pos)
@@ -313,13 +308,8 @@ class IndexBuildingThread(threading.Thread):
             return
 
         if config.getboolean("index", "prohibit empty rows at top"):
-            firstPageStyleName = doc.Text.createTextCursor().PageDescName
-            firstRowCount = 29
-            otherRowCount = 32
-            if firstPageStyleName.endswith("3") \
-                or firstPageStyleName.endswith("4"):
-                    firstRowCount = 27
-            pos = firstRowCount
+            _, firstRowCount, otherRowCount = getFirstPageInfo()
+            pos = firstRowCount + 1
             while pos < table.Rows.Count:
                 doc.lockControllers()
                 while True:

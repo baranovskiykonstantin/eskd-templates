@@ -115,10 +115,10 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     # и для каждого стиля имеется свой набор полей.
                     # При редактировании, значения полей нужно синхронизировать
                     # между собой.
-                    for i in range(1, 5):
-                        if currentFrame.Name[2] == str(i):
+                    for firstPageVariant in "1234":
+                        if currentFrame.Name[2] == firstPageVariant:
                             continue
-                        otherName = "1.{}.{}".format(i, name)
+                        otherName = "1.{}.{}".format(firstPageVariant, name)
                         if otherName in doc.TextFrames:
                             otherFrame = doc.TextFrames[otherName]
                             otherFrame.String = text

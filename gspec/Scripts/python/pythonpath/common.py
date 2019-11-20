@@ -488,6 +488,26 @@ def removeRevTable():
     SKIP_MODIFY_EVENTS = False
     return True
 
+def getFirstPageInfo():
+    """Информация о первом листе.
+
+    Возвращаемое значение -- кортеж из четырёх значений:
+        (номер варианта первого листа,
+         кол. строк на первом листе,
+         кол. строк на последующих листах,
+         присутствует ли таблица наименований исполнений)
+
+    """
+    doc = XSCRIPTCONTEXT.getDocument()
+    firstPageVariant = doc.Text.createTextCursor().PageDescName[-1]
+    varTableIsPresent = doc.TextFrames.hasByName("Наименования_исполнений")
+    if varTableIsPresent:
+        firstRowCount = 12 if firstPageVariant in "12" else 10
+    else:
+        firstRowCount = 17 if firstPageVariant in "12" else 14
+    otherRowCount = 19
+    return (firstPageVariant, firstRowCount, otherRowCount, varTableIsPresent)
+
 def getSpecRowHeight(rowIndex):
     """Вычислить высоту строки спецификации.
 
@@ -502,23 +522,9 @@ def getSpecRowHeight(rowIndex):
 
     """
     height = 800
-    doc = XSCRIPTCONTEXT.getDocument()
-    firstPageStyleName = doc.Text.createTextCursor().PageDescName
-    varTableIsPresent = doc.TextFrames.hasByName("Наименования_исполнений")
-    if varTableIsPresent:
-        firstRowCount = 12
-    else:
-        firstRowCount = 17
-    otherRowCount = 19
-    if firstPageStyleName.endswith("3") \
-        or firstPageStyleName.endswith("4"):
-            if varTableIsPresent:
-                firstRowCount = 10
-            else:
-                firstRowCount = 14
+    firstPageVariant, firstRowCount, otherRowCount, varTableIsPresent = getFirstPageInfo()
     if rowIndex <= firstRowCount:
-        if firstPageStyleName.endswith("1") \
-            or firstPageStyleName.endswith("2"):
+        if firstPageVariant in "12":
             # без граф заказчика:
             if varTableIsPresent:
                 height = 859
