@@ -279,31 +279,31 @@ def init(*args):
         options = (
             {
                 "path": "/org.openoffice.Office.Writer/Content/NonprintingCharacter",
-                "prop": "HiddenParagraph",
+                "property": "HiddenParagraph",
                 "value": False,
                 "command": ".uno:ShowHiddenParagraphs"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['LibreOffice']/DocBoundaries",
-                "prop": "IsVisible",
+                "property": "IsVisible",
                 "value": False,
                 "command": ".uno:ViewBounds"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['LibreOffice']/TableBoundaries",
-                "prop": "IsVisible",
+                "property": "IsVisible",
                 "value": False,
                 "command": ".uno:TableBoundaries"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['LibreOffice']/WriterFieldShadings",
-                "prop": "IsVisible",
+                "property": "IsVisible",
                 "value": False,
                 "command": ".uno:Marks"
             },
             {
                 "path": "/org.openoffice.Office.Common/Help",
-                "prop": "ExtendedTip",
+                "property": "ExtendedTip",
                 "value": True,
                 "command": ".uno:ActiveHelp"
             },
@@ -314,17 +314,17 @@ def init(*args):
         )
         nodePath = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
         nodePath.Name = "nodepath"
-        for op in options:
-            nodePath.Value = op["path"]
+        for option in options:
+            nodePath.Value = option["path"]
             configAccess = configProvider.createInstanceWithArguments(
                 "com.sun.star.configuration.ConfigurationAccess",
                 (nodePath,)
             )
-            value = configAccess.getPropertyValue(op["prop"])
-            if value != op["value"]:
+            value = configAccess.getPropertyValue(option["property"])
+            if value != option["value"]:
                 dispatchHelper.executeDispatch(
                     frame,
-                    op["command"],
+                    option["command"],
                     "",
                     0,
                     ()
@@ -347,8 +347,10 @@ def cleanup(*args):
         moduleName += XSCRIPTCONTEXT.getDocument().RuntimeUID
         if moduleName in sys.modules:
             del sys.modules[moduleName]
-    docPath = uno.fileUrlToSystemPath(XSCRIPTCONTEXT.getDocument().URL)
-    if docPath in zipimport._zip_directory_cache:
-        del zipimport._zip_directory_cache[docPath]
+    fileUrl = XSCRIPTCONTEXT.getDocument().URL
+    if fileUrl:
+        docPath = uno.fileUrlToSystemPath(fileUrl)
+        if docPath in zipimport._zip_directory_cache:
+            del zipimport._zip_directory_cache[docPath]
 
 g_exportedScripts = init, cleanup
