@@ -24,6 +24,11 @@ class DocModifyListener(unohelper.Base, XModifyListener):
     def __init__(self,):
         doc = XSCRIPTCONTEXT.getDocument()
         self.prevFirstPageStyleName = doc.Text.createTextCursor().PageDescName
+        if not self.prevFirstPageStyleName.startswith("Первый лист"):
+            self.prevFirstPageStyleName = "Первый лист 1"
+            doc.Text.createTextCursor().PageDescName = "Первый лист 1"
+        if "Ведомость_покупных_изделий" not in doc.TextTables:
+            common.rebuildTable()
         self.prevTableRowCount = doc.TextTables["Ведомость_покупных_изделий"].Rows.Count
         self.prevPageCount = doc.CurrentController.PageCount
 
@@ -268,8 +273,6 @@ def init(*args):
         )
         return
     config.load()
-    if "Ведомость_покупных_изделий" not in doc.TextTables:
-        common.rebuildTable()
     listener = DocModifyListener()
     doc.addModifyListener(listener)
     if config.getboolean("settings", "set view options"):
