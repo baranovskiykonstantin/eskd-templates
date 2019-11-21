@@ -192,7 +192,7 @@ def importEmbeddedModules(*args):
             "com.sun.star.util.PathSubstitution",
             context
         )
-        homeDir = path.getSubstituteVariableValue("$(work)")
+        homeDir = path.getSubstituteVariableValue("$(home)")
         filePicker.setDisplayDirectory(homeDir)
         filePicker.setDefaultName("Ведомость покупных изделий.odt")
         result = filePicker.execute()
