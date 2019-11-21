@@ -247,8 +247,8 @@ class BomBuildingThread(threading.Thread):
             dialog.getControl("ProgressBar").setRange(0, progressTotal)
             dialog.setVisible(True)
 
-            # В процессе заполнения ведомость, после текущей строки всегда должна
-            # оставаться пустая строка с ненарушенным форматированием.
+            # В процессе заполнения ведомости, после текущей строки всегда
+            # должна оставаться пустая строка с ненарушенным форматированием.
             # На её основе будут создаваться новые строки.
             # По окончанию, эта строка будет удалена.
             table.Rows.insertByIndex(lastRow, 1)
@@ -260,8 +260,8 @@ class BomBuildingThread(threading.Thread):
                         doc.lockControllers()
                         nextRow()
                         doc.unlockControllers()
-                        if config.getboolean("bom", "reserve position numbers"):
-                            increment += 1
+                    if config.getboolean("bom", "reserve position numbers"):
+                        increment += emptyRowsType
                 if len(group) == 1 \
                     and not config.getboolean("bom", "every group has title"):
                         compType = group[0].getBomValue("type", singular=True)
@@ -308,7 +308,7 @@ class BomBuildingThread(threading.Thread):
                         kickProgress()
                 prevGroup = group
 
-            table.getRows().removeByIndex(lastRow, 2)
+            table.Rows.removeByIndex(lastRow, 2)
 
             kickProgress()
 

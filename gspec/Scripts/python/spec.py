@@ -413,8 +413,8 @@ class SpecBuildingThread(threading.Thread):
                             doc.lockControllers()
                             nextRow()
                             doc.unlockControllers()
-                            if config.getboolean("spec", "reserve position numbers"):
-                                increment += 1
+                        if config.getboolean("spec", "reserve position numbers"):
+                            increment += emptyRowsType
                     if len(group) == 1 \
                         and not config.getboolean("spec", "every group has title"):
                             compType = group[0].getSpecValue("type", singular=True)
@@ -485,7 +485,7 @@ class SpecBuildingThread(threading.Thread):
 
                 kickProgress()
 
-            table.getRows().removeByIndex(lastRow, 2)
+            table.Rows.removeByIndex(lastRow, 2)
 
             kickProgress()
 
