@@ -148,6 +148,16 @@ class IndexBuildingThread(threading.Thread):
                 cellCursor = cell.createTextCursor()
                 return cellCursor.CharHeight
 
+            def isRowEmpty(row):
+                rowCells = table.getCellRangeByPosition(
+                    0, # left
+                    row, # top
+                    table.Columns.Count - 1, # right
+                    row # bottom
+                )
+                dataIsPresent = any(rowCells.DataArray[0])
+                return not dataIsPresent
+
             def fillRow(values, isTitle=False):
                 colWidth = (19, 109, 9, 44)
                 extraRow = [""] * len(values)
@@ -287,14 +297,19 @@ class IndexBuildingThread(threading.Thread):
             kickProgress()
 
             if config.getboolean("index", "prohibit titles at bottom"):
-                _, firstRowCount, otherRowCount = getFirstPageInfo()
+                _, firstRowCount, otherRowCount = common.getFirstPageInfo()
                 pos = firstRowCount
                 while pos < table.Rows.Count:
-                    cell = table.getCellByPosition(1, pos)
+                    offset = 0
+                    # Если внизу страницы пустая строка -
+                    # подняться вверх к строке с данными.
+                    while isRowEmpty(pos - offset) and pos > (offset + 1):
+                        offset += 1
+                    cell = table.getCellByPosition(1, pos - offset)
                     cellCursor = cell.createTextCursor()
                     if cellCursor.ParaStyleName == "Наименование (заголовок)" \
                         and cell.String != "":
-                            offset = 1
+                            offset += 1
                             while pos > offset:
                                 cell = table.getCellByPosition(1, pos - offset)
                                 cellCursor = cell.createTextCursor()
@@ -310,21 +325,11 @@ class IndexBuildingThread(threading.Thread):
             kickProgress()
 
             if config.getboolean("index", "prohibit empty rows at top"):
-                _, firstRowCount, otherRowCount = getFirstPageInfo()
+                _, firstRowCount, otherRowCount = common.getFirstPageInfo()
                 pos = firstRowCount + 1
                 while pos < table.Rows.Count:
                     doc.lockControllers()
-                    while True:
-                        rowIsEmpty = False
-                        for i in range(4):
-                            cell = table.getCellByPosition(i, pos)
-                            cellCursor = cell.createTextCursor()
-                            if cell.String != "":
-                                break
-                        else:
-                            rowIsEmpty = True
-                        if not rowIsEmpty:
-                            break
+                    while pos < table.Rows.Count and isRowEmpty(pos):
                         table.Rows.removeByIndex(pos, 1)
                     pos += otherRowCount
                     doc.unlockControllers()
