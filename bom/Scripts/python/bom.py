@@ -213,7 +213,7 @@ class BomBuildingThread(threading.Thread):
                                 getFontSize(col),
                                 colWidth[col]
                             )
-                            cellCursor = cell.createTextCursor()
+                            cellCursor.gotoStart(False)
                             cellCursor.gotoEnd(True)
                             cellCursor.CharScaleWidth = widthFactor
                     elif values[col]:
