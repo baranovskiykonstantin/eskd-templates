@@ -12,13 +12,11 @@ textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
 
 class ButtonStopActionListener(unohelper.Base, XActionListener):
-    def __init__(self, dialog, stopEvent):
-        self.dialog = dialog
+    def __init__(self, stopEvent):
         self.stopEvent = stopEvent
 
     def actionPerformed(self, event):
         self.stopEvent.set()
-        self.dialog.dispose()
 
 
 class StopException(Exception):
@@ -106,7 +104,7 @@ class IndexBuildingThread(threading.Thread):
             dialog.setVisible(False)
             dialog.setModel(dialogModel)
             dialog.getControl("ButtonStop").addActionListener(
-                ButtonStopActionListener(dialog, self.stopEvent)
+                ButtonStopActionListener(self.stopEvent)
             )
             toolkit = context.ServiceManager.createInstanceWithContext(
                 "com.sun.star.awt.Toolkit",
