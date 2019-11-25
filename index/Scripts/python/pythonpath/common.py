@@ -259,8 +259,10 @@ def appendRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" in doc.TextTables:
         return False
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
+    doc.UndoManager.lock()
     text = doc.Text
     text.insertControlCharacter(
         text.End,
@@ -398,6 +400,8 @@ def appendRevTable():
     viewCursor.gotoEnd(False) # Конец строки
     viewCursor.gotoEnd(False) # Конец документа
     viewCursor.goUp(29, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
     return True
@@ -407,8 +411,10 @@ def removeRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" not in doc.TextTables:
         return False
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
+    doc.UndoManager.lock()
     doc.TextTables["Лист_регистрации_изменений"].dispose()
     cursor = doc.Text.createTextCursor()
     cursor.gotoEnd(False)
@@ -418,6 +424,8 @@ def removeRevTable():
     viewCursor = doc.CurrentController.ViewCursor
     viewCursor.gotoStart(False)
     viewCursor.goDown(4, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
     return True
@@ -470,9 +478,11 @@ def getIndexRowHeight(rowIndex):
 
 def rebuildTable():
     """Построить новую пустую таблицу."""
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
+    doc.UndoManager.lock()
     text = doc.Text
     cursor = text.createTextCursor()
     firstPageStyleName = cursor.PageDescName
@@ -566,5 +576,7 @@ def rebuildTable():
     viewCursor = doc.CurrentController.ViewCursor
     viewCursor.gotoStart(False)
     viewCursor.goDown(4, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False

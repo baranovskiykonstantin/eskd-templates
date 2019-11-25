@@ -324,8 +324,10 @@ def appendRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" in doc.TextTables:
         return False
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
+    doc.UndoManager.lock()
     text = doc.Text
     text.insertControlCharacter(
         text.End,
@@ -464,6 +466,8 @@ def appendRevTable():
     viewCursor.gotoEnd(False) # Конец строки
     viewCursor.gotoEnd(False) # Конец документа
     viewCursor.goUp(29, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
     return True
@@ -473,8 +477,10 @@ def removeRevTable():
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" not in doc.TextTables:
         return False
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
+    doc.UndoManager.lock()
     doc.TextTables["Лист_регистрации_изменений"].dispose()
     cursor = doc.Text.createTextCursor()
     cursor.gotoEnd(False)
@@ -484,6 +490,8 @@ def removeRevTable():
     viewCursor = doc.CurrentController.ViewCursor
     viewCursor.gotoStart(False)
     viewCursor.goDown(2, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
     return True
@@ -547,9 +555,11 @@ def getSpecRowHeight(rowIndex):
 
 def rebuildTable():
     """Построить новую пустую таблицу."""
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
+    doc.UndoManager.lock()
     text = doc.Text
     cursor = text.createTextCursor()
     firstPageStyleName = cursor.PageDescName
@@ -705,16 +715,21 @@ def rebuildTable():
     viewCursor = doc.CurrentController.ViewCursor
     viewCursor.gotoStart(False)
     viewCursor.goDown(2, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
+    updateVarTablePosition()
 
 def addVarTable():
     """Добавить таблицу наименований исполнений."""
     doc = XSCRIPTCONTEXT.getDocument()
     if "Наименования_исполнений" in doc.TextFrames:
         return
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
+    doc.UndoManager.lock()
     # Врезка
     frame = doc.createInstance("com.sun.star.text.TextFrame")
     doc.Text.insertTextContent(doc.Text.End, frame, False)
@@ -830,13 +845,17 @@ def addVarTable():
         for litera in "123":
             literaFrameName = "1.{}.4 Лит.{}".format(i, litera)
             doc.TextFrames[literaFrameName].String = '-'
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
 
 def removeVarTable():
     """Удалить таблицу наименований исполнений."""
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc = XSCRIPTCONTEXT.getDocument()
+    doc.UndoManager.lock()
     if "Таблица_наименования_исполнений" in doc.TextTables:
         doc.lockControllers()
         doc.TextTables["Таблица_наименования_исполнений"].dispose()
@@ -850,12 +869,16 @@ def removeVarTable():
         for litera in "123":
             literaFrameName = "1.{}.4 Лит.{}".format(i, litera)
             doc.TextFrames[literaFrameName].String = ''
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
     SKIP_MODIFY_EVENTS = False
 
 def updateVarTablePosition():
     """Обновить положение таблицы наименований исполнений."""
+    global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc = XSCRIPTCONTEXT.getDocument()
+    doc.UndoManager.lock()
     if "Наименования_исполнений" in doc.TextFrames:
         pageVariant = doc.Text.createTextCursor().PageDescName[-1]
         tableRowCount = doc.TextTables["Спецификация"].Rows.Count
@@ -870,4 +893,5 @@ def updateVarTablePosition():
             if offset > 0:
                 position -= offset * 804
         doc.TextFrames["Наименования_исполнений"].VertOrientPosition = position
+    doc.UndoManager.unlock()
     SKIP_MODIFY_EVENTS = False

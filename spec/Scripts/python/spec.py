@@ -254,6 +254,7 @@ class SpecBuildingThread(threading.Thread):
             if schematic is None:
                 return
             doc = XSCRIPTCONTEXT.getDocument()
+            doc.UndoManager.lock()
             if self.update:
                 if "Спецификация" not in doc.TextTables:
                     common.showMessage(
@@ -551,6 +552,8 @@ class SpecBuildingThread(threading.Thread):
                 if pageCount > config.getint("spec", "pages rev table"):
                     common.appendRevTable()
 
+            doc.UndoManager.clear()
+
         except StopException:
             # Прервано пользователем
             pass
@@ -565,6 +568,10 @@ class SpecBuildingThread(threading.Thread):
         finally:
             if "dialog" in locals():
                 dialog.dispose()
+            if doc.UndoManager.isLocked():
+                doc.UndoManager.unlock()
+            if doc.hasControllersLocked():
+                doc.unlockControllers()
 
 
 def clean(*args, force=False):

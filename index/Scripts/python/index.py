@@ -43,6 +43,7 @@ class IndexBuildingThread(threading.Thread):
     def run(self):
         try:
             doc = XSCRIPTCONTEXT.getDocument()
+            doc.UndoManager.lock()
             # ----------------------------------------------------------------
             # Диалоговое окно прогресса
             # ----------------------------------------------------------------
@@ -348,6 +349,8 @@ class IndexBuildingThread(threading.Thread):
                 if pageCount > config.getint("index", "pages rev table"):
                     common.appendRevTable()
 
+            doc.UndoManager.clear()
+
         except StopException:
             # Прервано пользователем
             pass
@@ -362,6 +365,10 @@ class IndexBuildingThread(threading.Thread):
         finally:
             if "dialog" in locals():
                 dialog.dispose()
+            if doc.UndoManager.isLocked():
+                doc.UndoManager.unlock()
+            if doc.hasControllersLocked():
+                doc.unlockControllers()
 
 
 def clean(*args, force=False):

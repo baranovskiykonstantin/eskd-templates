@@ -254,8 +254,8 @@ def init(*args):
         )
         return
     config.load()
-    listener = DocModifyListener()
-    doc.addModifyListener(listener)
+    modifyListener = DocModifyListener()
+    doc.addModifyListener(modifyListener)
     if config.getboolean("settings", "set view options"):
         options = (
             {
