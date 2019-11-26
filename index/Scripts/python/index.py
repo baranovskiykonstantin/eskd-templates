@@ -337,7 +337,7 @@ class IndexBuildingThread(threading.Thread):
 
             doc.lockControllers()
             for rowIndex in range(1, table.Rows.Count):
-                table.Rows[rowIndex].Height = common.getIndexRowHeight(rowIndex)
+                table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
             doc.unlockControllers()
 
             kickProgress()

@@ -62,7 +62,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         # (см. bom.py).
                         doc.lockControllers()
                         for rowIndex in range(2, tableRowCount):
-                            table.Rows[rowIndex].Height = common.getBomRowHeight(rowIndex)
+                            table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
                         doc.unlockControllers()
 
                         # Автоматическое добавление/удаление

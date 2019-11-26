@@ -391,7 +391,7 @@ class BomBuildingThread(threading.Thread):
 
             doc.lockControllers()
             for rowIndex in range(2, table.Rows.Count):
-                table.Rows[rowIndex].Height = common.getBomRowHeight(rowIndex)
+                table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
             doc.unlockControllers()
 
             kickProgress()

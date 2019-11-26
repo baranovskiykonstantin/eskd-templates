@@ -540,7 +540,7 @@ class SpecBuildingThread(threading.Thread):
 
             doc.lockControllers()
             for rowIndex in range(1, table.Rows.Count):
-                table.Rows[rowIndex].Height = common.getSpecRowHeight(rowIndex)
+                table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
             doc.unlockControllers()
 
             kickProgress()
