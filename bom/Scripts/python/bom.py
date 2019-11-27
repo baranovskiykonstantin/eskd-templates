@@ -398,8 +398,9 @@ class BomBuildingThread(threading.Thread):
 
             if config.getboolean("bom", "process repeated values"):
                 doc.lockControllers()
-                prevValues = [""] * 11
-                repeatCount  = [0] * 11
+                colCount = 11
+                prevValues = [""] * colCount
+                repeatCount  = [0] * colCount
                 for rowIndex in range(2, table.Rows.Count):
                     for colIndex in (2, 3, 4, 5, 10):
                         cell = table.getCellByPosition(colIndex, rowIndex)
