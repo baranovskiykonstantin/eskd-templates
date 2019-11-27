@@ -383,6 +383,10 @@ def rebuildTable():
     doc = XSCRIPTCONTEXT.getDocument()
     doc.lockControllers()
     doc.UndoManager.lock()
+    if "Спецификация" in doc.TextTables:
+        amountTitle = doc.TextTables["Спецификация"].getCellByName("F1").String
+    else:
+        amountTitle = "Кол. на исполнение"
     text = doc.Text
     cursor = text.createTextCursor()
     firstPageStyleName = cursor.PageDescName
@@ -470,7 +474,7 @@ def rebuildTable():
         ("C1", "Поз."),
         ("D1", "Обозначение"),
         ("E1", "Наименование"),
-        ("F1", "Кол. на исполнение"),
+        ("F1", amountTitle),
         ("G1", "Приме-\nчание"),
         ("F2", "―"),
         ("G2", "01"),
