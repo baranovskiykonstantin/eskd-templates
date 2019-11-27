@@ -268,7 +268,7 @@ class IndexBuildingThread(threading.Thread):
                     for title in titleLines:
                         if title:
                             fillRow(
-                                ["", title, "", ""],
+                                ["", title],
                                 isTitle=True
                             )
                     if config.getboolean("index", "empty row after group title"):

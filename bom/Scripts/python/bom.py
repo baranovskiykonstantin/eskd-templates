@@ -294,7 +294,7 @@ class BomBuildingThread(threading.Thread):
                     title = group[0].getBomValue("type", plural=True)
                     if title:
                         fillRow(
-                            ["", title, "", "", "", "", "", "", "", "", ""],
+                            ["", title],
                             isTitle=True
                         )
                     if config.getboolean("bom", "empty row after group title"):

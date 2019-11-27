@@ -356,14 +356,14 @@ class SpecBuildingThread(threading.Thread):
                     if config.getboolean("sections", "assembly drawing"):
                         name = "Сборочный чертёж"
                         fillRow(
-                            ["", "", "", "", name, "X", "", "", "", "", "", "", "", "", "", ""]
+                            ["", "", "", "", name, "X"]
                         )
 
                     if config.getboolean("sections", "schematic"):
                         size, ref = common.getSchematicInfo()
                         name = "Схема электрическая принципиальная"
                         fillRow(
-                            [size, "", "", ref, name, "X", "", "", "", "", "", "", "", "", "", ""]
+                            [size, "", "", ref, name, "X"]
                         )
 
                     if config.getboolean("sections", "index"):
@@ -377,7 +377,7 @@ class SpecBuildingThread(threading.Thread):
                             ref = 'П'.join(refParts.groups())
                         name = "Перечень элементов"
                         fillRow(
-                            [size, "", "", ref, name, "X", "", "", "", "", "", "", "", "", "", ""]
+                            [size, "", "", ref, name, "X"]
                         )
 
                 kickProgress()
@@ -397,7 +397,7 @@ class SpecBuildingThread(threading.Thread):
                         size, ref = common.getPcbInfo()
                         name = "Плата печатная"
                         fillRow(
-                            [size, "", "", ref, name, "1", "", "", "", "", "", "", "", "", "", ""],
+                            [size, "", "", ref, name, "1"],
                             posIncrement=1
                         )
 
@@ -453,7 +453,7 @@ class SpecBuildingThread(threading.Thread):
                         for title in titleLines:
                             if title:
                                 fillRow(
-                                    ["", "", "", "", title, "", "", "", "", "", "", "", "", "", "", ""],
+                                    ["", "", "", "", title],
                                     isTitle=True
                                 )
                         if config.getboolean("spec", "empty row after group title"):
