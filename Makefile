@@ -1,8 +1,8 @@
-.PHONY: index spec bom gspec
+.PHONY: index spec bom gspec gbom
 
 default: all
 
-all: index spec bom gspec
+all: index spec bom gspec gbom
 
 index:
 	cd index && \
@@ -31,3 +31,10 @@ gspec:
 	asciidoctor help.adoc && \
 	cd - && \
 	zip -FS -r ~/.config/libreoffice/4/user/template/Групповая\ спецификация.ott * -x Scripts/python/doc/help.adoc
+
+gbom:
+	cd gbom && \
+	cd Scripts/python/doc/ && \
+	asciidoctor help.adoc && \
+	cd - && \
+	zip -FS -r ~/.config/libreoffice/4/user/template/Групповая\ ведомость\ покупных\ изделий.ott * -x Scripts/python/doc/help.adoc
