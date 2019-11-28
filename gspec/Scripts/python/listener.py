@@ -24,9 +24,10 @@ class DocModifyListener(unohelper.Base, XModifyListener):
     def __init__(self,):
         doc = XSCRIPTCONTEXT.getDocument()
         self.prevFirstPageStyleName = doc.Text.createTextCursor().PageDescName
-        if not self.prevFirstPageStyleName.startswith("Первый лист"):
-            self.prevFirstPageStyleName = "Первый лист 1"
-            doc.Text.createTextCursor().PageDescName = "Первый лист 1"
+        if self.prevFirstPageStyleName is None \
+            or not self.prevFirstPageStyleName.startswith("Первый лист "):
+                doc.Text.createTextCursor().PageDescName = "Первый лист 1"
+                self.prevFirstPageStyleName = "Первый лист 1"
         if "Спецификация" not in doc.TextTables:
             common.rebuildTable()
         self.prevTableRowCount = doc.TextTables["Спецификация"].Rows.Count

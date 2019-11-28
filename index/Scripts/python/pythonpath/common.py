@@ -314,7 +314,10 @@ def rebuildTable():
     firstPageStyleName = cursor.PageDescName
     text.String = ""
     cursor.ParaStyleName = "Пустой"
-    cursor.PageDescName = firstPageStyleName
+    if firstPageStyleName in ("Первый лист 1", "Первый лист 2", "Первый лист 3", "Первый лист 4"):
+        cursor.PageDescName = firstPageStyleName
+    else:
+        cursor.PageDescName = "Первый лист 1"
     # Если не оставить параграф перед таблицей, то при изменении форматирования
     # в ячейках с автоматическими стилями будет сбрасываться стиль страницы на
     # стиль по умолчанию.
