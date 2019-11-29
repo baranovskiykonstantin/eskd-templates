@@ -10,11 +10,6 @@ def syncCommonFields():
 
     Обновить значения граф форматной рамки последующих листов, которые
     совпадают с графами форматной рамки и основной надписи первого листа.
-    К таким графам относятся:
-    - 2. Обозначение документа;
-    - 19. Инв. № подл.;
-    - 21. Взам. инв. №;
-    - 22. Инв. № дубл.
     Необходимость в обновлении возникает при изменении значения графы
     на первом листе.
     На втором и последующих листах эти графы защищены от записи.
@@ -24,8 +19,8 @@ def syncCommonFields():
     doc.UndoManager.lock()
     doc.lockControllers()
     for name in common.STAMP_COMMON_FIELDS:
-        firstFrame = doc.TextFrames["1.1." + name]
-        for prefix in ("N.", "M."):
+        firstFrame = doc.TextFrames["Перв.1: " + name]
+        for prefix in ("Прочие: ", "РегИзм: "):
             otherFrame = doc.TextFrames[prefix + name]
             otherFrame.String = firstFrame.String
 
@@ -54,7 +49,7 @@ def setFirstPageFrameValue(name, value):
     doc.UndoManager.lock()
     doc.lockControllers()
     for firstPageVariant in "1234":
-        fullName = "1.{}.{}".format(firstPageVariant, name)
+        fullName = "Перв.{}: {}".format(firstPageVariant, name)
         if fullName in doc.TextFrames:
             frame = doc.TextFrames[fullName]
             # Записать в буфер действий для отмены
@@ -91,16 +86,16 @@ def clean(*args):
     doc.UndoManager.lock()
     doc.lockControllers()
     for frame in doc.TextFrames:
-        if frame.Name.startswith("1.") \
+        if frame.Name.startswith("Перв.") \
             and not frame.Name.endswith("(наименование)") \
-            and not frame.Name.endswith(".7 Лист") \
-            and not frame.Name.endswith(".8 Листов"):
+            and not frame.Name.endswith("7 Лист") \
+            and not frame.Name.endswith("8 Листов"):
                 # Записать в буфер действий для отмены
                 # только изменения текущего стиля
-                if firstPageStyleName[-1] == frame.Name[2]:
+                if firstPageStyleName[-1] == frame.Name[5]:
                     doc.UndoManager.unlock()
                 frame.String = ""
-                if firstPageStyleName[-1] == frame.Name[2]:
+                if firstPageStyleName[-1] == frame.Name[5]:
                     doc.UndoManager.lock()
                 cursor = frame.createTextCursor()
                 cursor.CharScaleWidth = 100

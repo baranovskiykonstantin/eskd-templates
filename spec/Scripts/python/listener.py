@@ -124,11 +124,11 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                                 itemCursor.collapseToEnd()
 
             if currentFrame is not None \
-                and currentFrame.Name.startswith("1.") \
-                and not currentFrame.Name.endswith(".7 Лист") \
-                and not currentFrame.Name.endswith(".8 Листов"):
+                and currentFrame.Name.startswith("Перв.") \
+                and not currentFrame.Name.endswith("7 Лист") \
+                and not currentFrame.Name.endswith("8 Листов"):
                     # Обновить только текущую графу
-                    name = currentFrame.Name[4:]
+                    name = currentFrame.Name[8:]
                     text = currentFrame.String
                     cursor = currentFrame.createTextCursor()
                     fontSize = cursor.CharHeight
@@ -142,7 +142,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     for firstPageVariant in "1234":
                         if currentFrame.Name[2] == firstPageVariant:
                             continue
-                        otherName = "1.{}.{}".format(firstPageVariant, name)
+                        otherName = "Перв.{}: {}".format(firstPageVariant, name)
                         if otherName in doc.TextFrames:
                             otherFrame = doc.TextFrames[otherName]
                             otherFrame.String = text
@@ -152,7 +152,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                             otherCursor.CharScaleWidth = widthFactor
                     # А также, обновить поля на последующих листах
                     if name in common.STAMP_COMMON_FIELDS:
-                        otherFrame = doc.TextFrames["N." + name]
+                        otherFrame = doc.TextFrames["Прочие: " + name]
                         otherFrame.String = text
                         otherCursor = otherFrame.createTextCursor()
                         otherCursor.gotoEnd(True)

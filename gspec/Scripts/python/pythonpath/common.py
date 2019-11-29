@@ -849,10 +849,10 @@ def addVarTable():
             cell.VertOrient = uno.getConstantByName(
                 "com.sun.star.text.VertOrientation.CENTER"
             )
-    for i in "1234":
-        doc.StyleFamilies["PageStyles"]["Первый лист " + i].FooterHeight += 3500
+    for variant in "1234":
+        doc.StyleFamilies["PageStyles"]["Первый лист " + variant].FooterHeight += 3500
         for litera in "123":
-            literaFrameName = "1.{}.4 Лит.{}".format(i, litera)
+            literaFrameName = "Перв.{}: 4 Лит.{}".format(variant, litera)
             doc.TextFrames[literaFrameName].String = '-'
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
@@ -873,10 +873,10 @@ def removeVarTable():
         doc.lockControllers()
         doc.TextFrames["Наименования_исполнений"].dispose()
         doc.unlockControllers()
-    for i in "1234":
-        doc.StyleFamilies["PageStyles"]["Первый лист " + i].FooterHeight -= 3500
+    for variant in "1234":
+        doc.StyleFamilies["PageStyles"]["Первый лист " + variant].FooterHeight -= 3500
         for litera in "123":
-            literaFrameName = "1.{}.4 Лит.{}".format(i, litera)
+            literaFrameName = "Перв.{}: 4 Лит.{}".format(variant, litera)
             doc.TextFrames[literaFrameName].String = ''
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
