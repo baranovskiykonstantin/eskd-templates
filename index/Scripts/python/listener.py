@@ -122,7 +122,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     # При редактировании, значения полей нужно синхронизировать
                     # между собой.
                     for firstPageVariant in "1234":
-                        if currentFrame.Name[2] == firstPageVariant:
+                        if currentFrame.Name[5] == firstPageVariant:
                             continue
                         otherName = "Перв.{}: {}".format(firstPageVariant, name)
                         if otherName in doc.TextFrames:
@@ -133,16 +133,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                             otherCursor.CharHeight = fontSize
                             otherCursor.CharScaleWidth = widthFactor
                     # А также, обновить поля на последующих листах
-                    if name in common.STAMP_COMMON_FIELDS:
-                        otherFrame = doc.TextFrames["Прочие: " + name]
-                        otherFrame.String = text
-                        otherCursor = otherFrame.createTextCursor()
-                        otherCursor.gotoEnd(True)
-                        otherCursor.CharHeight = fontSize
-                        if name.endswith("2 Обозначение документа") \
-                            and widthFactor < 100:
-                                widthFactor *= 110 / 120
-                        otherCursor.CharScaleWidth = widthFactor
+                    common.syncCommonFields()
 
         doc.UndoManager.unlock()
         doc.addModifyListener(self)

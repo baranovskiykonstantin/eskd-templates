@@ -15,16 +15,19 @@ XSCRIPTCONTEXT = None
 kicadnet = None
 schematic = None
 config = None
+textwidth = None
 
 def init(scriptcontext):
     global XSCRIPTCONTEXT
     global kicadnet
     global schematic
     global config
+    global textwidth
     XSCRIPTCONTEXT = scriptcontext
     kicadnet = sys.modules["kicadnet" + scriptcontext.getDocument().RuntimeUID]
     schematic = sys.modules["schematic" + scriptcontext.getDocument().RuntimeUID]
     config = sys.modules["config" + scriptcontext.getDocument().RuntimeUID]
+    textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
 STAMP_COMMON_FIELDS = (
     "2 Обозначение документа",
@@ -585,3 +588,37 @@ def removeRevTable():
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
     return True
+
+def syncCommonFields():
+    """Обновить значения общих граф.
+
+    Обновить значения граф форматной рамки последующих листов, которые
+    совпадают с графами форматной рамки и основной надписи первого листа.
+    Необходимость в обновлении возникает при изменении значения графы
+    на первом листе.
+    На втором и последующих листах эти графы защищены от записи.
+
+    """
+    doc = XSCRIPTCONTEXT.getDocument()
+    doc.UndoManager.lock()
+    doc.lockControllers()
+    for name in STAMP_COMMON_FIELDS:
+        firstFrame = doc.TextFrames["Перв.1: " + name]
+        otherFrame = doc.TextFrames["Прочие: " + name]
+        otherFrame.String = firstFrame.String
+
+        firstCursor = firstFrame.createTextCursor()
+        otherCursor = otherFrame.createTextCursor()
+        otherCursor.gotoEnd(True)
+        otherCursor.CharHeight = firstCursor.CharHeight
+        if name == "2 Обозначение документа":
+            # На первом листе ширина графы 120 мм, а на последующих -- 110.
+            otherCursor.CharScaleWidth = textwidth.getWidthFactor(
+                otherFrame.String,
+                otherCursor.CharHeight,
+                109
+            )
+        else:
+            otherCursor.CharScaleWidth = firstCursor.CharScaleWidth
+    doc.unlockControllers()
+    doc.UndoManager.unlock()

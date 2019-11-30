@@ -5,33 +5,6 @@ common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
-def syncCommonFields():
-    """Обновить значения общих граф.
-
-    Обновить значения граф форматной рамки последующих листов, которые
-    совпадают с графами форматной рамки и основной надписи первого листа.
-    Необходимость в обновлении возникает при изменении значения графы
-    на первом листе.
-    На втором и последующих листах эти графы защищены от записи.
-
-    """
-    doc = XSCRIPTCONTEXT.getDocument()
-    doc.UndoManager.lock()
-    doc.lockControllers()
-    for name in common.STAMP_COMMON_FIELDS:
-        firstFrame = doc.TextFrames["Перв.1: " + name]
-        for prefix in ("Прочие: ", "РегИзм: "):
-            otherFrame = doc.TextFrames[prefix + name]
-            otherFrame.String = firstFrame.String
-
-            firstCursor = firstFrame.createTextCursor()
-            otherCursor = otherFrame.createTextCursor()
-            otherCursor.gotoEnd(True)
-            otherCursor.CharHeight = firstCursor.CharHeight
-            otherCursor.CharScaleWidth = firstCursor.CharScaleWidth
-    doc.unlockControllers()
-    doc.UndoManager.unlock()
-
 def setFirstPageFrameValue(name, value):
     """Установить значение поля форматной рамки первого листа.
 
@@ -103,7 +76,7 @@ def clean(*args):
         and "Спецификация" in doc.TextTables:
             amountTitleCell = doc.TextTables["Спецификация"].getCellByName("F1")
             amountTitleCell.String = "Кол. на исполнение"
-    syncCommonFields()
+    common.syncCommonFields()
     doc.unlockControllers()
     doc.UndoManager.unlock()
 
@@ -159,7 +132,7 @@ def fill(*args):
     # Утвердил
     setFirstPageFrameValue("11 Утв.", schematic.approver)
 
-    syncCommonFields()
+    common.syncCommonFields()
     doc.unlockControllers()
 
 g_exportedScripts = clean, fill
