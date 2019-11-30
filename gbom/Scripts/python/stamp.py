@@ -107,7 +107,8 @@ def fill(*args):
         docTitle += "Ведомость покупных изделий"
     setFirstPageFrameValue("1 Наименование документа", docTitle)
     # Наименование организации
-    setFirstPageFrameValue("9 Наименование организации", schematic.company)
+    companyName = schematic.company.replace('\\n', '\n')
+    setFirstPageFrameValue("9 Наименование организации", companyName)
     # Обозначение документа
     docId = schematic.number
     idParts = re.match(
