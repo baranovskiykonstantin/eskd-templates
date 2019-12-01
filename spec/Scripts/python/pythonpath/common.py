@@ -504,7 +504,7 @@ def appendRevTable():
     """Добавить таблицу регистрации изменений."""
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" in doc.TextTables:
-        return False
+        return
     global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
@@ -650,13 +650,13 @@ def appendRevTable():
     doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
-    return True
+    return
 
 def removeRevTable():
     """Удалить таблицу регистрации изменений."""
     doc = XSCRIPTCONTEXT.getDocument()
     if "Лист_регистрации_изменений" not in doc.TextTables:
-        return False
+        return
     global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
     doc.lockControllers()
@@ -674,7 +674,7 @@ def removeRevTable():
     doc.UndoManager.clear()
     doc.unlockControllers()
     SKIP_MODIFY_EVENTS = False
-    return True
+    return
 
 def syncCommonFields():
     """Обновить значения общих граф.

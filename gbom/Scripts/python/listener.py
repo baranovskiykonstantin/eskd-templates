@@ -31,7 +31,6 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         if "Ведомость_покупных_изделий" not in doc.TextTables:
             common.rebuildTable()
         self.prevTableRowCount = doc.TextTables["Ведомость_покупных_изделий"].Rows.Count
-        self.prevPageCount = doc.CurrentController.PageCount
 
     def modified(self, event):
         """Приём сообщения об изменении в документе."""
@@ -55,21 +54,6 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     if not common.isThreadWorking():
                         # Обновить высоту строк.
                         common.updateTableRowsHeight()
-
-                        # Автоматическое добавление/удаление
-                        # таблицы регистрации изменений.
-                        pageCount = doc.CurrentController.PageCount
-                        if pageCount != self.prevPageCount:
-                            self.prevPageCount = pageCount
-                            if config.getboolean("bom", "append rev table"):
-                                if "Лист_регистрации_изменений" in doc.TextTables:
-                                    pageCount -= 1
-                                if pageCount > config.getint("bom", "pages rev table"):
-                                    if common.appendRevTable():
-                                        self.prevPageCount += 1
-                                else:
-                                    if common.removeRevTable():
-                                        self.prevPageCount -= 1
 
         if not common.isThreadWorking():
             currentTable = doc.CurrentController.ViewCursor.TextTable

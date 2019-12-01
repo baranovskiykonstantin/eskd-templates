@@ -31,7 +31,6 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         if "Спецификация" not in doc.TextTables:
             common.rebuildTable()
         self.prevTableRowCount = doc.TextTables["Спецификация"].Rows.Count
-        self.prevPageCount = doc.CurrentController.PageCount
         self.prevVarTableIsPresent = False
 
     def modified(self, event):
@@ -64,21 +63,6 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         # непосредственно под основной таблицей,
                         # но только на первом листе.
                         common.updateVarTablePosition()
-
-                        # Автоматическое добавление/удаление
-                        # таблицы регистрации изменений.
-                        pageCount = doc.CurrentController.PageCount
-                        if pageCount != self.prevPageCount:
-                            self.prevPageCount = pageCount
-                            if config.getboolean("spec", "append rev table"):
-                                if "Лист_регистрации_изменений" in doc.TextTables:
-                                    pageCount -= 1
-                                if pageCount > config.getint("spec", "pages rev table"):
-                                    if common.appendRevTable():
-                                        self.prevPageCount += 1
-                                else:
-                                    if common.removeRevTable():
-                                        self.prevPageCount -= 1
 
         if not common.isThreadWorking():
             currentTable = doc.CurrentController.ViewCursor.TextTable

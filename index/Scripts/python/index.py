@@ -392,8 +392,6 @@ def toggleRevTable(*args):
     if common.isThreadWorking():
         return
     doc = XSCRIPTCONTEXT.getDocument()
-    config.set("index", "append rev table", "no")
-    config.save()
     if "Лист_регистрации_изменений" in doc.TextTables:
         common.removeRevTable()
     else:
