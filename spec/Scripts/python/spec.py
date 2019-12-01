@@ -547,8 +547,6 @@ class SpecBuildingThread(threading.Thread):
                 if pageCount > config.getint("spec", "pages rev table"):
                     common.appendRevTable()
 
-            doc.UndoManager.clear()
-
         except StopException:
             # Прервано пользователем
             pass
@@ -565,6 +563,7 @@ class SpecBuildingThread(threading.Thread):
                 dialog.dispose()
             if doc.UndoManager.isLocked():
                 doc.UndoManager.unlock()
+            doc.UndoManager.clear()
             if doc.hasControllersLocked():
                 doc.unlockControllers()
 

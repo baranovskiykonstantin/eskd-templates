@@ -419,8 +419,6 @@ class BomBuildingThread(threading.Thread):
                 if pageCount > config.getint("bom", "pages rev table"):
                     common.appendRevTable()
 
-            doc.UndoManager.clear()
-
         except StopException:
             # Прервано пользователем
             pass
@@ -437,6 +435,7 @@ class BomBuildingThread(threading.Thread):
                 dialog.dispose()
             if doc.UndoManager.isLocked():
                 doc.UndoManager.unlock()
+            doc.UndoManager.clear()
             if doc.hasControllersLocked():
                 doc.unlockControllers()
 

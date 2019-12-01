@@ -344,8 +344,6 @@ class IndexBuildingThread(threading.Thread):
                 if pageCount > config.getint("index", "pages rev table"):
                     common.appendRevTable()
 
-            doc.UndoManager.clear()
-
         except StopException:
             # Прервано пользователем
             pass
@@ -362,6 +360,7 @@ class IndexBuildingThread(threading.Thread):
                 dialog.dispose()
             if doc.UndoManager.isLocked():
                 doc.UndoManager.unlock()
+            doc.UndoManager.clear()
             if doc.hasControllersLocked():
                 doc.unlockControllers()
 
