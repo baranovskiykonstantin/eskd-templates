@@ -57,18 +57,13 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     self.prevTableRowCount = tableRowCount
                     self.prevVarTableIsPresent = varTableIsPresent
                     if not common.isThreadWorking():
-                        # Высота строк подстраивается автоматически так, чтобы нижнее
-                        # обрамление последней строки листа совпадало с верхней линией
-                        # основной надписи.
-                        # Данное действие выполняется только при редактировании таблицы
-                        # спецификации вручную.
-                        # При автоматическом построении специф. высота строк и таблица
-                        # регистрации изменений обрабатываются отдельным образом
-                        # (см. spec.py).
-                        doc.lockControllers()
-                        for rowIndex in range(2, tableRowCount):
-                            table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
-                        doc.unlockControllers()
+                        # Обновить высоту строк.
+                        common.updateTableRowsHeight()
+
+                        # Позиция таблицы наименований исполнений
+                        # непосредственно под основной таблицей,
+                        # но только на первом листе.
+                        common.updateVarTablePosition()
 
                         # Автоматическое добавление/удаление
                         # таблицы регистрации изменений.
@@ -84,11 +79,6 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                                 else:
                                     if common.removeRevTable():
                                         self.prevPageCount -= 1
-
-                        # Позиция таблицы наименований исполнений
-                        # непосредственно под основной таблицей,
-                        # но только на первом листе.
-                        common.updateVarTablePosition()
 
         if not common.isThreadWorking():
             currentTable = doc.CurrentController.ViewCursor.TextTable

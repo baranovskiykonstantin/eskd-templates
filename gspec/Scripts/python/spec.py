@@ -538,10 +538,8 @@ class SpecBuildingThread(threading.Thread):
 
             kickProgress()
 
-            doc.lockControllers()
-            for rowIndex in range(2, table.Rows.Count):
-                table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
-            doc.unlockControllers()
+            common.updateTableRowsHeight()
+            common.updateVarTablePosition()
 
             kickProgress()
 
@@ -549,8 +547,6 @@ class SpecBuildingThread(threading.Thread):
                 pageCount = doc.CurrentController.PageCount
                 if pageCount > config.getint("spec", "pages rev table"):
                     common.appendRevTable()
-
-            common.updateVarTablePosition()
 
             doc.UndoManager.clear()
 

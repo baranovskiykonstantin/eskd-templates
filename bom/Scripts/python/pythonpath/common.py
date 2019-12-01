@@ -371,6 +371,20 @@ def getTableRowHeight(rowIndex):
         height = 815
     return height
 
+def updateTableRowsHeight():
+    """Обновить высоту строк таблицы.
+
+    Высота строк подстраивается так, чтобы нижнее обрамление последней строки
+    листа совпадало с верхней линией основной надписи.
+
+    """
+    doc = XSCRIPTCONTEXT.getDocument()
+    table = doc.TextTables["Ведомость_покупных_изделий"]
+    doc.lockControllers()
+    for rowIndex in range(2, table.Rows.Count):
+        table.Rows[rowIndex].Height = getTableRowHeight(rowIndex)
+    doc.unlockControllers()
+
 def rebuildTable():
     """Построить новую пустую таблицу."""
     global SKIP_MODIFY_EVENTS

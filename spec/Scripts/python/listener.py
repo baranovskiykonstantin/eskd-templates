@@ -53,18 +53,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     self.prevFirstPageStyleName = firstPageStyleName
                     self.prevTableRowCount = tableRowCount
                     if not common.isThreadWorking():
-                        # Высота строк подстраивается автоматически так, чтобы нижнее
-                        # обрамление последней строки листа совпадало с верхней линией
-                        # основной надписи.
-                        # Данное действие выполняется только при редактировании таблицы
-                        # спецификации вручную.
-                        # При автоматическом построении специф. высота строк и таблица
-                        # регистрации изменений обрабатываются отдельным образом
-                        # (см. spec.py).
-                        doc.lockControllers()
-                        for rowIndex in range(1, tableRowCount):
-                            table.Rows[rowIndex].Height = common.getTableRowHeight(rowIndex)
-                        doc.unlockControllers()
+                        # Обновить высоту строк.
+                        common.updateTableRowsHeight()
 
                         # Автоматическое добавление/удаление
                         # таблицы регистрации изменений.
