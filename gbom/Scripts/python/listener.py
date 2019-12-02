@@ -43,6 +43,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.removeModifyListener(self)
         doc.UndoManager.lock()
 
+        # Обновление высоты строк.
         firstPageStyleName = doc.Text.createTextCursor().PageDescName
         if firstPageStyleName and "Ведомость_покупных_изделий" in doc.TextTables:
             table = doc.TextTables["Ведомость_покупных_изделий"]
@@ -52,51 +53,52 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     self.prevFirstPageStyleName = firstPageStyleName
                     self.prevTableRowCount = tableRowCount
                     if not common.isThreadWorking():
-                        # Обновить высоту строк.
                         common.updateTableRowsHeight()
 
         if not common.isThreadWorking():
             currentTable = doc.CurrentController.ViewCursor.TextTable
             currentCell = doc.CurrentController.ViewCursor.Cell
             currentFrame = doc.CurrentController.ViewCursor.TextFrame
+
+            # Подстройка масштаба шрифта по ширине.
             if currentCell or currentFrame:
                 if currentCell:
                     itemName = currentCell.createTextCursor().ParaStyleName
                     item = currentCell
                 else: # currentFrame
-                    itemName = currentFrame.Name
+                    itemName = currentFrame.Name[8:]
                     item = currentFrame
                 itemCursor = item.createTextCursor()
-                for name in common.ITEM_WIDTHS:
-                    if itemName.endswith(name):
-                        itemWidth = common.ITEM_WIDTHS[name]
-                        if itemName == "№ строки" \
-                            and currentTable.Name == "Ведомость_покупных_изделий":
-                                # Подстроить ширину всех позиционных номеров
-                                # при изменении хотя бы одного.
-                                doc.TextFields.refresh()
-                                for row in range(2, currentTable.Rows.Count):
-                                    cellPos = currentTable.getCellByName(
-                                        "A{}".format(row + 1)
-                                    )
-                                    for textContent in cellPos:
-                                        widthFactor = textwidth.getWidthFactor(
-                                            cellPos.String,
-                                            textContent.CharHeight,
-                                            itemWidth - 1
-                                        )
-                                        textContent.CharScaleWidth = widthFactor
-                        else:
-                            for line in item.String.splitlines(keepends=True):
-                                widthFactor = textwidth.getWidthFactor(
-                                    line,
-                                    itemCursor.CharHeight,
-                                    itemWidth - 1
+                if itemName in common.ITEM_WIDTHS:
+                    itemWidth = common.ITEM_WIDTHS[itemName]
+                    if itemName == "№ строки" \
+                        and currentTable.Name == "Ведомость_покупных_изделий":
+                            # Подстроить ширину всех позиционных номеров
+                            # при изменении хотя бы одного.
+                            doc.TextFields.refresh()
+                            for row in range(2, currentTable.Rows.Count):
+                                cellPos = currentTable.getCellByName(
+                                    "A{}".format(row + 1)
                                 )
-                                itemCursor.goRight(len(line), True)
-                                itemCursor.CharScaleWidth = widthFactor
-                                itemCursor.collapseToEnd()
+                                for textContent in cellPos:
+                                    widthFactor = textwidth.getWidthFactor(
+                                        cellPos.String,
+                                        textContent.CharHeight,
+                                        itemWidth - 1
+                                    )
+                                    textContent.CharScaleWidth = widthFactor
+                    else:
+                        for line in item.String.splitlines(keepends=True):
+                            widthFactor = textwidth.getWidthFactor(
+                                line,
+                                itemCursor.CharHeight,
+                                itemWidth - 1
+                            )
+                            itemCursor.goRight(len(line), True)
+                            itemCursor.CharScaleWidth = widthFactor
+                            itemCursor.collapseToEnd()
 
+            # Синхронизация содержимого полей в разных стилях страниц.
             if currentFrame is not None \
                 and currentFrame.Name.startswith("Перв.") \
                 and not currentFrame.Name.endswith("7 Лист") \

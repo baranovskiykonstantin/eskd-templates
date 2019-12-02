@@ -43,6 +43,7 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.removeModifyListener(self)
         doc.UndoManager.lock()
 
+        # Обновление высоты строк.
         firstPageStyleName = doc.Text.createTextCursor().PageDescName
         if firstPageStyleName and "Перечень_элементов" in doc.TextTables:
             table = doc.TextTables["Перечень_элементов"]
@@ -52,33 +53,34 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                     self.prevFirstPageStyleName = firstPageStyleName
                     self.prevTableRowCount = tableRowCount
                     if not common.isThreadWorking():
-                        # Обновить высоту строк.
                         common.updateTableRowsHeight()
 
         if not common.isThreadWorking():
             currentCell = doc.CurrentController.ViewCursor.Cell
             currentFrame = doc.CurrentController.ViewCursor.TextFrame
+
+            # Подстройка масштаба шрифта по ширине.
             if currentCell or currentFrame:
                 if currentCell:
                     itemName = currentCell.createTextCursor().ParaStyleName
                     item = currentCell
                 else: # currentFrame
-                    itemName = currentFrame.Name
+                    itemName = currentFrame.Name[8:]
                     item = currentFrame
                 itemCursor = item.createTextCursor()
-                for name in common.ITEM_WIDTHS:
-                    if itemName.endswith(name):
-                        itemWidth = common.ITEM_WIDTHS[name]
-                        for line in item.String.splitlines(keepends=True):
-                            widthFactor = textwidth.getWidthFactor(
-                                line,
-                                itemCursor.CharHeight,
-                                itemWidth - 1
-                            )
-                            itemCursor.goRight(len(line), True)
-                            itemCursor.CharScaleWidth = widthFactor
-                            itemCursor.collapseToEnd()
+                if itemName in common.ITEM_WIDTHS:
+                    itemWidth = common.ITEM_WIDTHS[itemName]
+                    for line in item.String.splitlines(keepends=True):
+                        widthFactor = textwidth.getWidthFactor(
+                            line,
+                            itemCursor.CharHeight,
+                            itemWidth - 1
+                        )
+                        itemCursor.goRight(len(line), True)
+                        itemCursor.CharScaleWidth = widthFactor
+                        itemCursor.collapseToEnd()
 
+            # Синхронизация содержимого полей в разных стилях страниц.
             if currentFrame is not None \
                 and currentFrame.Name.startswith("Перв.") \
                 and not currentFrame.Name.endswith("7 Лист") \
