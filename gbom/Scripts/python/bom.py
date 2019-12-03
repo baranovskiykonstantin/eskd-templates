@@ -12,22 +12,130 @@ config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
 
-class ButtonStopActionListener(unohelper.Base, XActionListener):
-    def __init__(self, stopEvent):
-        self.stopEvent = stopEvent
-
-    def actionPerformed(self, event):
-        self.stopEvent.set()
-
-
 class StopException(Exception):
     pass
+
+
+class ProgressDialog:
+    """Диалоговое окно прогресса.
+
+    Диалоговое окно отображает текущий прогресс построения таблицы
+    и позволяет пользователю прервать операцию досрочно.
+
+    """
+
+    def __init__(self, message, target):
+        self.stopEvent = threading.Event()
+        context = XSCRIPTCONTEXT.getComponentContext()
+
+        dialogModel = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.awt.UnoControlDialogModel",
+            context
+        )
+        dialogModel.Width = 200
+        dialogModel.Height = 70
+        dialogModel.PositionX = 0
+        dialogModel.PositionY = 0
+        dialogModel.Title = "Прогресс: 0%"
+        dialogModel.Closeable = False
+
+        labelModel = dialogModel.createInstance(
+            "com.sun.star.awt.UnoControlFixedTextModel"
+        )
+        labelModel.PositionX = 0
+        labelModel.PositionY = 0
+        labelModel.Width = dialogModel.Width
+        labelModel.Height = 30
+        labelModel.Align = 1
+        labelModel.VerticalAlign = uno.Enum(
+            "com.sun.star.style.VerticalAlignment",
+            "MIDDLE"
+        )
+        labelModel.Name = "Label"
+        labelModel.Label = "Выполняется построение ведомости\nпокупных изделий"
+        dialogModel.insertByName("Label", labelModel)
+
+        progressBarModel = dialogModel.createInstance(
+            "com.sun.star.awt.UnoControlProgressBarModel"
+        )
+        progressBarModel.PositionX = 4
+        progressBarModel.PositionY = labelModel.Height
+        progressBarModel.Width = dialogModel.Width - 8
+        progressBarModel.Height = 12
+        progressBarModel.Name = "ProgressBar"
+        progressBarModel.ProgressValue = 0
+        progressBarModel.ProgressValueMin = 0
+        progressBarModel.ProgressValueMax = 1
+        dialogModel.insertByName("ProgressBar", progressBarModel)
+
+        bottonModelStop = dialogModel.createInstance(
+            "com.sun.star.awt.UnoControlButtonModel"
+        )
+        bottonModelStop.Width = 45
+        bottonModelStop.Height = 16
+        bottonModelStop.PositionX = (dialogModel.Width - bottonModelStop.Width) / 2
+        bottonModelStop.PositionY = dialogModel.Height - bottonModelStop.Height - 5
+        bottonModelStop.Name = "ButtonStop"
+        bottonModelStop.Label = "Прервать"
+        dialogModel.insertByName("ButtonStop", bottonModelStop)
+
+        dialog = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.awt.UnoControlDialog",
+            context
+        )
+        dialog.setVisible(False)
+        dialog.setModel(dialogModel)
+        dialog.getControl("ButtonStop").addActionListener(
+            self.ButtonStopActionListener(self.stopEvent)
+        )
+        toolkit = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.awt.Toolkit",
+            context
+        )
+        dialog.createPeer(toolkit, None)
+        # Установить диалоговое окно по центру
+        doc = XSCRIPTCONTEXT.getDocument()
+        windowPosSize = doc.CurrentController.Frame.ContainerWindow.getPosSize()
+        dialogPosSize = dialog.getPosSize()
+        dialog.setPosSize(
+            (windowPosSize.Width - dialogPosSize.Width) / 2,
+            (windowPosSize.Height - dialogPosSize.Height) / 2,
+            dialogPosSize.Width,
+            dialogPosSize.Height,
+            uno.getConstantByName("com.sun.star.awt.PosSize.POS")
+        )
+        dialog.getControl("ProgressBar").setRange(0, target)
+        dialog.setVisible(True)
+
+        self.dialog = dialog
+        self.progress = 0
+        self.progressTotal = target
+
+    def stepUp(self):
+        if self.stopEvent.is_set():
+            raise StopException
+        self.progress += 1
+        self.dialog.getControl("ProgressBar").setValue(self.progress)
+        self.dialog.setTitle("Прогресс: {:.0f}%".format(
+            100 * self.progress / self.progressTotal
+        ))
+
+    def close(self):
+        self.dialog.dispose()
+
+
+    class ButtonStopActionListener(unohelper.Base, XActionListener):
+        def __init__(self, stopEvent):
+            self.stopEvent = stopEvent
+
+        def actionPerformed(self, event):
+            self.stopEvent.set()
 
 
 class BomBuildingThread(threading.Thread):
     """Ведомость заполняется из отдельного вычислительного потока.
 
-    Из-за особенностей реализации uno-интерфейса, процесс построения ведомость
+    Из-за особенностей реализации uno-интерфейса, процесс построения ведомости
     занимает значительное время. Чтобы избежать продолжительного зависания
     графического интерфейса LibreOffice, ведомость заполняется из отдельного
     вычислительного потока и внесённые изменения сразу же отображаются в окне
@@ -37,104 +145,12 @@ class BomBuildingThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.name = "BuildingThread"
-        self.stopEvent = threading.Event()
 
     def run(self):
         try:
-            doc = XSCRIPTCONTEXT.getDocument()
-            # ----------------------------------------------------------------
-            # Диалоговое окно прогресса
-            # ----------------------------------------------------------------
-            context = XSCRIPTCONTEXT.getComponentContext()
-
-            dialogModel = context.ServiceManager.createInstanceWithContext(
-                "com.sun.star.awt.UnoControlDialogModel",
-                context
-            )
-            dialogModel.Width = 200
-            dialogModel.Height = 70
-            dialogModel.PositionX = 0
-            dialogModel.PositionY = 0
-            dialogModel.Title = "Прогресс: 0%"
-
-            labelModel = dialogModel.createInstance(
-                "com.sun.star.awt.UnoControlFixedTextModel"
-            )
-            labelModel.PositionX = 0
-            labelModel.PositionY = 0
-            labelModel.Width = dialogModel.Width
-            labelModel.Height = 30
-            labelModel.Align = 1
-            labelModel.VerticalAlign = uno.Enum(
-                "com.sun.star.style.VerticalAlignment",
-                "MIDDLE"
-            )
-            labelModel.Name = "Label"
-            labelModel.Label = "Выполняется построение ведомости\nпокупных изделий"
-            dialogModel.insertByName("Label", labelModel)
-
-            progressBarModel = dialogModel.createInstance(
-                "com.sun.star.awt.UnoControlProgressBarModel"
-            )
-            progressBarModel.PositionX = 4
-            progressBarModel.PositionY = labelModel.Height
-            progressBarModel.Width = dialogModel.Width - 8
-            progressBarModel.Height = 12
-            progressBarModel.Name = "ProgressBar"
-            progressBarModel.ProgressValue = 0
-            progressBarModel.ProgressValueMin = 0
-            progressBarModel.ProgressValueMax = 1
-            dialogModel.insertByName("ProgressBar", progressBarModel)
-
-            bottonModelStop = dialogModel.createInstance(
-                "com.sun.star.awt.UnoControlButtonModel"
-            )
-            bottonModelStop.Width = 45
-            bottonModelStop.Height = 16
-            bottonModelStop.PositionX = (dialogModel.Width - bottonModelStop.Width) / 2
-            bottonModelStop.PositionY = dialogModel.Height - bottonModelStop.Height - 5
-            bottonModelStop.Name = "ButtonStop"
-            bottonModelStop.Label = "Прервать"
-            dialogModel.insertByName("ButtonStop", bottonModelStop)
-
-            dialog = context.ServiceManager.createInstanceWithContext(
-                "com.sun.star.awt.UnoControlDialog",
-                context
-            )
-            dialog.setVisible(False)
-            dialog.setModel(dialogModel)
-            dialog.getControl("ButtonStop").addActionListener(
-                ButtonStopActionListener(self.stopEvent)
-            )
-            toolkit = context.ServiceManager.createInstanceWithContext(
-                "com.sun.star.awt.Toolkit",
-                context
-            )
-            dialog.createPeer(toolkit, None)
-            # Установить диалоговое окно по центру
-            windowPosSize = doc.CurrentController.Frame.ContainerWindow.getPosSize()
-            dialogPosSize = dialog.getPosSize()
-            dialog.setPosSize(
-                (windowPosSize.Width - dialogPosSize.Width) / 2,
-                (windowPosSize.Height - dialogPosSize.Height) / 2,
-                dialogPosSize.Width,
-                dialogPosSize.Height,
-                uno.getConstantByName("com.sun.star.awt.PosSize.POS")
-            )
-
             # ----------------------------------------------------------------
             # Методы для построения таблицы
             # ----------------------------------------------------------------
-
-            def kickProgress():
-                if self.stopEvent.is_set():
-                    raise StopException
-                nonlocal progress
-                progress += 1
-                dialog.getControl("ProgressBar").setValue(progress)
-                dialog.setTitle("Прогресс: {:.0f}%".format(
-                    100*progress/progressTotal
-                ))
 
             def nextRow():
                 nonlocal lastRow
@@ -249,12 +265,13 @@ class BomBuildingThread(threading.Thread):
             prevGroup = None
             emptyRowsType = config.getint("bom", "empty rows between diff type")
 
-            progress = 0
             progressTotal = 6
             for group in compGroups:
                 progressTotal += len(group)
-            dialog.getControl("ProgressBar").setRange(0, progressTotal)
-            dialog.setVisible(True)
+            progressDialog = ProgressDialog(
+                "Выполняется построение ведомости\nпокупных изделий",
+                progressTotal
+            )
 
             # В процессе заполнения ведомости, после текущей строки всегда
             # должна оставаться пустая строка с ненарушенным форматированием.
@@ -288,7 +305,7 @@ class BomBuildingThread(threading.Thread):
                             ["", name, compCode, compDoc, compDealer, compCount, "", "", "", "", "", "", "", "", "", compComment],
                             posIncrement=increment
                         )
-                        kickProgress()
+                        progressDialog.stepUp()
                 else:
                     title = group[0].getBomValue("type", plural=True)
                     if title:
@@ -312,12 +329,12 @@ class BomBuildingThread(threading.Thread):
                             posIncrement=increment
                         )
                         increment = 1
-                        kickProgress()
+                        progressDialog.stepUp()
                 prevGroup = group
 
             table.Rows.removeByIndex(lastRow, 2)
 
-            kickProgress()
+            progressDialog.stepUp()
 
             if config.getboolean("bom", "prohibit titles at bottom"):
                 _, firstRowCount, otherRowCount = common.getFirstPageInfo()
@@ -345,7 +362,7 @@ class BomBuildingThread(threading.Thread):
                                 offset += 1
                     pos += otherRowCount
 
-            kickProgress()
+            progressDialog.stepUp()
 
             if config.getboolean("bom", "prohibit empty rows at top"):
                 _, firstRowCount, otherRowCount = common.getFirstPageInfo()
@@ -357,7 +374,7 @@ class BomBuildingThread(threading.Thread):
                     pos += otherRowCount
                     doc.unlockControllers()
 
-            kickProgress()
+            progressDialog.stepUp()
 
             if not config.getboolean("bom", "only components have position numbers"):
                 doc.lockControllers()
@@ -385,11 +402,11 @@ class BomBuildingThread(threading.Thread):
                     cellCursor.CharScaleWidth = widthFactor
                 doc.unlockControllers()
 
-            kickProgress()
+            progressDialog.stepUp()
 
             common.updateTableRowsHeight()
 
-            kickProgress()
+            progressDialog.stepUp()
 
             if config.getboolean("bom", "process repeated values"):
                 doc.lockControllers()
@@ -410,7 +427,7 @@ class BomBuildingThread(threading.Thread):
                             repeatCount[colIndex] = 0
                 doc.unlockControllers()
 
-            kickProgress()
+            progressDialog.stepUp()
 
             if config.getboolean("bom", "append rev table"):
                 pageCount = doc.CurrentController.PageCount
@@ -420,7 +437,6 @@ class BomBuildingThread(threading.Thread):
         except StopException:
             # Прервано пользователем
             pass
-
         except:
             # Ошибка!
             common.showMessage(
@@ -429,8 +445,8 @@ class BomBuildingThread(threading.Thread):
                 "Ведомость покупных изделий"
             )
         finally:
-            if "dialog" in locals():
-                dialog.dispose()
+            if "progressDialog" in locals():
+                progressDialog.close()
             if doc.UndoManager.isLocked():
                 doc.UndoManager.unlock()
             doc.UndoManager.clear()
