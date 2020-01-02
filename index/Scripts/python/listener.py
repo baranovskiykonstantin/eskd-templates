@@ -164,6 +164,7 @@ def importEmbeddedModules(*args):
                 0,
                 (fileUrl,)
             )
+            doc.setModified(True)
         if not doc.URL:
             msgbox = frame.ContainerWindow.Toolkit.createMessageBox(
                 frame.ContainerWindow,
