@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0">
+ <manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.text-template"/>
+ <manifest:file-entry manifest:full-path="Thumbnails/thumbnail.png" manifest:media-type="image/png"/>
+ <manifest:file-entry manifest:full-path="Fonts/Font_OpenGost_Type_B_TT_1.ttf" manifest:media-type="application/x-font-ttf"/>
+ <manifest:file-entry manifest:full-path="Pictures/10000860000052220000741EA1DBBC1A78CA6D8C.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Pictures/1000100B000052220000741E9298E5E0505486D5.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Pictures/10001E61000052220000741EDA0F5E82E99FFB4B.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Pictures/1000353C000052220000741E50F383452A69B711.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Pictures/10003111000052220000741E1EAD7DF78A081CEB.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Pictures/10002B5A000052220000741E56562D4D2F83E937.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Pictures/10002F79000052220000741E0FD23ADFEBE1A948.svg" manifest:media-type="image/svg+xml"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/pythonpath/common.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/pythonpath/config.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/pythonpath/kicadnet.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/pythonpath/schematic.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/pythonpath/textwidth.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/pythonpath/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/doc/help.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/doc/help.html" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/doc/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/manual.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/listener.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/settings.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/stamp.py" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/python/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Scripts/" manifest:media-type="application/binary"/>
+ <manifest:file-entry manifest:full-path="Configurations2/toolbar/custom_manual.xml" manifest:media-type=""/>
+ <manifest:file-entry manifest:full-path="Configurations2/" manifest:media-type="application/vnd.sun.xml.ui.configuration"/>
+ <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="manifest.rdf" manifest:media-type="application/rdf+xml"/>
+ <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
+ <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
+</manifest:manifest>
