@@ -73,12 +73,20 @@ class Netlist():
             if self.fileName.endswith(".net"):
                 self._content = netlist.read()
                 self.data = self._parseNetItem(None)
+                self._cleanUp()
             elif self.fileName.endswith(".xml"):
                 netlist.readline() # Пропустить первую строку (заголовок)
                 self._content = netlist.read()
                 self.data = self._parseXmlItem(None)
+                self._cleanUp()
             else:
                 self._error("Формат файла не поддерживается.")
+
+    def _cleanUp(self):
+        self._content = ""
+        self._index = 0
+        self._line = 1
+        self._pos = 1
 
     def _error(self, message):
         raise ParseException(

@@ -13,20 +13,20 @@ import threading
 import uno
 
 XSCRIPTCONTEXT = None
-kicadnet = None
 schematic = None
+kicadnet = None
 config = None
 textwidth = None
 
 def init(scriptcontext):
     global XSCRIPTCONTEXT
-    global kicadnet
     global schematic
+    global kicadnet
     global config
     global textwidth
     XSCRIPTCONTEXT = scriptcontext
-    kicadnet = sys.modules["kicadnet" + scriptcontext.getDocument().RuntimeUID]
     schematic = sys.modules["schematic" + scriptcontext.getDocument().RuntimeUID]
+    kicadnet = sys.modules["kicadnet" + scriptcontext.getDocument().RuntimeUID]
     config = sys.modules["config" + scriptcontext.getDocument().RuntimeUID]
     textwidth = sys.modules["textwidth" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 
@@ -206,50 +206,14 @@ def getSchematicData():
     """
     sourceFileName = getSourceFileName()
     if sourceFileName is None:
-        showMessage(
-            "Не удалось получить данные о схеме.",
-            "Ведомость покупных изделий"
-        )
+        # Отменено пользователем
+        #showMessage(
+        #    "Не удалось получить данные о схеме.",
+        #    "Ведомость покупных изделий"
+        #)
         return None
     try:
-        netlist = kicadnet.Netlist(sourceFileName)
-        schematicData = schematic.Schematic()
-        for sheet in netlist.items("sheet"):
-            if sheet.attributes["name"] == "/":
-                title_block = netlist.find("title_block", sheet)
-                for item in title_block.items:
-                    if item.name == "title":
-                        schematicData.title = item.text if item.text is not None else ""
-                    elif item.name == "company":
-                        schematicData.company = item.text if item.text is not None else ""
-                    elif item.name == "comment":
-                        if item.attributes["number"] == "1":
-                            schematicData.number = item.attributes["value"]
-                        elif item.attributes["number"] == "2":
-                            schematicData.developer = item.attributes["value"]
-                        elif item.attributes["number"] == "3":
-                            schematicData.verifier = item.attributes["value"]
-                        elif item.attributes["number"] == "4":
-                            schematicData.approver = item.attributes["value"]
-                        elif item.attributes["number"] == "6":
-                            schematicData.inspector = item.attributes["value"]
-                break
-        for comp in netlist.items("comp"):
-            component = schematic.Component(schematicData)
-            component.reference = comp.attributes["ref"]
-            for item in comp.items:
-                if item.name == "value":
-                    component.value = item.text if item.text is not None and item.text != "~" else ""
-                elif item.name == "footprint":
-                    component.footprint = item.text if item.text is not None and item.text != "~" else ""
-                elif item.name == "datasheet":
-                    component.datasheet = item.text if item.text is not None and item.text != "~" else ""
-                elif item.name == "fields":
-                    for field in item.items:
-                        fieldName = field.attributes["name"]
-                        component.fields[fieldName] = field.text if field.text is not None and field.text != "~" else ""
-            schematicData.components.append(component)
-        return schematicData
+        return schematic.Schematic(sourceFileName)
     except kicadnet.ParseException as error:
         showMessage(
             "Не удалось получить данные о схеме.\n\n" \

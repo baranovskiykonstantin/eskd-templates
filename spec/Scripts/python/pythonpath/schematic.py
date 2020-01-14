@@ -3,11 +3,13 @@
 import re
 import sys
 
+kicadnet = None
 config = None
 
 def init(scriptcontext):
+    global kicadnet
     global config
-    XSCRIPTCONTEXT = scriptcontext
+    kicadnet = sys.modules["kicadnet" + scriptcontext.getDocument().RuntimeUID]
     config = sys.modules["config" + scriptcontext.getDocument().RuntimeUID]
 
 REF_REGEXP = re.compile(r"([^0-9?]+)([0-9]+)")
@@ -734,7 +736,7 @@ class CompGroup():
 class Schematic():
     """Данные о схеме и компонентах."""
 
-    def __init__(self):
+    def __init__(self, netlistName):
         self.title = ""
         self.number = ""
         self.company = ""
@@ -755,6 +757,43 @@ class Schematic():
                             singular = settingsKB2S.get('group names singular', index)
                             plural = settingsKB2S.get('group names plural', index)
                             self.typeNamesDict[singular] = plural
+
+        netlist = kicadnet.Netlist(netlistName)
+        for sheet in netlist.items("sheet"):
+            if sheet.attributes["name"] == "/":
+                title_block = netlist.find("title_block", sheet)
+                for item in title_block.items:
+                    if item.name == "title":
+                        self.title = item.text if item.text is not None else ""
+                    elif item.name == "company":
+                        self.company = item.text if item.text is not None else ""
+                    elif item.name == "comment":
+                        if item.attributes["number"] == "1":
+                            self.number = item.attributes["value"]
+                        elif item.attributes["number"] == "2":
+                            self.developer = item.attributes["value"]
+                        elif item.attributes["number"] == "3":
+                            self.verifier = item.attributes["value"]
+                        elif item.attributes["number"] == "4":
+                            self.approver = item.attributes["value"]
+                        elif item.attributes["number"] == "6":
+                            self.inspector = item.attributes["value"]
+                break
+        for comp in netlist.items("comp"):
+            component = Component(self)
+            component.reference = comp.attributes["ref"]
+            for item in comp.items:
+                if item.name == "value":
+                    component.value = item.text if item.text is not None and item.text != "~" else ""
+                elif item.name == "footprint":
+                    component.footprint = item.text if item.text is not None and item.text != "~" else ""
+                elif item.name == "datasheet":
+                    component.datasheet = item.text if item.text is not None and item.text != "~" else ""
+                elif item.name == "fields":
+                    for field in item.items:
+                        fieldName = field.attributes["name"]
+                        component.fields[fieldName] = field.text if field.text is not None and field.text != "~" else ""
+            self.components.append(component)
 
     def getGroupedComponents(self):
         """Вернуть компоненты, сгруппированные по типу."""
