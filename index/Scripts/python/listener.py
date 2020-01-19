@@ -192,7 +192,8 @@ def importEmbeddedModules(*args):
             del sys.modules[moduleName]
         module = importer.load_module(moduleName)
         module.__name__ = moduleName + docId
-        module.init(XSCRIPTCONTEXT)
+        if hasattr(module, "init"):
+            module.init(XSCRIPTCONTEXT)
         del sys.modules[moduleName]
         sys.modules[moduleName + docId] = module
     global common

@@ -1,8 +1,5 @@
 """Модуль для вычисления ширины текста."""
 
-def init(scriptcontext):
-    pass
-
 CHARWIDTH_MM_PER_POINT = {
     '\r': 0,
     '\n': 0,
