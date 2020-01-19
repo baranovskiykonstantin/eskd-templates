@@ -145,88 +145,88 @@ class IndexBuildingThread(threading.Thread):
         threading.Thread.__init__(self)
         self.name = "BuildingThread"
 
+        self.currentRow = 0
+
     def run(self):
-        try:
-            # ----------------------------------------------------------------
-            # Методы для построения таблицы
-            # ----------------------------------------------------------------
+        # --------------------------------------------------------------------
+        # Методы для построения таблицы
+        # --------------------------------------------------------------------
 
-            def nextRow():
-                nonlocal lastRow
-                lastRow += 1
-                table.Rows.insertByIndex(lastRow, 1)
+        def gotoNextRow(count=1):
+            table.Rows.insertByIndex(self.currentRow + 1, count)
+            self.currentRow += count
 
-            def getFontSize(col):
-                nonlocal lastRow
-                cell = table.getCellByPosition(col, lastRow)
-                cellCursor = cell.createTextCursor()
-                return cellCursor.CharHeight
+        def getFontSize(col):
+            cell = table.getCellByPosition(col, self.currentRow)
+            cellCursor = cell.createTextCursor()
+            return cellCursor.CharHeight
 
-            def isRowEmpty(row):
-                rowCells = table.getCellRangeByPosition(
-                    0, # left
-                    row, # top
-                    table.Columns.Count - 1, # right
-                    row # bottom
+        def isRowEmpty(row):
+            lastCol = len(table.Rows[row].TableColumnSeparators)
+            rowCells = table.getCellRangeByPosition(
+                0, # left
+                row, # top
+                lastCol, # right
+                row # bottom
+            )
+            dataIsPresent = any(rowCells.DataArray[0])
+            return not dataIsPresent
+
+        def fillRow(values, isTitle=False):
+            colWidth = (19, 109, 9, 44)
+            extraRow = [""] * len(values)
+            extremeWidthFactor = config.getint("index", "extreme width factor")
+            doc.lockControllers()
+            for col in range(len(values)):
+                if values[col] == "":
+                    continue
+                if '\n' in values[col]:
+                    text = values[col]
+                    lfPos = text.find('\n')
+                    values[col] = text[:lfPos]
+                    extraRow[col] = text[(lfPos + 1):]
+                widthFactor = textwidth.getWidthFactor(
+                    values[col],
+                    getFontSize(col),
+                    colWidth[col]
                 )
-                dataIsPresent = any(rowCells.DataArray[0])
-                return not dataIsPresent
+                if widthFactor < extremeWidthFactor:
+                    text = values[col]
+                    extremePos = int(len(text) * widthFactor / extremeWidthFactor)
+                    # Первая попытка: определить длину не превышающую
+                    # критическое сжатие шрифта.
+                    pos = text.rfind(" ", 0, extremePos)
+                    if pos == -1:
+                        # Вторая попытка: определить длину, которая хоть и
+                        # превышает критическое значение, но всё же меньше
+                        # максимального.
+                        pos = text.find(" ", extremePos)
+                    if pos != -1:
+                        values[col] = text[:pos]
+                        extraRow[col] = text[(pos + 1):] + extraRow[col]
+                        widthFactor = textwidth.getWidthFactor(
+                            values[col],
+                            getFontSize(col),
+                            colWidth[col]
+                        )
+                cell = table.getCellByPosition(col, self.currentRow)
+                cellCursor = cell.createTextCursor()
+                if col == 1 and isTitle:
+                    cellCursor.ParaStyleName = "Наименование (заголовок)"
+                # Параметры символов необходимо устанавливать после
+                # параметров абзаца!
+                cellCursor.CharScaleWidth = widthFactor
+                cell.String = values[col]
+            doc.unlockControllers()
 
-            def fillRow(values, isTitle=False):
-                colWidth = (19, 109, 9, 44)
-                extraRow = [""] * len(values)
-                extremeWidthFactor = config.getint("index", "extreme width factor")
-                doc.lockControllers()
-                for col in range(len(values)):
-                    if values[col] == "":
-                        continue
-                    if '\n' in values[col]:
-                        text = values[col]
-                        lfPos = text.find('\n')
-                        values[col] = text[:lfPos]
-                        extraRow[col] = text[(lfPos + 1):]
-                    widthFactor = textwidth.getWidthFactor(
-                        values[col],
-                        getFontSize(col),
-                        colWidth[col]
-                    )
-                    if widthFactor < extremeWidthFactor:
-                        text = values[col]
-                        extremePos = int(len(text) * widthFactor / extremeWidthFactor)
-                        # Первая попытка: определить длину не превышающую
-                        # критическое сжатие шрифта.
-                        pos = text.rfind(" ", 0, extremePos)
-                        if pos == -1:
-                            # Вторая попытка: определить длину, которая хоть и
-                            # превышает критическое значение, но всё же меньше
-                            # максимального.
-                            pos = text.find(" ", extremePos)
-                        if pos != -1:
-                            values[col] = text[:pos]
-                            extraRow[col] = text[(pos + 1):] + extraRow[col]
-                            widthFactor = textwidth.getWidthFactor(
-                                values[col],
-                                getFontSize(col),
-                                colWidth[col]
-                            )
-                    cell = table.getCellByPosition(col, lastRow)
-                    cellCursor = cell.createTextCursor()
-                    if col == 1 and isTitle:
-                        cellCursor.ParaStyleName = "Наименование (заголовок)"
-                    # Параметры символов необходимо устанавливать после
-                    # параметров абзаца!
-                    cellCursor.CharScaleWidth = widthFactor
-                    cell.String = values[col]
-                doc.unlockControllers()
+            gotoNextRow()
+            if any(extraRow):
+                fillRow(extraRow, isTitle)
 
-                nextRow()
-                if any(extraRow):
-                    fillRow(extraRow, isTitle)
-
-            # ----------------------------------------------------------------
-            # Начало построения таблицы
-            # ----------------------------------------------------------------
-
+        # --------------------------------------------------------------------
+        # Начало построения таблицы
+        # --------------------------------------------------------------------
+        try:
             schematic = common.getSchematicData()
             if schematic is None:
                 return
@@ -238,12 +238,12 @@ class IndexBuildingThread(threading.Thread):
             prevGroup = None
             emptyRowsRef = config.getint("index", "empty rows between diff ref")
             emptyRowsType = config.getint("index", "empty rows between diff type")
-            lastRow = table.Rows.Count - 1
+            self.currentRow = table.Rows.Count - 1
             # В процессе заполнения перечня, в конце таблицы всегда должна
             # оставаться пустая строка с ненарушенным форматированием.
             # На её основе будут создаваться новые строки.
             # По окончанию, последняя строка будет удалена.
-            table.Rows.insertByIndex(lastRow, 1)
+            table.Rows.insertByIndex(self.currentRow, 1)
 
             progressTotal = 3
             for group in compGroups:
@@ -260,10 +260,9 @@ class IndexBuildingThread(threading.Thread):
                         emptyRows = emptyRowsRef
                     else:
                         emptyRows = emptyRowsType
-                    for _ in range(emptyRows):
-                        doc.lockControllers()
-                        nextRow()
-                        doc.unlockControllers()
+                    doc.lockControllers()
+                    gotoNextRow(emptyRows)
+                    doc.unlockControllers()
                 if len(group) == 1 \
                     and not config.getboolean("index", "every group has title"):
                         compRef = group[0].getRefRangeString()
@@ -290,7 +289,7 @@ class IndexBuildingThread(threading.Thread):
                                 isTitle=True
                             )
                     if config.getboolean("index", "empty row after group title"):
-                        nextRow()
+                        gotoNextRow()
                     for compRange in group:
                         compRef = compRange.getRefRangeString()
                         compName = compRange.getIndexValue("name")
@@ -309,7 +308,7 @@ class IndexBuildingThread(threading.Thread):
                         progressDialog.stepUp()
                 prevGroup = group
 
-            table.Rows.removeByIndex(lastRow, 2)
+            table.Rows.removeByIndex(self.currentRow, 2)
 
             progressDialog.stepUp()
 

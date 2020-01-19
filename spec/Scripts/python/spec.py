@@ -145,123 +145,123 @@ class SpecBuildingThread(threading.Thread):
     def __init__(self, update=False):
         threading.Thread.__init__(self)
         self.name = "BuildingThread"
-        self.update = update
         self.stopEvent = threading.Event()
 
+        self.currentRow = 0
+        self.currentPosition = 0
+        self.update = update
+
     def run(self):
-        try:
-            # ----------------------------------------------------------------
-            # Методы для построения таблицы
-            # ----------------------------------------------------------------
+        # --------------------------------------------------------------------
+        # Методы для построения таблицы
+        # --------------------------------------------------------------------
 
-            def nextRow():
-                nonlocal lastRow
-                lastRow += 1
-                table.Rows.insertByIndex(lastRow, 1)
+        def gotoNextRow(count=1):
+            table.Rows.insertByIndex(self.currentRow + 1, count)
+            self.currentRow += count
 
-            def getFontSize(col):
-                nonlocal lastRow
-                cell = table.getCellByPosition(col, lastRow)
-                cellCursor = cell.createTextCursor()
-                return cellCursor.CharHeight
+        def getFontSize(col):
+            cell = table.getCellByPosition(col, self.currentRow)
+            cellCursor = cell.createTextCursor()
+            return cellCursor.CharHeight
 
-            def isRowEmpty(row):
-                rowCells = table.getCellRangeByPosition(
-                    0, # left
-                    row, # top
-                    table.Columns.Count - 1, # right
-                    row # bottom
+        def isRowEmpty(row):
+            lastCol = len(table.Rows[row].TableColumnSeparators)
+            rowCells = table.getCellRangeByPosition(
+                0, # left
+                row, # top
+                lastCol, # right
+                row # bottom
+            )
+            dataIsPresent = any(rowCells.DataArray[0])
+            return not dataIsPresent
+
+        def fillSectionTitle(section):
+            doc.lockControllers()
+            cell = table.getCellByPosition(4, self.currentRow)
+            cellCursor = cell.createTextCursor()
+            cellCursor.ParaStyleName = "Наименование (заголовок раздела)"
+            cell.String = section
+            gotoNextRow()
+            doc.unlockControllers()
+
+        def fillRow(values, isTitle=False, posIncrement=0):
+            colWidth = (5, 5, 7, 69, 62, 9, 21)
+            extraRow = [""] * len(values)
+            extremeWidthFactor = config.getint("spec", "extreme width factor")
+            doc.lockControllers()
+            for col in range(len(values)):
+                if values[col] == "" and not (col == 2 and posIncrement != 0):
+                    continue
+                if '\n' in values[col]:
+                    text = values[col]
+                    lfPos = text.find('\n')
+                    values[col] = text[:lfPos]
+                    extraRow[col] = text[(lfPos + 1):]
+                widthFactor = textwidth.getWidthFactor(
+                    values[col],
+                    getFontSize(col),
+                    colWidth[col]
                 )
-                dataIsPresent = any(rowCells.DataArray[0])
-                return not dataIsPresent
-
-            def fillSectionTitle(section):
-                doc.lockControllers()
-                cell = table.getCellByPosition(4, lastRow)
-                cellCursor = cell.createTextCursor()
-                cellCursor.ParaStyleName = "Наименование (заголовок раздела)"
-                cell.String = section
-                nextRow()
-                doc.unlockControllers()
-
-            def fillRow(values, isTitle=False, posIncrement=0):
-                nonlocal posValue
-                colWidth = (5, 5, 7, 69, 62, 9, 21)
-                extraRow = [""] * len(values)
-                extremeWidthFactor = config.getint("spec", "extreme width factor")
-                doc.lockControllers()
-                for col in range(len(values)):
-                    if values[col] == "" and not (col == 2 and posIncrement != 0):
-                        continue
-                    if '\n' in values[col]:
-                        text = values[col]
-                        lfPos = text.find('\n')
-                        values[col] = text[:lfPos]
-                        extraRow[col] = text[(lfPos + 1):]
-                    widthFactor = textwidth.getWidthFactor(
-                        values[col],
-                        getFontSize(col),
-                        colWidth[col]
-                    )
-                    if widthFactor < extremeWidthFactor:
-                        text = values[col]
-                        extremePos = int(len(text) * widthFactor / extremeWidthFactor)
-                        # Первая попытка: определить длину не превышающую
-                        # критическое сжатие шрифта.
-                        pos = text.rfind(" ", 0, extremePos)
-                        if pos == -1:
-                            # Вторая попытка: определить длину, которая хоть и
-                            # превышает критическое значение, но всё же меньше
-                            # максимального.
-                            pos = text.find(" ", extremePos)
-                        if pos != -1:
-                            values[col] = text[:pos]
-                            extraRow[col] = text[(pos + 1):] + extraRow[col]
-                            widthFactor = textwidth.getWidthFactor(
-                                values[col],
-                                getFontSize(col),
-                                colWidth[col]
-                            )
-                    cell = table.getCellByPosition(col, lastRow)
-                    cellCursor = cell.createTextCursor()
-                    if col == 4 and isTitle:
-                        cellCursor.ParaStyleName = "Наименование (заголовок группы)"
-                    # Параметры символов необходимо устанавливать после
-                    # параметров абзаца!
-                    cellCursor.CharScaleWidth = widthFactor
-                    if col == 2 and posIncrement:
-                        if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
-                            posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
-                        else:
-                            posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
-                            posFieldMaster.SubType = 0
-                            posFieldMaster.Name = "Позиция"
-                        posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
-                        posField.Content = "Позиция+" + str(posIncrement)
-                        posField.attachTextFieldMaster(posFieldMaster)
-                        cell.Text.insertTextContent(cellCursor, posField, False)
-
-                        posValue += posIncrement
+                if widthFactor < extremeWidthFactor:
+                    text = values[col]
+                    extremePos = int(len(text) * widthFactor / extremeWidthFactor)
+                    # Первая попытка: определить длину не превышающую
+                    # критическое сжатие шрифта.
+                    pos = text.rfind(" ", 0, extremePos)
+                    if pos == -1:
+                        # Вторая попытка: определить длину, которая хоть и
+                        # превышает критическое значение, но всё же меньше
+                        # максимального.
+                        pos = text.find(" ", extremePos)
+                    if pos != -1:
+                        values[col] = text[:pos]
+                        extraRow[col] = text[(pos + 1):] + extraRow[col]
                         widthFactor = textwidth.getWidthFactor(
-                            str(posValue),
+                            values[col],
                             getFontSize(col),
                             colWidth[col]
                         )
-                        cellCursor.gotoStart(False)
-                        cellCursor.gotoEnd(True)
-                        cellCursor.CharScaleWidth = widthFactor
-                    elif values[col]:
-                        cell.String = values[col]
-                doc.unlockControllers()
+                cell = table.getCellByPosition(col, self.currentRow)
+                cellCursor = cell.createTextCursor()
+                if col == 4 and isTitle:
+                    cellCursor.ParaStyleName = "Наименование (заголовок группы)"
+                # Параметры символов необходимо устанавливать после
+                # параметров абзаца!
+                cellCursor.CharScaleWidth = widthFactor
+                if col == 2 and posIncrement:
+                    if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
+                        posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
+                    else:
+                        posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
+                        posFieldMaster.SubType = 0
+                        posFieldMaster.Name = "Позиция"
+                    posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
+                    posField.Content = "Позиция+" + str(posIncrement)
+                    posField.attachTextFieldMaster(posFieldMaster)
+                    cell.Text.insertTextContent(cellCursor, posField, False)
 
-                nextRow()
-                if any(extraRow):
-                    fillRow(extraRow, isTitle)
+                    self.currentPosition += posIncrement
+                    widthFactor = textwidth.getWidthFactor(
+                        str(self.currentPosition),
+                        getFontSize(col),
+                        colWidth[col]
+                    )
+                    cellCursor.gotoStart(False)
+                    cellCursor.gotoEnd(True)
+                    cellCursor.CharScaleWidth = widthFactor
+                elif values[col]:
+                    cell.String = values[col]
+            doc.unlockControllers()
 
-            # ----------------------------------------------------------------
-            # Начало построения таблицы
-            # ----------------------------------------------------------------
+            gotoNextRow()
+            if any(extraRow):
+                fillRow(extraRow, isTitle)
 
+        # --------------------------------------------------------------------
+        # Начало построения таблицы
+        # --------------------------------------------------------------------
+        try:
             schematic = common.getSchematicData()
             if schematic is None:
                 return
@@ -278,8 +278,7 @@ class SpecBuildingThread(threading.Thread):
                 clean(force=True)
             table = doc.TextTables["Спецификация"]
             tableRowCount = table.Rows.Count
-            lastRow = tableRowCount - 1
-            posValue = 0
+            self.currentRow = tableRowCount - 1
             if self.update:
                 otherPartsFirstRow = 0
                 otherPartsLastRow = 0
@@ -287,7 +286,7 @@ class SpecBuildingThread(threading.Thread):
                     if otherPartsFirstRow == 0:
                         cellPos = table.getCellByPosition(2, rowIndex).String
                         if cellPos.isdecimal():
-                            posValue = int(cellPos)
+                            self.currentPosition = int(cellPos)
                     cell = table.getCellByPosition(4, rowIndex)
                     cellCursor = cell.createTextCursor()
                     if cellCursor.ParaStyleName == "Наименование (заголовок раздела)":
@@ -314,16 +313,13 @@ class SpecBuildingThread(threading.Thread):
             if config.getboolean("sections", "other parts"):
                 for group in compGroups:
                     progressTotal += len(group)
+            progressMessage = "Выполняется построение спецификации"
             if self.update:
-                progressDialog = ProgressDialog(
-                    "Выполняется обновление раздела \"Прочие изделия\"",
-                    progressTotal
-                )
-            else:
-                progressDialog = ProgressDialog(
-                    "Выполняется построение спецификации",
-                    progressTotal
-                )
+                progressMessage = "Выполняется обновление раздела \"Прочие изделия\""
+            progressDialog = ProgressDialog(
+                progressMessage,
+                progressTotal
+            )
 
             if self.update:
                 # Удалить содержимое раздела
@@ -353,7 +349,7 @@ class SpecBuildingThread(threading.Thread):
                 # необходимо добавить пустую разделительную строку.
                 if otherPartsLastRow != tableRowCount - 1:
                     table.Rows.insertByIndex(otherPartsFirstRow, 1)
-                lastRow = otherPartsFirstRow
+                self.currentRow = otherPartsFirstRow
 
                 progressDialog.stepUp()
 
@@ -361,18 +357,18 @@ class SpecBuildingThread(threading.Thread):
             # оставаться пустая строка с ненарушенным форматированием.
             # На её основе будут создаваться новые строки.
             # По окончанию, эта строка будет удалена.
-            table.Rows.insertByIndex(lastRow, 1)
+            table.Rows.insertByIndex(self.currentRow, 1)
 
             if not self.update:
                 if config.getboolean("sections", "documentation"):
                     if not config.getboolean("spec", "prohibit empty rows at top"):
-                        nextRow()
+                        gotoNextRow()
                     fillSectionTitle("Документация")
 
                     if config.getboolean("sections", "assembly drawing") \
                         or config.getboolean("sections", "schematic") \
                         or config.getboolean("sections", "index"):
-                            nextRow()
+                            gotoNextRow()
 
                     if config.getboolean("sections", "assembly drawing"):
                         name = "Сборочный чертёж"
@@ -404,17 +400,17 @@ class SpecBuildingThread(threading.Thread):
                 progressDialog.stepUp()
 
                 if config.getboolean("sections", "assembly units"):
-                    nextRow()
+                    gotoNextRow()
                     fillSectionTitle("Сборочные единицы")
 
                 progressDialog.stepUp()
 
                 if config.getboolean("sections", "details"):
-                    nextRow()
+                    gotoNextRow()
                     fillSectionTitle("Детали")
 
                     if config.getboolean("sections", "pcb"):
-                        nextRow()
+                        gotoNextRow()
                         size, ref = common.getPcbInfo()
                         name = "Плата печатная"
                         fillRow(
@@ -425,24 +421,23 @@ class SpecBuildingThread(threading.Thread):
                 progressDialog.stepUp()
 
                 if config.getboolean("sections", "standard parts"):
-                    nextRow()
+                    gotoNextRow()
                     fillSectionTitle("Стандартные изделия")
 
                 progressDialog.stepUp()
 
             if config.getboolean("sections", "other parts"):
                 if not self.update:
-                    nextRow()
+                    gotoNextRow()
                 fillSectionTitle("Прочие изделия")
 
-                nextRow()
+                gotoNextRow()
                 for group in compGroups:
                     increment = 1
                     if prevGroup is not None:
-                        for _ in range(emptyRowsType):
-                            doc.lockControllers()
-                            nextRow()
-                            doc.unlockControllers()
+                        doc.lockControllers()
+                        gotoNextRow(emptyRowsType)
+                        doc.unlockControllers()
                         if config.getboolean("spec", "reserve position numbers"):
                             increment += emptyRowsType
                     if len(group) == 1 \
@@ -478,7 +473,7 @@ class SpecBuildingThread(threading.Thread):
                                     isTitle=True
                                 )
                         if config.getboolean("spec", "empty row after group title"):
-                            nextRow()
+                            gotoNextRow()
                             if config.getboolean("spec", "reserve position numbers"):
                                 increment += 1
                         for compRange in group:
@@ -509,13 +504,13 @@ class SpecBuildingThread(threading.Thread):
 
             if not self.update:
                 if config.getboolean("sections", "materials"):
-                    nextRow()
+                    gotoNextRow()
                     fillSectionTitle("Материалы")
-                    nextRow()
+                    gotoNextRow()
 
                 progressDialog.stepUp()
 
-            table.Rows.removeByIndex(lastRow, 2)
+            table.Rows.removeByIndex(self.currentRow, 2)
 
             progressDialog.stepUp()
 

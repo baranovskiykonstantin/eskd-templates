@@ -146,112 +146,112 @@ class BomBuildingThread(threading.Thread):
         threading.Thread.__init__(self)
         self.name = "BuildingThread"
 
+        self.currentRow = 0
+        self.currentPosition = 0
+
     def run(self):
-        try:
-            # ----------------------------------------------------------------
-            # Методы для построения таблицы
-            # ----------------------------------------------------------------
+        # ----------------------------------------------------------------
+        # Методы для построения таблицы
+        # ----------------------------------------------------------------
 
-            def nextRow():
-                nonlocal lastRow
-                lastRow += 1
-                table.Rows.insertByIndex(lastRow, 1)
+        def gotoNextRow(count=1):
+            table.Rows.insertByIndex(self.currentRow + 1, count)
+            self.currentRow += count
 
-            def getFontSize(col):
-                nonlocal lastRow
-                cell = table.getCellByPosition(col, lastRow)
-                cellCursor = cell.createTextCursor()
-                return cellCursor.CharHeight
+        def getFontSize(col):
+            cell = table.getCellByPosition(col, self.currentRow)
+            cellCursor = cell.createTextCursor()
+            return cellCursor.CharHeight
 
-            def isRowEmpty(row):
-                rowCells = table.getCellRangeByPosition(
-                    0, # left
-                    row, # top
-                    table.Columns.Count - 1, # right
-                    row # bottom
+        def isRowEmpty(row):
+            lastCol = len(table.Rows[row].TableColumnSeparators)
+            rowCells = table.getCellRangeByPosition(
+                0, # left
+                row, # top
+                lastCol, # right
+                row # bottom
+            )
+            dataIsPresent = any(rowCells.DataArray[0])
+            return not dataIsPresent
+
+        def fillRow(values, isTitle=False, posIncrement=0):
+            colWidth = (6, 59, 44, 69, 54, 69, 15, 15, 15, 15, 23)
+            extraRow = [""] * len(values)
+            extremeWidthFactor = config.getint("bom", "extreme width factor")
+            doc.lockControllers()
+            for col in range(len(values)):
+                if values[col] == "" and not (col == 0 and posIncrement != 0):
+                    continue
+                if '\n' in values[col]:
+                    text = values[col]
+                    lfPos = text.find('\n')
+                    values[col] = text[:lfPos]
+                    extraRow[col] = text[(lfPos + 1):]
+                widthFactor = textwidth.getWidthFactor(
+                    values[col],
+                    getFontSize(col),
+                    colWidth[col]
                 )
-                dataIsPresent = any(rowCells.DataArray[0])
-                return not dataIsPresent
+                if widthFactor < extremeWidthFactor:
+                    text = values[col]
+                    extremePos = int(len(text) * widthFactor / extremeWidthFactor)
+                    # Первая попытка: определить длину не превышающую
+                    # критическое сжатие шрифта.
+                    pos = text.rfind(" ", 0, extremePos)
+                    if pos == -1:
+                        # Вторая попытка: определить длину, которая хоть и
+                        # превышает критическое значение, но всё же меньше
+                        # максимального.
+                        pos = text.find(" ", extremePos)
+                    if pos != -1:
+                        values[col] = text[:pos]
+                        extraRow[col] = text[(pos + 1):] + extraRow[col]
+                        widthFactor = textwidth.getWidthFactor(
+                            values[col],
+                            getFontSize(col),
+                            colWidth[col]
+                        )
+                cell = table.getCellByPosition(col, self.currentRow)
+                cellCursor = cell.createTextCursor()
+                if col == 1 and isTitle:
+                    cellCursor.ParaStyleName = "Наименование (заголовок)"
+                # Параметры символов необходимо устанавливать после
+                # параметров абзаца!
+                cellCursor.CharScaleWidth = widthFactor
+                if col == 0 and posIncrement \
+                    and config.getboolean("bom", "only components have position numbers"):
+                        if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
+                            posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
+                        else:
+                            posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
+                            posFieldMaster.SubType = 0
+                            posFieldMaster.Name = "Позиция"
+                        posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
+                        posField.Content = "Позиция+" + str(posIncrement)
+                        posField.attachTextFieldMaster(posFieldMaster)
+                        cell.Text.insertTextContent(cellCursor, posField, False)
 
-            def fillRow(values, isTitle=False, posIncrement=0):
-                nonlocal posValue
-                colWidth = (6, 59, 44, 69, 54, 69, 15, 15, 15, 15, 23)
-                extraRow = [""] * len(values)
-                extremeWidthFactor = config.getint("bom", "extreme width factor")
-                doc.lockControllers()
-                for col in range(len(values)):
-                    if values[col] == "" and not (col == 0 and posIncrement != 0):
-                        continue
-                    if '\n' in values[col]:
-                        text = values[col]
-                        lfPos = text.find('\n')
-                        values[col] = text[:lfPos]
-                        extraRow[col] = text[(lfPos + 1):]
-                    widthFactor = textwidth.getWidthFactor(
-                        values[col],
-                        getFontSize(col),
-                        colWidth[col]
-                    )
-                    if widthFactor < extremeWidthFactor:
-                        text = values[col]
-                        extremePos = int(len(text) * widthFactor / extremeWidthFactor)
-                        # Первая попытка: определить длину не превышающую
-                        # критическое сжатие шрифта.
-                        pos = text.rfind(" ", 0, extremePos)
-                        if pos == -1:
-                            # Вторая попытка: определить длину, которая хоть и
-                            # превышает критическое значение, но всё же меньше
-                            # максимального.
-                            pos = text.find(" ", extremePos)
-                        if pos != -1:
-                            values[col] = text[:pos]
-                            extraRow[col] = text[(pos + 1):] + extraRow[col]
-                            widthFactor = textwidth.getWidthFactor(
-                                values[col],
-                                getFontSize(col),
-                                colWidth[col]
-                            )
-                    cell = table.getCellByPosition(col, lastRow)
-                    cellCursor = cell.createTextCursor()
-                    if col == 1 and isTitle:
-                        cellCursor.ParaStyleName = "Наименование (заголовок)"
-                    # Параметры символов необходимо устанавливать после
-                    # параметров абзаца!
-                    cellCursor.CharScaleWidth = widthFactor
-                    if col == 0 and posIncrement \
-                        and config.getboolean("bom", "only components have position numbers"):
-                            if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
-                                posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
-                            else:
-                                posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
-                                posFieldMaster.SubType = 0
-                                posFieldMaster.Name = "Позиция"
-                            posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
-                            posField.Content = "Позиция+" + str(posIncrement)
-                            posField.attachTextFieldMaster(posFieldMaster)
-                            cell.Text.insertTextContent(cellCursor, posField, False)
+                        self.currentPosition += posIncrement
+                        widthFactor = textwidth.getWidthFactor(
+                            str(self.currentPosition),
+                            getFontSize(col),
+                            colWidth[col]
+                        )
+                        cellCursor.gotoStart(False)
+                        cellCursor.gotoEnd(True)
+                        cellCursor.CharScaleWidth = widthFactor
+                elif values[col]:
+                    cell.String = values[col]
+            doc.unlockControllers()
 
-                            posValue += posIncrement
-                            widthFactor = textwidth.getWidthFactor(
-                                str(posValue),
-                                getFontSize(col),
-                                colWidth[col]
-                            )
-                            cellCursor.gotoStart(False)
-                            cellCursor.gotoEnd(True)
-                            cellCursor.CharScaleWidth = widthFactor
-                    elif values[col]:
-                        cell.String = values[col]
-                doc.unlockControllers()
+            gotoNextRow()
+            if any(extraRow):
+                fillRow(extraRow, isTitle)
 
-                nextRow()
-                if any(extraRow):
-                    fillRow(extraRow, isTitle)
-
-            # ----------------------------------------------------------------
-            # Начало построения таблицы
-            # ----------------------------------------------------------------
-
+        # ----------------------------------------------------------------
+        # Начало построения таблицы
+        # ----------------------------------------------------------------
+        try:
             schematic = common.getSchematicData()
             if schematic is None:
                 return
@@ -259,8 +259,7 @@ class BomBuildingThread(threading.Thread):
             doc.UndoManager.lock()
             clean(force=True)
             table = doc.TextTables["Ведомость_покупных_изделий"]
-            lastRow = table.Rows.Count - 1
-            posValue = 0
+            self.currentRow = table.Rows.Count - 1
             compGroups = schematic.getGroupedComponents()
             prevGroup = None
             emptyRowsType = config.getint("bom", "empty rows between diff type")
@@ -277,15 +276,14 @@ class BomBuildingThread(threading.Thread):
             # должна оставаться пустая строка с ненарушенным форматированием.
             # На её основе будут создаваться новые строки.
             # По окончанию, эта строка будет удалена.
-            table.Rows.insertByIndex(lastRow, 1)
+            table.Rows.insertByIndex(self.currentRow, 1)
 
             for group in compGroups:
                 increment = 1
                 if prevGroup is not None:
-                    for _ in range(emptyRowsType):
-                        doc.lockControllers()
-                        nextRow()
-                        doc.unlockControllers()
+                    doc.lockControllers()
+                    gotoNextRow(emptyRowsType)
+                    doc.unlockControllers()
                     if config.getboolean("bom", "reserve position numbers"):
                         increment += emptyRowsType
                 if len(group) == 1 \
@@ -315,7 +313,7 @@ class BomBuildingThread(threading.Thread):
                             isTitle=True
                         )
                     if config.getboolean("bom", "empty row after group title"):
-                        nextRow()
+                        gotoNextRow()
                         if config.getboolean("bom", "reserve position numbers"):
                             increment += 1
                     for compRange in group:
@@ -334,7 +332,7 @@ class BomBuildingThread(threading.Thread):
                         progressDialog.stepUp()
                 prevGroup = group
 
-            table.Rows.removeByIndex(lastRow, 2)
+            table.Rows.removeByIndex(self.currentRow, 2)
 
             progressDialog.stepUp()
 
@@ -386,16 +384,16 @@ class BomBuildingThread(threading.Thread):
                     posFieldMaster = doc.createInstance("com.sun.star.text.fieldmaster.SetExpression")
                     posFieldMaster.SubType = 0
                     posFieldMaster.Name = "Позиция"
-                for lastRow in range(2, table.Rows.Count):
+                for self.currentRow in range(2, table.Rows.Count):
                     posField = doc.createInstance("com.sun.star.text.textfield.SetExpression")
                     posField.Content = "Позиция+1"
                     posField.attachTextFieldMaster(posFieldMaster)
-                    cell = table.getCellByPosition(0, lastRow)
+                    cell = table.getCellByPosition(0, self.currentRow)
                     cellCursor = cell.createTextCursor()
                     cell.Text.insertTextContent(cellCursor, posField, False)
 
                     widthFactor = textwidth.getWidthFactor(
-                        str(lastRow - 1),
+                        str(self.currentRow - 1),
                         getFontSize(0),
                         6
                     )
