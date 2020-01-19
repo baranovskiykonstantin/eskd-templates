@@ -57,12 +57,16 @@ class DocModifyListener(unohelper.Base, XModifyListener):
 
         if not common.isThreadWorking():
             currentCell = doc.CurrentController.ViewCursor.Cell
+            currentTable = doc.CurrentController.ViewCursor.TextTable
             currentFrame = doc.CurrentController.ViewCursor.TextFrame
 
             # Подстройка масштаба шрифта по ширине.
             if currentCell or currentFrame:
                 if currentCell:
-                    itemName = currentCell.createTextCursor().ParaStyleName
+                    if currentTable.Name == "Лист_регистрации_изменений":
+                        itemName = "РегИзм." + currentCell.CellName[0]
+                    else:
+                        itemName = currentCell.createTextCursor().ParaStyleName
                     item = currentCell
                 else: # currentFrame
                     itemName = currentFrame.Name[8:]

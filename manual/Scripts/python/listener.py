@@ -50,15 +50,25 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.removeModifyListener(self)
         doc.UndoManager.lock()
 
+        currentCell = doc.CurrentController.ViewCursor.Cell
+        currentTable = doc.CurrentController.ViewCursor.TextTable
         currentFrame = doc.CurrentController.ViewCursor.TextFrame
 
         # Подстройка масштаба шрифта по ширине.
-        if currentFrame is not None:
-            itemName = currentFrame.Name[8:]
-            itemCursor = currentFrame.createTextCursor()
+        if currentCell or currentFrame:
+            if currentCell:
+                if currentTable.Name == "Лист_регистрации_изменений":
+                    itemName = "РегИзм." + currentCell.CellName[0]
+                else:
+                    itemName = currentCell.createTextCursor().ParaStyleName
+                item = currentCell
+            else: # currentFrame
+                itemName = currentFrame.Name[8:]
+                item = currentFrame
+            itemCursor = item.createTextCursor()
             if itemName in common.ITEM_WIDTHS:
                 itemWidth = common.ITEM_WIDTHS[itemName]
-                for line in currentFrame.String.splitlines(keepends=True):
+                for line in item.String.splitlines(keepends=True):
                     widthFactor = textwidth.getWidthFactor(
                         line,
                         itemCursor.CharHeight,
