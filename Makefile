@@ -1,47 +1,33 @@
+OUT := ~/.config/libreoffice/4/user/template
+
 .PHONY: index spec bom gspec gbom manual
 
 default: all
 
 all: index spec bom gspec gbom manual
 
-index:
-	cd index && \
+define build_ott
+	cd $(1) && \
 	cd Scripts/python/doc/ && \
 	asciidoctor help.adoc && \
 	cd - && \
-	zip -FS -r ~/.config/libreoffice/4/user/template/Перечень\ элементов.ott * -x Scripts/python/doc/help.adoc
+	zip -FS -r $(OUT)/$(2).ott * -x Scripts/python/doc/help.adoc
+endef
+
+index:
+	$(call build_ott,index,Перечень\ элементов)
 
 spec:
-	cd spec && \
-	cd Scripts/python/doc/ && \
-	asciidoctor help.adoc && \
-	cd - && \
-	zip -FS -r ~/.config/libreoffice/4/user/template/Спецификация.ott * -x Scripts/python/doc/help.adoc
+	$(call build_ott,spec,Спецификация)
 
 bom:
-	cd bom && \
-	cd Scripts/python/doc/ && \
-	asciidoctor help.adoc && \
-	cd - && \
-	zip -FS -r ~/.config/libreoffice/4/user/template/Ведомость\ покупных\ изделий.ott * -x Scripts/python/doc/help.adoc
+	$(call build_ott,bom,Ведомость\ покупных\ изделий)
 
 gspec:
-	cd gspec && \
-	cd Scripts/python/doc/ && \
-	asciidoctor help.adoc && \
-	cd - && \
-	zip -FS -r ~/.config/libreoffice/4/user/template/Групповая\ спецификация.ott * -x Scripts/python/doc/help.adoc
+	$(call build_ott,gspec,Групповая\ спецификация)
 
 gbom:
-	cd gbom && \
-	cd Scripts/python/doc/ && \
-	asciidoctor help.adoc && \
-	cd - && \
-	zip -FS -r ~/.config/libreoffice/4/user/template/Групповая\ ведомость\ покупных\ изделий.ott * -x Scripts/python/doc/help.adoc
+	$(call build_ott,gbom,Групповая\ ведомость\ покупных\ изделий)
 
 manual:
-	cd manual && \
-	cd Scripts/python/doc/ && \
-	asciidoctor help.adoc && \
-	cd - && \
-	zip -FS -r ~/.config/libreoffice/4/user/template/Пояснительная\ записка.ott * -x Scripts/python/doc/help.adoc
+	$(call build_ott,manual,Пояснительная\ записка)
