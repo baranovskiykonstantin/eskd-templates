@@ -209,8 +209,8 @@ def getWidthFactor(text, size, width):
             textWidth += CHARWIDTH_MM_PER_POINT["max"]
     # Ширина текста измеряется с небольшой погрешностью.
     # Чтобы текст гарантировано поместился в графе,
-    # достаточно добавить половину ширины наименьшего символа.
-    textWidth += CHARWIDTH_MM_PER_POINT["min"] / 2
+    # достаточно добавить ширину наименьшего символа.
+    textWidth += CHARWIDTH_MM_PER_POINT["min"]
     textWidth *= size
     widthFactor = int((100 * width) / textWidth)
     widthFactor = max(widthFactor, 1)
