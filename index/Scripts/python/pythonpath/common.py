@@ -397,8 +397,7 @@ def rebuildTable():
         )
     doc.refresh()
     viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoStart(False)
-    viewCursor.goDown(4, False)
+    viewCursor.gotoRange(table.getCellByName("A2").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
@@ -547,9 +546,7 @@ def appendRevTable():
     cursor.ParaStyleName = "Пустой"
     doc.refresh()
     viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoEnd(False) # Конец строки
-    viewCursor.gotoEnd(False) # Конец документа
-    viewCursor.goUp(29, False)
+    viewCursor.gotoRange(table.getCellByName("A4").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
@@ -571,9 +568,10 @@ def removeRevTable():
     cursor.goLeft(1, True)
     cursor.String = ""
     doc.refresh()
-    viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoStart(False)
-    viewCursor.goDown(4, False)
+    if "Перечень_элементов" in doc.TextTables:
+        viewCursor = doc.CurrentController.ViewCursor
+        table = doc.TextTables["Перечень_элементов"]
+        viewCursor.gotoRange(table.getCellByName("A2").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()

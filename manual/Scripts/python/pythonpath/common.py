@@ -368,9 +368,7 @@ def appendRevTable():
     cursor.ParaStyleName = "Пустой"
     doc.refresh()
     viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoEnd(False) # Конец строки
-    viewCursor.gotoEnd(False) # Конец документа
-    viewCursor.goUp(29, False)
+    viewCursor.gotoRange(table.getCellByName("A4").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()

@@ -550,8 +550,7 @@ def rebuildTable():
         )
     doc.refresh()
     viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoStart(False)
-    viewCursor.goDown(2, False)
+    viewCursor.gotoRange(table.getCellByName("A3").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
@@ -702,9 +701,7 @@ def appendRevTable():
     cursor.ParaStyleName = "Пустой"
     doc.refresh()
     viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoEnd(False) # Конец строки
-    viewCursor.gotoEnd(False) # Конец документа
-    viewCursor.goUp(29, False)
+    viewCursor.gotoRange(table.getCellByName("A4").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
@@ -726,9 +723,10 @@ def removeRevTable():
     cursor.goLeft(1, True)
     cursor.String = ""
     doc.refresh()
-    viewCursor = doc.CurrentController.ViewCursor
-    viewCursor.gotoStart(False)
-    viewCursor.goDown(2, False)
+    if "Спецификация" in doc.TextTables:
+        viewCursor = doc.CurrentController.ViewCursor
+        table = doc.TextTables["Спецификация"]
+        viewCursor.gotoRange(table.getCellByName("A3").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
@@ -859,6 +857,9 @@ def addVarTable():
         for litera in "123":
             literaFrameName = "Перв.{}: 4 Лит.{}".format(variant, litera)
             doc.TextFrames[literaFrameName].String = '-'
+    doc.refresh()
+    viewCursor = doc.CurrentController.ViewCursor
+    viewCursor.gotoRange(table.getCellByName("B4").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
@@ -883,6 +884,11 @@ def removeVarTable():
         for litera in "123":
             literaFrameName = "Перв.{}: 4 Лит.{}".format(variant, litera)
             doc.TextFrames[literaFrameName].String = ''
+    doc.refresh()
+    if "Спецификация" in doc.TextTables:
+        viewCursor = doc.CurrentController.ViewCursor
+        table = doc.TextTables["Спецификация"]
+        viewCursor.gotoRange(table.getCellByName("A3").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     SKIP_MODIFY_EVENTS = False
