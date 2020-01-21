@@ -66,7 +66,6 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                         common.updateVarTablePosition()
 
         if not common.isThreadWorking():
-            currentTable = doc.CurrentController.ViewCursor.TextTable
             currentCell = doc.CurrentController.ViewCursor.Cell
             currentTable = doc.CurrentController.ViewCursor.TextTable
             currentFrame = doc.CurrentController.ViewCursor.TextFrame
@@ -74,33 +73,35 @@ class DocModifyListener(unohelper.Base, XModifyListener):
             # Подстройка масштаба шрифта по ширине.
             if currentCell or currentFrame:
                 if currentCell:
-                    if currentTable.Name == "Лист_регистрации_изменений":
-                        itemName = "РегИзм." + currentCell.CellName[0]
-                    else:
-                        itemName = currentCell.createTextCursor().ParaStyleName
+                    itemName = ""
+                    if currentTable.Name == "Спецификация":
+                        itemName = "ТабСП." + currentCell.CellName[0]
+                    elif currentTable.Name == "Таблица_наименований_исполнений":
+                        itemName = "ТабНИ." + currentCell.CellName[-1]
+                    elif currentTable.Name == "Лист_регистрации_изменений":
+                        itemName = "ТабРИ." + currentCell.CellName[0]
                     item = currentCell
                 else: # currentFrame
                     itemName = currentFrame.Name[8:]
                     item = currentFrame
-                itemCursor = item.createTextCursor()
                 if itemName in common.ITEM_WIDTHS:
                     itemWidth = common.ITEM_WIDTHS[itemName]
-                    if itemName == "Поз." \
-                        and currentTable.Name == "Спецификация":
-                            # Подстроить ширину всех позиционных номеров
-                            # при изменении хотя бы одного.
-                            doc.TextFields.refresh()
-                            for row in range(2, currentTable.Rows.Count):
-                                cellPos = currentTable.getCellByName(
-                                    "C{}".format(row + 1)
+                    itemCursor = item.createTextCursor()
+                    if itemName == "ТабСП.C":
+                        # Подстроить ширину всех позиционных номеров
+                        # при изменении хотя бы одного.
+                        doc.TextFields.refresh()
+                        for row in range(2, currentTable.Rows.Count):
+                            cellPos = currentTable.getCellByName(
+                                "C{}".format(row + 1)
+                            )
+                            for textContent in cellPos:
+                                widthFactor = textwidth.getWidthFactor(
+                                    cellPos.String,
+                                    textContent.CharHeight,
+                                    itemWidth - 1
                                 )
-                                for textContent in cellPos:
-                                    widthFactor = textwidth.getWidthFactor(
-                                        cellPos.String,
-                                        textContent.CharHeight,
-                                        itemWidth - 1
-                                    )
-                                    textContent.CharScaleWidth = widthFactor
+                                textContent.CharScaleWidth = widthFactor
                     else:
                         for line in item.String.splitlines(keepends=True):
                             widthFactor = textwidth.getWidthFactor(

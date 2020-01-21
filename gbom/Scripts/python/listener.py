@@ -63,33 +63,33 @@ class DocModifyListener(unohelper.Base, XModifyListener):
             # Подстройка масштаба шрифта по ширине.
             if currentCell or currentFrame:
                 if currentCell:
-                    if currentTable.Name == "Лист_регистрации_изменений":
-                        itemName = "РегИзм." + currentCell.CellName[0]
-                    else:
-                        itemName = currentCell.createTextCursor().ParaStyleName
+                    itemName = ""
+                    if currentTable.Name == "Ведомость_покупных_изделий":
+                        itemName = "ТабВП." + currentCell.CellName[0]
+                    elif currentTable.Name == "Лист_регистрации_изменений":
+                        itemName = "ТабРИ." + currentCell.CellName[0]
                     item = currentCell
                 else: # currentFrame
                     itemName = currentFrame.Name[8:]
                     item = currentFrame
-                itemCursor = item.createTextCursor()
                 if itemName in common.ITEM_WIDTHS:
                     itemWidth = common.ITEM_WIDTHS[itemName]
-                    if itemName == "№ строки" \
-                        and currentTable.Name == "Ведомость_покупных_изделий":
-                            # Подстроить ширину всех позиционных номеров
-                            # при изменении хотя бы одного.
-                            doc.TextFields.refresh()
-                            for row in range(2, currentTable.Rows.Count):
-                                cellPos = currentTable.getCellByName(
-                                    "A{}".format(row + 1)
+                    itemCursor = item.createTextCursor()
+                    if itemName == "ТабВП.A":
+                        # Подстроить ширину всех позиционных номеров
+                        # при изменении хотя бы одного.
+                        doc.TextFields.refresh()
+                        for row in range(2, currentTable.Rows.Count):
+                            cellPos = currentTable.getCellByName(
+                                "A{}".format(row + 1)
+                            )
+                            for textContent in cellPos:
+                                widthFactor = textwidth.getWidthFactor(
+                                    cellPos.String,
+                                    textContent.CharHeight,
+                                    itemWidth - 1
                                 )
-                                for textContent in cellPos:
-                                    widthFactor = textwidth.getWidthFactor(
-                                        cellPos.String,
-                                        textContent.CharHeight,
-                                        itemWidth - 1
-                                    )
-                                    textContent.CharScaleWidth = widthFactor
+                                textContent.CharScaleWidth = widthFactor
                     else:
                         for line in item.String.splitlines(keepends=True):
                             widthFactor = textwidth.getWidthFactor(

@@ -63,17 +63,18 @@ class DocModifyListener(unohelper.Base, XModifyListener):
             # Подстройка масштаба шрифта по ширине.
             if currentCell or currentFrame:
                 if currentCell:
-                    if currentTable.Name == "Лист_регистрации_изменений":
-                        itemName = "РегИзм." + currentCell.CellName[0]
-                    else:
-                        itemName = currentCell.createTextCursor().ParaStyleName
+                    itemName = ""
+                    if currentTable.Name == "Перечень_элементов":
+                        itemName = "ТабПЭ." + currentCell.CellName[0]
+                    elif currentTable.Name == "Лист_регистрации_изменений":
+                        itemName = "ТабРИ." + currentCell.CellName[0]
                     item = currentCell
                 else: # currentFrame
                     itemName = currentFrame.Name[8:]
                     item = currentFrame
-                itemCursor = item.createTextCursor()
                 if itemName in common.ITEM_WIDTHS:
                     itemWidth = common.ITEM_WIDTHS[itemName]
+                    itemCursor = item.createTextCursor()
                     for line in item.String.splitlines(keepends=True):
                         widthFactor = textwidth.getWidthFactor(
                             line,
