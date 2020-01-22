@@ -25,7 +25,25 @@ def load():
     Считать параметры работы из файла.
 
     """
-    global SETTINGS
+    SETTINGS.read_dict(
+        {
+            "manual": {
+                "source": "",
+            },
+            "stamp": {
+                "convert doc title": "yes",
+                "convert doc id": "yes",
+                "fill first usage": "yes",
+            },
+            "settings": {
+                "pos x": "100",
+                "pos y": "100",
+                "set view options": "yes",
+                "compatibility mode": "no",
+            }
+        }
+    )
+
     doc = XSCRIPTCONTEXT.getDocument()
     ctx = XSCRIPTCONTEXT.getComponentContext()
     fileAccess = ctx.ServiceManager.createInstance(
@@ -42,25 +60,6 @@ def load():
         configString = configInput.readString((), False)
         SETTINGS.read_string(configString, source=configFileUrl)
         configInput.closeInput()
-    else:
-        SETTINGS.read_dict(
-            {
-                "manual": {
-                    "source": "",
-                },
-                "stamp": {
-                    "convert doc title": "yes",
-                    "convert doc id": "yes",
-                    "fill first usage": "yes",
-                },
-                "settings": {
-                    "pos x": "100",
-                    "pos y": "100",
-                    "set view options": "yes",
-                    "compatibility mode": "no",
-                }
-            }
-        )
 
 def save():
     """Сохранить настройки.
@@ -68,7 +67,6 @@ def save():
     Записать параметры работы в файл.
 
     """
-    global SETTINGS
     doc = XSCRIPTCONTEXT.getDocument()
     serviceManager = XSCRIPTCONTEXT.getComponentContext().ServiceManager
     fileAccess = serviceManager.createInstance(
@@ -91,22 +89,18 @@ def save():
 
 def get(section, option):
     """Получить значение параметра "option" из раздела "section"."""
-    global SETTINGS
     return SETTINGS.get(section, option)
 
 def getboolean(section, option):
     """Получить булево значение параметра "option" из раздела "section"."""
-    global SETTINGS
     return SETTINGS.getboolean(section, option)
 
 def getint(section, option):
     """Получить целочисленное значение параметра "option" из раздела "section"."""
-    global SETTINGS
     return SETTINGS.getint(section, option)
 
 def set(section, option, value):
     """Установить значение "value" параметру "option" из раздела "section"."""
-    global SETTINGS
     return SETTINGS.set(section, option, value)
 
 def loadFromKicadbom2spec():
