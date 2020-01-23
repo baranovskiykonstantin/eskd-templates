@@ -212,7 +212,9 @@ def getWidthFactor(text, size, width):
     # достаточно добавить ширину наименьшего символа.
     textWidth += CHARWIDTH_MM_PER_POINT["min"]
     textWidth *= size
-    widthFactor = int((100 * width) / textWidth)
-    widthFactor = max(widthFactor, 1)
-    widthFactor = min(widthFactor, 100)
+    widthFactor = 100
+    if textWidth > 0:
+        widthFactor = int((100 * width) / textWidth)
+        widthFactor = max(widthFactor, 1)
+        widthFactor = min(widthFactor, 100)
     return widthFactor
