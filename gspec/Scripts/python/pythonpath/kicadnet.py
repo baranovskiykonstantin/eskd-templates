@@ -62,24 +62,21 @@ class Netlist():
         """
         self.fileName = fileName
         self.data = None
-        self._content = ""
-        self._index = 0
-        self._line = 1
-        self._pos = 1
+        self._reset()
         with open(fileName, encoding="utf-8") as netlist:
             if self.fileName.endswith(".net"):
                 self._content = netlist.read()
                 self.data = self._parseNetItem(None)
-                self._cleanUp()
+                self._reset()
             elif self.fileName.endswith(".xml"):
                 netlist.readline() # Пропустить первую строку (заголовок)
                 self._content = netlist.read()
                 self.data = self._parseXmlItem(None)
-                self._cleanUp()
+                self._reset()
             else:
                 self._error("Формат файла не поддерживается.")
 
-    def _cleanUp(self):
+    def _reset(self):
         self._content = ""
         self._index = 0
         self._line = 1
@@ -96,11 +93,11 @@ class Netlist():
         return self._index < len(self._content)
 
     def _getChar(self, offset=0):
-        return self._content[self._index+offset]
+        return self._content[self._index + offset]
 
     def _nextChar(self, offset=1):
         if offset > 1:
-            self._nextChar(offset-1)
+            self._nextChar(offset - 1)
         if self._hasChar() and self._getChar() == '\n':
             self._line += 1
             self._pos = 0
