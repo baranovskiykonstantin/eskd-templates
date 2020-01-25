@@ -323,14 +323,17 @@ def getFirstPageInfo():
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
-    firstPageVariant = doc.Text.createTextCursor().PageDescName[-1]
     varTableIsPresent = doc.TextFrames.hasByName("Наименования_исполнений")
-    if varTableIsPresent:
-        firstRowCount = 12 if firstPageVariant in "12" else 10
-    else:
-        firstRowCount = 17 if firstPageVariant in "12" else 14
-    otherRowCount = 19
-    return (firstPageVariant, firstRowCount, otherRowCount, varTableIsPresent)
+    firstPageStyleName = doc.Text.createTextCursor().PageDescName
+    if firstPageStyleName.startswith("Первый лист "):
+        firstPageVariant = firstPageStyleName[-1]
+        if varTableIsPresent:
+            firstRowCount = 12 if firstPageVariant in "12" else 10
+        else:
+            firstRowCount = 17 if firstPageVariant in "12" else 14
+        otherRowCount = 19
+        return (firstPageVariant, firstRowCount, otherRowCount, varTableIsPresent)
+    return ("?", 0, 0, varTableIsPresent)
 
 def getTableRowHeight(rowIndex):
     """Вычислить высоту строки основной таблицы.
@@ -347,6 +350,8 @@ def getTableRowHeight(rowIndex):
     """
     height = 800
     firstPageVariant, firstRowCount, otherRowCount, varTableIsPresent = getFirstPageInfo()
+    if firstPageVariant == "?":
+        return height
     if rowIndex <= firstRowCount:
         if firstPageVariant in "12":
             # без граф заказчика:
@@ -377,6 +382,8 @@ def updateTableRowsHeight():
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
+    if "Спецификация" not in doc.TextTables:
+        return
     table = doc.TextTables["Спецификация"]
     doc.lockControllers()
     for rowIndex in range(2, table.Rows.Count):
@@ -930,8 +937,12 @@ def syncCommonFields():
     doc.UndoManager.lock()
     doc.lockControllers()
     for name in STAMP_COMMON_FIELDS:
+        if ("Перв.1: " + name) not in doc.TextFrames:
+            continue
         firstFrame = doc.TextFrames["Перв.1: " + name]
         for prefix in ("Прочие: ", "РегИзм: "):
+            if (prefix + name) not in doc.TextFrames:
+                continue
             otherFrame = doc.TextFrames[prefix + name]
             otherFrame.String = firstFrame.String
 

@@ -317,10 +317,13 @@ def getFirstPageInfo():
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
-    firstPageVariant = doc.Text.createTextCursor().PageDescName[-1]
-    firstRowCount = 29 if firstPageVariant in "12" else 27
-    otherRowCount = 32
-    return (firstPageVariant, firstRowCount, otherRowCount)
+    firstPageStyleName = doc.Text.createTextCursor().PageDescName
+    if firstPageStyleName.startswith("Первый лист "):
+        firstPageVariant = firstPageStyleName[-1]
+        firstRowCount = 29 if firstPageVariant in "12" else 27
+        otherRowCount = 32
+        return (firstPageVariant, firstRowCount, otherRowCount)
+    return ("?", 0, 0)
 
 def getTableRowHeight(rowIndex):
     """Вычислить высоту строки основной таблицы.
@@ -337,6 +340,8 @@ def getTableRowHeight(rowIndex):
     """
     height = 800
     firstPageVariant, firstRowCount, otherRowCount = getFirstPageInfo()
+    if firstPageVariant == "?":
+        return height
     if rowIndex <= firstRowCount:
         if firstPageVariant in "12":
             # без граф заказчика:
@@ -361,6 +366,8 @@ def updateTableRowsHeight():
 
     """
     doc = XSCRIPTCONTEXT.getDocument()
+    if "Ведомость_покупных_изделий" not in doc.TextTables:
+        return
     table = doc.TextTables["Ведомость_покупных_изделий"]
     doc.lockControllers()
     for rowIndex in range(2, table.Rows.Count):
@@ -728,8 +735,12 @@ def syncCommonFields():
     doc.UndoManager.lock()
     doc.lockControllers()
     for name in STAMP_COMMON_FIELDS:
+        if ("Перв.1: " + name) not in doc.TextFrames:
+            continue
         firstFrame = doc.TextFrames["Перв.1: " + name]
         for prefix in ("Прочие: ", "РегИзм: "):
+            if (prefix + name) not in doc.TextFrames:
+                continue
             otherFrame = doc.TextFrames[prefix + name]
             otherFrame.String = firstFrame.String
 

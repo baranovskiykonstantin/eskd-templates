@@ -412,9 +412,11 @@ def syncCommonFields():
     doc.UndoManager.lock()
     doc.lockControllers()
     for name in STAMP_COMMON_FIELDS:
+        if ("Перв.1: " + name) not in doc.TextFrames:
+            continue
         firstFrame = doc.TextFrames["Перв.1: " + name]
         for prefix in ("Титул2: ", "Прочие: ", "РегИзм: "):
-            if not doc.TextFrames.hasByName(prefix + name):
+            if (prefix + name) not in doc.TextFrames:
                 continue
             otherFrame = doc.TextFrames[prefix + name]
             otherFrame.String = firstFrame.String
