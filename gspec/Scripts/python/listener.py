@@ -74,8 +74,11 @@ class DocModifyListener(unohelper.Base, XModifyListener):
             if currentCell or currentFrame:
                 if currentCell:
                     itemName = ""
-                    if currentTable.Name == "Спецификация":
-                        itemName = "ТабСП." + currentCell.CellName[0]
+                    if currentTable.Name == "Спецификация" \
+                        # По непонятной причине при добавлении строки
+                        # изменяется ширина текста в ячейке А1!
+                        and currentCell.CellName != "A1":
+                            itemName = "ТабСП." + currentCell.CellName[0]
                     elif currentTable.Name == "Таблица_наименований_исполнений":
                         itemName = "ТабНИ." + currentCell.CellName[-1]
                     elif currentTable.Name == "Лист_регистрации_изменений":
