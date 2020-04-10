@@ -12,7 +12,7 @@
 = Спецификация
 :author: Барановский Константин
 :email: baranovskiykonstantin@gmail.com
-:revnumber: 1.0
+:revnumber: 1.1
 
 Справочное руководство
 

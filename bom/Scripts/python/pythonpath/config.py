@@ -135,6 +135,7 @@ def loadFromKicadbom2spec():
     Возвращаемое значение -- ConfigParser или None в случае ошибки.
 
     """
+    settings = None
     configPath = ""
     if sys.platform == "win32":
         configPath = os.path.join(
@@ -150,6 +151,8 @@ def loadFromKicadbom2spec():
         )
     if os.path.isfile(configPath):
         settings = ConfigParser()
-        settings.read(configPath)
-        return settings
-    return None
+        try:
+            settings.read(configPath)
+        except:
+            settings = None
+    return settings

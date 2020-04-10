@@ -1191,7 +1191,13 @@ class Button10ActionListener(unohelper.Base, XActionListener):
             }
             # KB2S - kicadbom2spec
             settingsKB2S = config.loadFromKicadbom2spec()
-            if settingsKB2S is not None:
+            if settingsKB2S is None:
+                common.showMessage(
+                    "Не удалось найти или загрузить файл настроек kicadbom2spec.\n" \
+                    "Будут использованы значения по умолчанию.",
+                    "Режим совместимости"
+                )
+            else:
                 for item in separators:
                     if settingsKB2S.has_option("prefixes", item.lower()):
                         separators[item][0] = settingsKB2S.get("prefixes", item.lower())[1:-1]
