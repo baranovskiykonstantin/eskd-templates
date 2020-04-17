@@ -12,7 +12,7 @@
 = Пояснительная записка
 :author: Барановский Константин
 :email: baranovskiykonstantin@gmail.com
-:revnumber: 1.1
+:revnumber: 1.2
 
 Справочное руководство
 

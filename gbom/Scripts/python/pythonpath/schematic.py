@@ -205,6 +205,8 @@ class Component():
             # Перевести множитель на русский
             if multiplier in Component.multipliersDict:
                 multiplier = Component.multipliersDict[multiplier]
+            elif multiplier is None:
+                multiplier = ''
             numValue = numValue.replace('.', ',')
             return numValue + separator + multiplier + units
         return self.value
@@ -363,7 +365,10 @@ class Component():
             value = self.getFieldValue(fieldName)
             value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            value = self.value
+            if config.getboolean("bom", "add units"):
+                value = self.getValueWithUnits()
+            else:
+                value = self.value
         if value is None:
             value = ""
         return value
@@ -399,7 +404,8 @@ class Component():
             'n': 1e-9,
             'н': 1e-9,
             'p': 1e-12,
-            'п': 1e-12
+            'п': 1e-12,
+            None: 1
         }
         if self.getRefType().startswith('C'):
             value = self.value
@@ -425,7 +431,7 @@ class Component():
             value = value.rstrip('H')
             value = value.replace("Гн", "")
             value = value.strip()
-            if re.match(r"^\d+[\.,]\d+$", value):
+            if re.match(r"^\d+(?:[\.,]\d+)?$", value):
                 extValue = float(value.replace(',', '.')) * 1e-6
             elif re.match(Component.regexpr1, value):
                 searchRes = re.search(Component.regexpr1, value).groups()

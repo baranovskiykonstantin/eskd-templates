@@ -204,6 +204,8 @@ class Component():
             # Перевести множитель на русский
             if multiplier in multipliersDict:
                 multiplier = multipliersDict[multiplier]
+            elif multiplier is None:
+                multiplier = ''
             numValue = numValue.replace('.', ',')
             return numValue + separator + multiplier + units
         return self.value
@@ -362,7 +364,10 @@ class Component():
             value = self.getFieldValue(fieldName)
             value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            value = self.value
+            if config.getboolean("index", "add units"):
+                value = self.getValueWithUnits()
+            else:
+                value = self.value
         if value is None:
             value = ""
         return value
