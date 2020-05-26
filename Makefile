@@ -1,10 +1,10 @@
 OUT := ~/.config/libreoffice/4/user/template
 
-.PHONY: index spec bom gspec gbom manual
+.PHONY: index spec bom gspec gbom manual mexanic
 
 default: all
 
-all: index spec bom gspec gbom manual
+all: index spec bom gspec gbom manual mexanic
 
 define build_ott
 	cd $(1) && \
@@ -31,3 +31,6 @@ gbom:
 
 manual:
 	$(call build_ott,manual,Пояснительная\ записка)
+
+mexanic:
+	$(call build_ott,mexanic,Ведомость\ покупных\ изделий\ \(Mexanic\))
