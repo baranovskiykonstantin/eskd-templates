@@ -523,6 +523,22 @@ def setup(*args):
 вверху страницы будут удалены."""
     pageModel0.insertByName("CheckBox08", checkModel08)
 
+    checkModel09 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel09.PositionX = 5
+    checkModel09.PositionY = checkModel08.PositionY + checkModel08.Height
+    checkModel09.Width = tabsModel.Width - 10
+    checkModel09.Height = checkModel00.Height
+    checkModel09.Name = "CheckBox09"
+    checkModel09.State = \
+        {False: 0, True: 1}[config.getboolean("index", "footprint only")]
+    checkModel09.Label = "\"Посад.место\" без наименования библиотеки"
+    checkModel09.HelpText = """\
+Если отмечено, то посадочное место
+будет указано без наименования библиотеки."""
+    pageModel0.insertByName("CheckBox09", checkModel09)
+
     # ------------------------------------------------------------------------
     # Fields Tab Model
     # ------------------------------------------------------------------------
@@ -933,6 +949,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("index", "prohibit empty rows at top",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox08").State]
+        )
+        config.set("index", "footprint only",
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox09").State]
         )
 
         # --------------------------------------------------------------------

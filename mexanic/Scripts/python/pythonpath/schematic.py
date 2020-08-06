@@ -59,6 +59,10 @@ class Component():
                 value = self.value
         elif name == "Посад.место":
             value = self.footprint
+            if config.getboolean("bom", "footprint only") \
+                    and ':' in value:
+                # Удалить наименование библиотеки включительно с двоеточием
+                value = value[(value.index(':') + 1):]
         elif name == "Документация":
             value = self.datasheet
         elif name in self.fields:

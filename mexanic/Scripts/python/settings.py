@@ -26,7 +26,7 @@ def setup(*args):
         context
     )
     dialogModel.Width = 300
-    dialogModel.Height = 300
+    dialogModel.Height = 320
     dialogModel.PositionX = 0
     dialogModel.PositionY = 0
     dialogModel.Title = "Параметры ведомости покупных изделий"
@@ -475,6 +475,22 @@ def setup(*args):
 фразой "То же", а далее кавычками."""
     pageModel0.insertByName("CheckBox011", checkModel011)
 
+    checkModel012 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel012.PositionX = 5
+    checkModel012.PositionY = checkModel011.PositionY + checkModel011.Height
+    checkModel012.Width = tabsModel.Width - 10
+    checkModel012.Height = checkModel00.Height
+    checkModel012.Name = "CheckBox012"
+    checkModel012.State = \
+        {False: 0, True: 1}[config.getboolean("bom", "footprint only")]
+    checkModel012.Label = "\"Посад.место\" без наименования библиотеки"
+    checkModel012.HelpText = """\
+Если отмечено, то посадочное место
+будет указано без наименования библиотеки."""
+    pageModel0.insertByName("CheckBox012", checkModel012)
+
     # ------------------------------------------------------------------------
     # Fields Tab Model
     # ------------------------------------------------------------------------
@@ -881,6 +897,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("bom", "process repeated values",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox011").State]
+        )
+        config.set("bom", "footprint only",
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox012").State]
         )
 
         # --------------------------------------------------------------------

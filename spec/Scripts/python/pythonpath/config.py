@@ -43,6 +43,7 @@ def load():
                 "extreme width factor": 80,
                 "append rev table": "no",
                 "pages rev table": 3,
+                "footprint only": "yes",
             },
             "sections": {
                 "documentation": "yes",

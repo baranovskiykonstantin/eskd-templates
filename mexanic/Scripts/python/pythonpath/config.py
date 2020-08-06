@@ -43,6 +43,7 @@ def load():
                 "append rev table": "no",
                 "pages rev table": 3,
                 "process repeated values": "yes",
+                "footprint only": "yes",
             },
             "fields": {
                 "type": "Тип",
