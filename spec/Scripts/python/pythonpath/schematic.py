@@ -643,22 +643,25 @@ class CompGroup():
         return False
 
     @staticmethod
-    def _strCommon(str1, str2):
-        """Определить общее начало двух строк.
+    def _shortenName(name):
+        """Сократить имя до наименее возможного.
 
-        Вернуть подстроку, с которой начинаются обе указанные строки.
+        Сократить имя до первого пробела, дефиса или конца строки.
 
         Аргументы:
-        str1 (str) -- первая строка;
-        str2 (str) -- вторая строка.
+        name (str) -- имя для сокращения.
 
-        Возвращаемое значение (str) -- общее начало двух строк.
+        Возвращаемое значение (str) -- сокращённое имя.
 
         """
-        for i in range(len(str1)):
-            if i == len(str2) or str1[i] != str2[i]:
-                return str1[:i]
-        return str1
+        index = len(name)
+        if " " in name:
+            index = name.index(" ")
+        if "-" in name:
+            index = min(index, name.index("-"))
+        name = name[:index]
+        name = name.rstrip(" -")
+        return name
 
     def getTitle(self):
         """Вернуть заголовок группы компонентов.
@@ -682,13 +685,11 @@ class CompGroup():
         if not config.getboolean("spec", "title with doc"):
             return [currentType]
 
-        currentName = self._compRanges[0].getSpecValue("name")
-        currentDoc = self._compRanges[0].getSpecValue("doc")
-
         # Список уникальных пар Наименование-Документ
         nameDocList = []
         for compRange in self:
             currentName = compRange.getSpecValue("name")
+            currentShortestName = self._shortenName(currentName)
             currentDoc = compRange.getSpecValue("doc")
             if not currentDoc:
                 # Если имеются компоненты, в которых документ не указан,
@@ -696,14 +697,11 @@ class CompGroup():
                 currentName = ""
             for i in range(len(nameDocList)):
                 savedName = nameDocList[i][0]
+                savedShortestName = self._shortenName(savedName)
                 savedDoc = nameDocList[i][1]
-                if savedDoc == currentDoc:
-                    commonName = self._strCommon(savedName, currentName)
-                    commonName = commonName.rstrip(" -")
-                    if commonName:
-                        # Оставить только общую часть наименования
-                        nameDocList[i][0] = commonName
-                        break
+                if savedDoc == currentDoc \
+                        and savedShortestName == currentShortestName:
+                    break
             else:
                 nameDocList.append([currentName, currentDoc])
 

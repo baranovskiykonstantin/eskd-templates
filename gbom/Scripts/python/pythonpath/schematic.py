@@ -642,24 +642,6 @@ class CompGroup():
                         return True
         return False
 
-    @staticmethod
-    def _strCommon(str1, str2):
-        """Определить общее начало двух строк.
-
-        Вернуть подстроку, с которой начинаются обе указанные строки.
-
-        Аргументы:
-        str1 (str) -- первая строка;
-        str2 (str) -- вторая строка.
-
-        Возвращаемое значение (str) -- общее начало двух строк.
-
-        """
-        for i in range(len(str1)):
-            if i == len(str2) or str1[i] != str2[i]:
-                return str1[:i]
-        return str1
-
 
 class Schematic():
     """Данные о схеме и компонентах."""
