@@ -45,6 +45,7 @@ class Component():
         self.value = ""
         self.footprint = ""
         self.datasheet = ""
+        self.description = ""
         self.fields = {}
 
     def getFieldValue(self, name):
@@ -69,6 +70,8 @@ class Component():
                 value = value[(value.index(':') + 1):]
         elif name == "Документация":
             value = self.datasheet
+        elif name == "Описание":
+            value = self.description
         elif name in self.fields:
             value = self.fields[name]
         if value:
@@ -499,6 +502,7 @@ class CompRange(Component):
             self.value = comp.value
             self.footprint = comp.footprint
             self.datasheet = comp.datasheet
+            self.description = comp.description
             self.fields = comp.fields
 
     def __iter__(self):
@@ -713,6 +717,9 @@ class Schematic():
                     component.footprint = item.text if item.text is not None and item.text != "~" else ""
                 elif item.name == "datasheet":
                     component.datasheet = item.text if item.text is not None and item.text != "~" else ""
+                elif item.name == "libsource":
+                    if "description" in item.attributes:
+                        component.description = item.attributes["description"]
                 elif item.name == "fields":
                     for field in item.items:
                         fieldName = field.attributes["name"]
