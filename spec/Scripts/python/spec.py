@@ -371,9 +371,18 @@ class SpecBuildingThread(threading.Thread):
                             gotoNextRow()
 
                     if config.getboolean("sections", "assembly drawing"):
+                        _, ref = common.getSchematicInfo()
+                        refParts = re.match(
+                            r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
+                            ref
+                        )
+                        if refParts is not None:
+                            ref = refParts.group(1)
+                        if ref:
+                            ref += "СБ"
                         name = "Сборочный чертёж"
                         fillRow(
-                            ["", "", "", "", name]
+                            ["", "", "", ref, name]
                         )
 
                     if config.getboolean("sections", "schematic"):
