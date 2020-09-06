@@ -1,5 +1,7 @@
 import re
 import sys
+from os import path
+import uno
 
 common = sys.modules["common" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
 config = sys.modules["config" + XSCRIPTCONTEXT.getDocument().RuntimeUID]
@@ -100,7 +102,10 @@ def fill(*args):
         docTitle = docTitle.strip()
         if docTitle:
             docTitle += '\n'
-        docTitle += "Ведомость покупных изделий"
+        docName = "Ведомость покупных изделий"
+        if config.getboolean("stamp", "doc type is file name"):
+            docName = path.splitext(path.basename(uno.fileUrlToSystemPath(doc.URL)))[0]
+        docTitle += docName
     setFirstPageFrameValue("1 Наименование документа", docTitle)
     # Наименование организации
     companyName = schematic.company.replace('\\n', '\n')

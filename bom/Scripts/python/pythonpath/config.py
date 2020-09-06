@@ -59,6 +59,7 @@ def load():
                 "convert doc title": "yes",
                 "convert doc id": "yes",
                 "fill first usage": "yes",
+                "doc type is file name": "yes",
             },
             "settings": {
                 "pos x": "100",

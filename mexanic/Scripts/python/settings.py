@@ -792,6 +792,25 @@ def setup(*args):
 останется без изменений."""
     pageModel2.insertByName("CheckBox22", checkModel22)
 
+    checkModel23 = pageModel2.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel23.PositionX = checkModel20.PositionX
+    checkModel23.PositionY = checkModel20.PositionY + checkModel20.Height * 3
+    checkModel23.Width = checkModel20.Width
+    checkModel23.Height = checkModel20.Height
+    checkModel23.Name = "CheckBox23"
+    checkModel23.State = {False: 0, True: 1}[
+        config.getboolean("stamp", "doc type is file name")
+    ]
+    checkModel23.Label = "Использовать имя файла в качестве типа документа"
+    checkModel23.HelpText = """\
+Если отмечено, и активен параметр
+"Преобразовать наименование документа",
+то в качестве типа документа будет
+указано имя файла."""
+    pageModel2.insertByName("CheckBox23", checkModel23)
+
     # ------------------------------------------------------------------------
     # Action Listeners
     # ------------------------------------------------------------------------
@@ -940,6 +959,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("stamp", "fill first usage",
             {0: "no", 1: "yes"}[page2.getControl("CheckBox22").State]
+        )
+        config.set("stamp", "doc type is file name",
+            {0: "no", 1: "yes"}[page2.getControl("CheckBox23").State]
         )
 
         self.dialog.endExecute()
