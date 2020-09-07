@@ -102,6 +102,21 @@ def setup(*args):
     dialogModel.insertByName("ButtonOK", buttonModelOK)
 
     # ------------------------------------------------------------------------
+    # Button Import settings
+    # ------------------------------------------------------------------------
+
+    buttonModelImport = dialogModel.createInstance(
+        "com.sun.star.awt.UnoControlButtonModel"
+    )
+    buttonModelImport.Width = buttonModelOK.Width
+    buttonModelImport.Height = buttonModelOK.Height
+    buttonModelImport.PositionX = buttonModelOK.PositionX - buttonModelOK.Width - 5
+    buttonModelImport.PositionY = buttonModelOK.PositionY
+    buttonModelImport.Name = "ButtonImport"
+    buttonModelImport.Label = "Импорт..."
+    dialogModel.insertByName("ButtonImport", buttonModelImport)
+
+    # ------------------------------------------------------------------------
     # Dialog
     # ------------------------------------------------------------------------
 
@@ -247,6 +262,8 @@ def setup(*args):
     # ------------------------------------------------------------------------
 
     dialog.addWindowListener(DialogWindowListener(dialog))
+    buttonImport = dialog.getControl("ButtonImport")
+    buttonImport.addActionListener(ButtonImportActionListener(dialog))
     buttonOK = dialog.getControl("ButtonOK")
     buttonOK.addActionListener(ButtonOKActionListener(dialog))
     ButtonCancel = dialog.getControl("ButtonCancel")
@@ -275,6 +292,43 @@ class DialogWindowListener(unohelper.Base, XWindowListener):
 
     def windowHidden(self, event):
         config.save()
+
+
+class ButtonImportActionListener(unohelper.Base, XActionListener):
+    def __init__(self, dialog):
+        self.dialog = dialog
+
+    def actionPerformed(self, event):
+        self.dialog.endExecute()
+        docName = common.showFilePicker(
+            "",
+            "Выбор документа для импорта параметров",
+            **{"Текстовые документы": "*.odt", "Все файлы": "*.*"}
+        )
+        if docName:
+            try:
+                n = config.importFromDoc(docName)
+                common.showMessage(
+                    "Загружено {} параметров.".format(n),
+                    "Импорт параметров"
+                )
+
+            except config.ImportIniNotExists:
+                common.showMessage(
+                    "Выбранный документ не содержит файл параметров.\n" + \
+                    "В нём используются значения по умолчанию.",
+                    "Ошибка импорта параметров"
+                )
+            except config.ImportBadDoc:
+                common.showMessage(
+                    "Выбранный документ не является zip архивом.",
+                    "Ошибка импорта параметров"
+                )
+            except:
+                common.showMessage(
+                    "Не удалось загрузить параметры.",
+                    "Ошибка импорта параметров"
+                )
 
 
 class ButtonOKActionListener(unohelper.Base, XActionListener):

@@ -100,7 +100,7 @@ def showMessage(text, title="Сообщение"):
     )
     msgbox.execute()
 
-def showFilePicker(filePath="", **fileFilters):
+def showFilePicker(filePath="", title="Выбор файла с данными о схеме", **fileFilters):
     """Показать диалоговое окно выбора файла.
 
     Аргументы:
@@ -126,7 +126,7 @@ def showFilePicker(filePath="", **fileFilters):
         "com.sun.star.ui.dialogs.OfficeFilePicker",
         context
     )
-    filePicker.setTitle("Выбор файла с данными о схеме")
+    filePicker.setTitle(title)
     pickerType = uno.getConstantByName(
         "com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_SIMPLE"
     )

@@ -9,6 +9,8 @@ import os
 import sys
 from configparser import ConfigParser
 import tempfile
+import zipfile
+import io
 import uno
 
 XSCRIPTCONTEXT = None
@@ -155,3 +157,43 @@ def loadFromKicadbom2spec():
         except:
             settings = None
     return settings
+
+
+class ImportIniNotExists(Exception):
+    pass
+
+
+class ImportBadDoc(Exception):
+    pass
+
+
+def importFromDoc(docName):
+    """Загрузить параметры из другого документа.
+
+    docName - полное имя файла документа, из которого нужно
+    импортировать параметры.
+
+    """
+    if not zipfile.is_zipfile(docName):
+        raise ImportBadDoc
+
+    docFile = zipfile.ZipFile(docName)
+
+    if "Scripts/python/settings.ini" not in docFile.namelist():
+        raise ImportIniNotExists
+
+    iSettingsData = docFile.open("Scripts/python/settings.ini")
+    iSettings = ConfigParser()
+    iSettings.read_file(io.TextIOWrapper(iSettingsData))
+    pCount = 0
+    load()
+    for section in iSettings:
+        if section == "DEFAULT":
+            continue
+        if section in SETTINGS:
+            for param in iSettings[section]:
+                if param in SETTINGS[section]:
+                    SETTINGS[section][param] = iSettings[section][param]
+                    pCount += 1
+    save()
+    return pCount
