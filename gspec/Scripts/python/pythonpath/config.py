@@ -50,6 +50,8 @@ def load():
                 "assembly drawing": "no",
                 "schematic": "yes",
                 "index": "yes",
+                "bom": "no",
+                "bom name": "Ведомость покупных изделий",
                 "assembly units": "no",
                 "details": "yes",
                 "pcb": "yes",

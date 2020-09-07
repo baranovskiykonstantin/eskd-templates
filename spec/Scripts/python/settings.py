@@ -600,11 +600,40 @@ def setup(*args):
 будет указан перечень элементов."""
     pageModel3.insertByName("CheckBox33", checkModel33)
 
+    checkModel310 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel310.PositionX = checkModel30.PositionX + 10
+    checkModel310.PositionY = checkModel30.PositionY + checkModel30.Height * 4
+    checkModel310.Width = checkModel30.Height
+    checkModel310.Height = checkModel30.Height
+    checkModel310.Name = "CheckBox310"
+    checkModel310.State = {False: 0, True: 1}[
+        config.getboolean("sections", "bom")
+    ]
+    checkModel310.Label = ""
+    checkModel310.HelpText = """\
+Если отмечено, то при формировании
+спецификации в разделе "Документация"
+будет указана ведомость покупных изделий."""
+    pageModel3.insertByName("CheckBox310", checkModel310)
+
+    editControlModel311 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel311.PositionX = checkModel310.PositionX + checkModel310.Width
+    editControlModel311.PositionY = checkModel310.PositionY
+    editControlModel311.Width = tabsModel.Width - editControlModel311.PositionX - 3
+    editControlModel311.Height = checkModel310.Height
+    editControlModel311.Name = "EditControl311"
+    editControlModel311.Text = config.get("sections", "bom name")
+    pageModel3.insertByName("EditControl311", editControlModel311)
+
     checkModel34 = pageModel3.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel34.PositionX = checkModel30.PositionX
-    checkModel34.PositionY = checkModel30.PositionY + checkModel30.Height * 4
+    checkModel34.PositionY = checkModel30.PositionY + checkModel30.Height * 5
     checkModel34.Width = checkModel30.Width
     checkModel34.Height = checkModel30.Height
     checkModel34.Name = "CheckBox34"
@@ -622,7 +651,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel35.PositionX = checkModel30.PositionX
-    checkModel35.PositionY = checkModel30.PositionY + checkModel30.Height * 5
+    checkModel35.PositionY = checkModel30.PositionY + checkModel30.Height * 6
     checkModel35.Width = checkModel30.Width
     checkModel35.Height = checkModel30.Height
     checkModel35.Name = "CheckBox35"
@@ -640,7 +669,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel36.PositionX = checkModel30.PositionX + 10
-    checkModel36.PositionY = checkModel30.PositionY + checkModel30.Height * 6
+    checkModel36.PositionY = checkModel30.PositionY + checkModel30.Height * 7
     checkModel36.Width = checkModel30.Width
     checkModel36.Height = checkModel30.Height
     checkModel36.Name = "CheckBox36"
@@ -658,7 +687,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel37.PositionX = checkModel30.PositionX
-    checkModel37.PositionY = checkModel30.PositionY + checkModel30.Height * 7
+    checkModel37.PositionY = checkModel30.PositionY + checkModel30.Height * 8
     checkModel37.Width = checkModel30.Width
     checkModel37.Height = checkModel30.Height
     checkModel37.Name = "CheckBox37"
@@ -676,7 +705,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel38.PositionX = checkModel30.PositionX
-    checkModel38.PositionY = checkModel30.PositionY + checkModel30.Height * 8
+    checkModel38.PositionY = checkModel30.PositionY + checkModel30.Height * 9
     checkModel38.Width = checkModel30.Width
     checkModel38.Height = checkModel30.Height
     checkModel38.Name = "CheckBox38"
@@ -694,7 +723,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel39.PositionX = checkModel30.PositionX
-    checkModel39.PositionY = checkModel30.PositionY + checkModel30.Height * 9
+    checkModel39.PositionY = checkModel30.PositionY + checkModel30.Height * 10
     checkModel39.Width = checkModel30.Width
     checkModel39.Height = checkModel30.Height
     checkModel39.Name = "CheckBox39"
@@ -1106,6 +1135,12 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("sections", "index",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox33").State]
+        )
+        config.set("sections", "bom",
+            {0: "no", 1: "yes"}[page3.getControl("CheckBox310").State]
+        )
+        config.set("sections", "bom name",
+            page3.getControl("EditControl311").Text
         )
         config.set("sections", "assembly units",
             {0: "no", 1: "yes"}[page3.getControl("CheckBox34").State]

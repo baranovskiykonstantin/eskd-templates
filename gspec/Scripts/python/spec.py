@@ -405,6 +405,22 @@ class SpecBuildingThread(threading.Thread):
                             [size, "", "", ref, name, "X"]
                         )
 
+                    if config.getboolean("sections", "bom"):
+                        size, ref = common.getSchematicInfo()
+                        size = "A3"
+                        refParts = re.match(
+                            r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
+                            ref
+                        )
+                        if refParts is not None:
+                            ref = refParts[1] + 'ВП'
+                        name = config.get("sections", "bom name")
+                        if not name:
+                            name = "Ведомость покупных изделий"
+                        fillRow(
+                            [size, "", "", ref, name, "X"]
+                        )
+
                 progressDialog.stepUp()
 
                 if config.getboolean("sections", "assembly units"):
