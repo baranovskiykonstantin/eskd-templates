@@ -370,18 +370,20 @@ class SpecBuildingThread(threading.Thread):
                             gotoNextRow()
 
                     if config.getboolean("sections", "assembly drawing"):
-                        _, ref = common.getSchematicInfo()
-                        refParts = re.match(
-                            r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
-                            ref
-                        )
-                        if refParts is not None:
-                            ref = refParts.group(1)
-                        if ref:
-                            ref += "СБ"
+                        size, ref = common.getPcbInfo()
+                        if not ref:
+                            _, ref = common.getSchematicInfo()
+                            refParts = re.match(
+                                r"([А-ЯA-Z0-9]+(?:[\.\-]\d+)+\s?)(Э\d)",
+                                ref
+                            )
+                            if refParts is not None:
+                                ref = refParts.group(1)
+                            if ref:
+                                ref += "СБ"
                         name = "Сборочный чертёж"
                         fillRow(
-                            ["", "", "", ref, name, "X"]
+                            [size, "", "", ref, name, "X"]
                         )
 
                     if config.getboolean("sections", "schematic"):
@@ -435,10 +437,9 @@ class SpecBuildingThread(threading.Thread):
 
                     if config.getboolean("sections", "pcb"):
                         gotoNextRow()
-                        size, ref = common.getPcbInfo()
                         name = "Плата печатная"
                         fillRow(
-                            [size, "", "", ref, name, "1"],
+                            ["", "", "", "", name, "1"],
                             posIncrement=1
                         )
 
