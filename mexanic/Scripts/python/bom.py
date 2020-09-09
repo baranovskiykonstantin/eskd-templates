@@ -177,7 +177,7 @@ class BomBuildingThread(threading.Thread):
         def fillRow(values, isTitle=False, posIncrement=0):
             colWidth = (6, 54, 49, 29, 9, 9, 22)
             extraRow = [""] * len(values)
-            extremeWidthFactor = config.getint("bom", "extreme width factor")
+            extremeWidthFactor = config.getint("doc", "extreme width factor")
             doc.lockControllers()
             for col in range(len(values)):
                 if values[col] == "" and not (col == 0 and posIncrement != 0):
@@ -219,7 +219,7 @@ class BomBuildingThread(threading.Thread):
                 # параметров абзаца!
                 cellCursor.CharScaleWidth = widthFactor
                 if col == 0 and posIncrement \
-                    and config.getboolean("bom", "only components have position numbers"):
+                    and config.getboolean("doc", "only components have position numbers"):
                         if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
                             posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
                         else:
@@ -262,7 +262,7 @@ class BomBuildingThread(threading.Thread):
             self.currentRow = table.Rows.Count - 1
             compGroups = schematic.getGroupedComponents()
             prevGroup = None
-            emptyRowsType = config.getint("bom", "empty rows between diff type")
+            emptyRowsType = config.getint("doc", "empty rows between diff type")
 
             progressTotal = 6
             for group in compGroups:
@@ -284,10 +284,10 @@ class BomBuildingThread(threading.Thread):
                     doc.lockControllers()
                     gotoNextRow(emptyRowsType)
                     doc.unlockControllers()
-                    if config.getboolean("bom", "reserve position numbers"):
+                    if config.getboolean("doc", "reserve position numbers"):
                         increment += emptyRowsType
                 if len(group) == 1 \
-                    and not config.getboolean("bom", "every group has title"):
+                    and not config.getboolean("doc", "every group has title"):
                         compType = group[0].getBomValue("type", singular=True)
                         compName = group[0].getBomValue("name")
                         compDoc = group[0].getBomValue("doc")
@@ -311,9 +311,9 @@ class BomBuildingThread(threading.Thread):
                             ["", title],
                             isTitle=True
                         )
-                    if config.getboolean("bom", "empty row after group title"):
+                    if config.getboolean("doc", "empty row after group title"):
                         gotoNextRow()
-                        if config.getboolean("bom", "reserve position numbers"):
+                        if config.getboolean("doc", "reserve position numbers"):
                             increment += 1
                     for compRange in group:
                         compName = compRange.getBomValue("name")
@@ -334,7 +334,7 @@ class BomBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("bom", "prohibit titles at bottom"):
+            if config.getboolean("doc", "prohibit titles at bottom"):
                 _, firstRowCount, otherRowCount = common.getFirstPageInfo()
                 pos = firstRowCount
                 while pos < table.Rows.Count:
@@ -362,7 +362,7 @@ class BomBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("bom", "prohibit empty rows at top"):
+            if config.getboolean("doc", "prohibit empty rows at top"):
                 _, firstRowCount, otherRowCount = common.getFirstPageInfo()
                 pos = firstRowCount + 1
                 while pos < table.Rows.Count:
@@ -374,7 +374,7 @@ class BomBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if not config.getboolean("bom", "only components have position numbers"):
+            if not config.getboolean("doc", "only components have position numbers"):
                 doc.lockControllers()
                 if "com.sun.star.text.fieldmaster.SetExpression.Позиция" in doc.TextFieldMasters:
                     posFieldMaster = doc.TextFieldMasters["com.sun.star.text.fieldmaster.SetExpression.Позиция"]
@@ -406,7 +406,7 @@ class BomBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("bom", "process repeated values"):
+            if config.getboolean("doc", "process repeated values"):
                 doc.lockControllers()
                 colCount = 11
                 prevValues = [""] * colCount
@@ -427,9 +427,9 @@ class BomBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("bom", "append rev table"):
+            if config.getboolean("doc", "append rev table"):
                 pageCount = doc.CurrentController.PageCount
-                if pageCount > config.getint("bom", "pages rev table"):
+                if pageCount > config.getint("doc", "pages rev table"):
                     common.appendRevTable()
 
         except StopException:

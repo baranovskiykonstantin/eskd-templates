@@ -29,7 +29,7 @@ def load():
     """
     SETTINGS.read_dict(
         {
-            "bom": {
+            "doc": {
                 "source": "",
                 "add units": "yes",
                 "space before units": "no",

@@ -29,7 +29,7 @@ def load():
     """
     SETTINGS.read_dict(
         {
-            "manual": {
+            "doc": {
                 "source": "",
             },
             "stamp": {

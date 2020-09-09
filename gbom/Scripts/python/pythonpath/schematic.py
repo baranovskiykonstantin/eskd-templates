@@ -54,12 +54,12 @@ class Component():
         if name == "Обозначение":
             value = self.reference
         elif name == "Значение":
-            if config.getboolean("bom", "add units"):
+            if config.getboolean("doc", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
         elif name == "Посад.место":
-            if config.getboolean("bom", "footprint only"):
+            if config.getboolean("doc", "footprint only"):
                 value = self.getFieldValue("Посад.место!")
             else:
                 value = self.footprint
@@ -146,7 +146,7 @@ class Component():
         """
         numValue = ""
         separator = ""
-        if config.getboolean("bom", "space before units"):
+        if config.getboolean("doc", "space before units"):
             separator = ' '
         multiplier = ""
         units = ""
@@ -376,7 +376,7 @@ class Component():
             value = self.getFieldValue(fieldName)
             value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            if config.getboolean("bom", "add units"):
+            if config.getboolean("doc", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
@@ -624,7 +624,7 @@ class CompGroup():
             return True
         lastCompRange = self._compRanges[-1]
         if lastCompRange.getBomValue("type") == compRange.getBomValue("type"):
-            if config.getboolean("bom", "separate group for each doc"):
+            if config.getboolean("doc", "separate group for each doc"):
                 if lastCompRange.getBomValue("doc") == compRange.getBomValue("doc"):
                     # Если тип и документ не указаны, формировать группы
                     # на основе буквенной части обозначения.

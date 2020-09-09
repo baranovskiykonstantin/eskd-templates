@@ -183,7 +183,7 @@ def setup(*args):
     editControlModel00.PositionX = 0
     editControlModel00.PositionY = buttonModel00.PositionY
     editControlModel00.Name = "EditControl00"
-    editControlModel00.Text = config.get("manual", "source")
+    editControlModel00.Text = config.get("doc", "source")
     pageModel0.insertByName("EditControl00", editControlModel00)
 
     # ------------------------------------------------------------------------
@@ -350,7 +350,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Пояснительная записка
         # --------------------------------------------------------------------
 
-        config.set("manual", "source",
+        config.set("doc", "source",
             page0.getControl("EditControl00").Text
         )
 

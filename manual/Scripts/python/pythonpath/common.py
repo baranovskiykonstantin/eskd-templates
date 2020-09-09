@@ -161,7 +161,7 @@ def getSourceFileName():
         не найден или не выбран.
 
     """
-    sourcePath = config.get("manual", "source")
+    sourcePath = config.get("doc", "source")
     if os.path.exists(sourcePath):
         return sourcePath
     sourceDir = ""
@@ -176,7 +176,7 @@ def getSourceFileName():
         if sourceName:
             sourcePath = os.path.join(sourceDir, sourceName)
             if os.path.exists(sourcePath):
-                config.set("manual", "source", sourcePath)
+                config.set("doc", "source", sourcePath)
                 config.save()
                 return sourcePath
     sourcePath = showFilePicker(
@@ -184,7 +184,7 @@ def getSourceFileName():
         **{"Список цепей KiCad": "*.net;*.xml", "Все файлы": "*.*"}
     )
     if sourcePath is not None:
-        config.set("manual", "source", sourcePath)
+        config.set("doc", "source", sourcePath)
         config.save()
         return sourcePath
     return None

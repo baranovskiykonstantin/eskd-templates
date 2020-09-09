@@ -33,12 +33,12 @@ class Component():
         if name == "Обозначение":
             value = self.reference
         elif name == "Значение":
-            if config.getboolean("index", "add units"):
+            if config.getboolean("doc", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
         elif name == "Посад.место":
-            if config.getboolean("index", "footprint only"):
+            if config.getboolean("doc", "footprint only"):
                 value = self.getFieldValue("Посад.место!")
             else:
                 value = self.footprint
@@ -136,7 +136,7 @@ class Component():
         }
         numValue = ""
         separator = ""
-        if config.getboolean("index", "space before units"):
+        if config.getboolean("doc", "space before units"):
             separator = ' '
         multiplier = ""
         units = ""
@@ -375,7 +375,7 @@ class Component():
             value = self.getFieldValue(fieldName)
             value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            if config.getboolean("index", "add units"):
+            if config.getboolean("doc", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
@@ -461,7 +461,7 @@ class CompRange(Component):
                         prevNumber = currentNumber
                         counter += 1
                         if counter > 1:
-                            separator = config.get("index", "ref separator")
+                            separator = config.get("doc", "ref separator")
                         continue
                 else:
                     if counter > 0:
@@ -532,7 +532,7 @@ class CompGroup():
         if not self._compRanges:
             self._compRanges.append(compRange)
             return True
-        skipRefType = config.getboolean("index", "concatenate same name groups")
+        skipRefType = config.getboolean("doc", "concatenate same name groups")
         lastCompRange = self._compRanges[-1]
         if (lastCompRange.getRefType() == compRange.getRefType() or skipRefType) \
             and lastCompRange.getIndexValue("type") == compRange.getIndexValue("type"):
@@ -580,7 +580,7 @@ class CompGroup():
 
         currentType = self._compRanges[0].getIndexValue("type", plural=True)
 
-        if not config.getboolean("index", "title with doc"):
+        if not config.getboolean("doc", "title with doc"):
             return [currentType]
 
         # Список уникальных пар Наименование-Документ

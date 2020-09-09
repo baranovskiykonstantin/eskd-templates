@@ -185,7 +185,7 @@ def setup(*args):
     editControlModel00.PositionX = 0
     editControlModel00.PositionY = buttonModel00.PositionY
     editControlModel00.Name = "EditControl00"
-    editControlModel00.Text = config.get("bom", "source")
+    editControlModel00.Text = config.get("doc", "source")
     pageModel0.insertByName("EditControl00", editControlModel00)
 
     editControlModel02 = pageModel0.createInstance(
@@ -196,7 +196,7 @@ def setup(*args):
     editControlModel02.PositionX = 0
     editControlModel02.PositionY = editControlModel00.PositionY + editControlModel00.Height
     editControlModel02.Name = "EditControl02"
-    editControlModel02.Value = config.getint("bom", "empty rows between diff type")
+    editControlModel02.Value = config.getint("doc", "empty rows between diff type")
     editControlModel02.ValueMin = 0
     editControlModel02.ValueMax = 99
     editControlModel02.ValueStep = 1
@@ -231,7 +231,7 @@ def setup(*args):
     editControlModel03.PositionX = editControlModel02.PositionX
     editControlModel03.PositionY = editControlModel02.PositionY + editControlModel02.Height
     editControlModel03.Name = "EditControl03"
-    editControlModel03.Value = config.getint("bom", "extreme width factor")
+    editControlModel03.Value = config.getint("doc", "extreme width factor")
     editControlModel03.ValueMin = 0
     editControlModel03.ValueMax = 99
     editControlModel03.ValueStep = 1
@@ -269,7 +269,7 @@ def setup(*args):
     checkModel00.Height = 15
     checkModel00.Name = "CheckBox00"
     checkModel00.State = {False: 0, True: 1}[
-        config.getboolean("bom", "add units")
+        config.getboolean("doc", "add units")
     ]
     checkModel00.Label = "Добавить единицы измерения"
     checkModel00.HelpText = """\
@@ -291,7 +291,7 @@ def setup(*args):
     checkModel01.Height = checkModel00.Height
     checkModel01.Name = "CheckBox01"
     checkModel01.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "space before units")]
+        {False: 0, True: 1}[config.getboolean("doc", "space before units")]
     checkModel01.Label = "Вставить пробел перед единицами измерения"
     checkModel01.HelpText = """\
 Если отмечено, то между цифровой
@@ -308,7 +308,7 @@ def setup(*args):
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
     checkModel02.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "separate group for each doc")]
+        {False: 0, True: 1}[config.getboolean("doc", "separate group for each doc")]
     checkModel02.Label = "Формировать отдельную группу для каждого документа"
     checkModel02.HelpText = """\
 По умолчанию, группы компонентов
@@ -330,7 +330,7 @@ def setup(*args):
     checkModel04.Height = checkModel00.Height
     checkModel04.Name = "CheckBox04"
     checkModel04.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "every group has title")]
+        {False: 0, True: 1}[config.getboolean("doc", "every group has title")]
     checkModel04.Label = "Формировать заголовок для каждой группы"
     checkModel04.HelpText = """\
 По умолчанию, заголовок формируется
@@ -354,7 +354,7 @@ def setup(*args):
     checkModel010.Height = checkModel00.Height
     checkModel010.Name = "CheckBox010"
     checkModel010.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "only components have position numbers")]
+        {False: 0, True: 1}[config.getboolean("doc", "only components have position numbers")]
     checkModel010.Label = "Нумеровать только позиции компонентов"
     checkModel010.HelpText = """\
 По умолчанию, номера позиций
@@ -373,7 +373,7 @@ def setup(*args):
     checkModel09.Height = checkModel00.Height
     checkModel09.Name = "CheckBox09"
     checkModel09.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "reserve position numbers")]
+        {False: 0, True: 1}[config.getboolean("doc", "reserve position numbers")]
     checkModel09.Label = "Резервировать номера позиций"
     checkModel09.HelpText = """\
 По умолчанию, позиции в ведомости
@@ -392,7 +392,7 @@ def setup(*args):
     checkModel05.Height = checkModel00.Height
     checkModel05.Name = "CheckBox05"
     checkModel05.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "empty row after group title")]
+        {False: 0, True: 1}[config.getboolean("doc", "empty row after group title")]
     checkModel05.Label = "Добавить пустую строку после заголовка группы"
     checkModel05.HelpText = """\
 Если отмечено, то между заголовком
@@ -408,7 +408,7 @@ def setup(*args):
     editControlModel04.PositionX = tabsModel.Width - editControlModel04.Width - 3
     editControlModel04.PositionY = checkModel05.PositionY + checkModel05.Height
     editControlModel04.Name = "EditControl04"
-    editControlModel04.Value = config.getint("bom", "pages rev table")
+    editControlModel04.Value = config.getint("doc", "pages rev table")
     editControlModel04.ValueMin = 0
     editControlModel04.ValueMax = 99
     editControlModel04.ValueStep = 1
@@ -429,7 +429,7 @@ def setup(*args):
     )
     checkModel06.Name = "CheckBox06"
     checkModel06.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "append rev table")]
+        {False: 0, True: 1}[config.getboolean("doc", "append rev table")]
     checkModel06.Label = "Добавить лист регистрации изменений, если количество листов больше:"
     checkModel06.HelpText = """\
 Если отмечено и при автоматическом
@@ -448,7 +448,7 @@ def setup(*args):
     checkModel07.Height = checkModel00.Height
     checkModel07.Name = "CheckBox07"
     checkModel07.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "prohibit titles at bottom")]
+        {False: 0, True: 1}[config.getboolean("doc", "prohibit titles at bottom")]
     checkModel07.Label = "Запретить заголовки групп внизу страницы"
     checkModel07.HelpText = """\
 Если отмечено, то заголовки групп,
@@ -466,7 +466,7 @@ def setup(*args):
     checkModel08.Height = checkModel00.Height
     checkModel08.Name = "CheckBox08"
     checkModel08.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "prohibit empty rows at top")]
+        {False: 0, True: 1}[config.getboolean("doc", "prohibit empty rows at top")]
     checkModel08.Label = "Запретить пустые строки вверху страницы"
     checkModel08.HelpText = """\
 Если отмечено, то пустые строки
@@ -482,7 +482,7 @@ def setup(*args):
     checkModel011.Height = checkModel00.Height
     checkModel011.Name = "CheckBox011"
     checkModel011.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "process repeated values")]
+        {False: 0, True: 1}[config.getboolean("doc", "process repeated values")]
     checkModel011.Label = "Обработать повторяющиеся значения в графах"
     checkModel011.HelpText = """\
 Если отмечено, при первом повторении
@@ -499,7 +499,7 @@ def setup(*args):
     checkModel012.Height = checkModel00.Height
     checkModel012.Name = "CheckBox012"
     checkModel012.State = \
-        {False: 0, True: 1}[config.getboolean("bom", "footprint only")]
+        {False: 0, True: 1}[config.getboolean("doc", "footprint only")]
     checkModel012.Label = "\"Посад.место\" без наименования библиотеки"
     checkModel012.HelpText = """\
 Если отмечено, то посадочное место
@@ -985,52 +985,52 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Ведомость
         # --------------------------------------------------------------------
 
-        config.set("bom", "source",
+        config.set("doc", "source",
             page0.getControl("EditControl00").Text
         )
-        config.set("bom", "empty rows between diff type",
+        config.set("doc", "empty rows between diff type",
             str(int(page0.getControl("EditControl02").Value))
         )
-        config.set("bom", "extreme width factor",
+        config.set("doc", "extreme width factor",
             str(int(page0.getControl("EditControl03").Value))
         )
-        config.set("bom", "add units",
+        config.set("doc", "add units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox00").State]
         )
-        config.set("bom", "space before units",
+        config.set("doc", "space before units",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox01").State]
         )
-        config.set("bom", "separate group for each doc",
+        config.set("doc", "separate group for each doc",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox02").State]
         )
-        config.set("bom", "every group has title",
+        config.set("doc", "every group has title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox04").State]
         )
-        config.set("bom", "only components have position numbers",
+        config.set("doc", "only components have position numbers",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox010").State]
         )
-        config.set("bom", "reserve position numbers",
+        config.set("doc", "reserve position numbers",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox09").State]
         )
-        config.set("bom", "empty row after group title",
+        config.set("doc", "empty row after group title",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox05").State]
         )
-        config.set("bom", "append rev table",
+        config.set("doc", "append rev table",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox06").State]
         )
-        config.set("bom", "pages rev table",
+        config.set("doc", "pages rev table",
             str(int(page0.getControl("EditControl04").Value))
         )
-        config.set("bom", "prohibit titles at bottom",
+        config.set("doc", "prohibit titles at bottom",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox07").State]
         )
-        config.set("bom", "prohibit empty rows at top",
+        config.set("doc", "prohibit empty rows at top",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox08").State]
         )
-        config.set("bom", "process repeated values",
+        config.set("doc", "process repeated values",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox011").State]
         )
-        config.set("bom", "footprint only",
+        config.set("doc", "footprint only",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox012").State]
         )
 

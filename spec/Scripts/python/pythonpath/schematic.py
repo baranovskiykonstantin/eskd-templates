@@ -54,12 +54,12 @@ class Component():
         if name == "Обозначение":
             value = self.reference
         elif name == "Значение":
-            if config.getboolean("spec", "add units"):
+            if config.getboolean("doc", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
         elif name == "Посад.место":
-            if config.getboolean("spec", "footprint only"):
+            if config.getboolean("doc", "footprint only"):
                 value = self.getFieldValue("Посад.место!")
             else:
                 value = self.footprint
@@ -146,7 +146,7 @@ class Component():
         """
         numValue = ""
         separator = ""
-        if config.getboolean("spec", "space before units"):
+        if config.getboolean("doc", "space before units"):
             separator = ' '
         multiplier = ""
         units = ""
@@ -376,7 +376,7 @@ class Component():
             value = self.getFieldValue(fieldName)
             value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            if config.getboolean("spec", "add units"):
+            if config.getboolean("doc", "add units"):
                 value = self.getValueWithUnits()
             else:
                 value = self.value
@@ -562,7 +562,7 @@ class CompRange(Component):
                         prevNumber = currentNumber
                         counter += 1
                         if counter > 1:
-                            separator = config.get("spec", "ref separator")
+                            separator = config.get("doc", "ref separator")
                         continue
                 else:
                     if counter > 0:
@@ -624,7 +624,7 @@ class CompGroup():
             return True
         lastCompRange = self._compRanges[-1]
         if lastCompRange.getSpecValue("type") == compRange.getSpecValue("type"):
-            if config.getboolean("spec", "separate group for each doc"):
+            if config.getboolean("doc", "separate group for each doc"):
                 if lastCompRange.getSpecValue("doc") == compRange.getSpecValue("doc"):
                     # Если тип и документ не указаны, формировать группы
                     # на основе буквенной части обозначения.
@@ -682,7 +682,7 @@ class CompGroup():
 
         currentType = self._compRanges[0].getSpecValue("type", plural=True)
 
-        if not config.getboolean("spec", "title with doc"):
+        if not config.getboolean("doc", "title with doc"):
             return [currentType]
 
         # Список уникальных пар Наименование-Документ

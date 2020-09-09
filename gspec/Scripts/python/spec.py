@@ -187,7 +187,7 @@ class SpecBuildingThread(threading.Thread):
         def fillRow(values, isTitle=False, posIncrement=0):
             colWidth = (5, 5, 7, 69, 62, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 32)
             extraRow = [""] * len(values)
-            extremeWidthFactor = config.getint("spec", "extreme width factor")
+            extremeWidthFactor = config.getint("doc", "extreme width factor")
             doc.lockControllers()
             for col in range(len(values)):
                 if values[col] == "" and not (col == 2 and posIncrement != 0):
@@ -306,7 +306,7 @@ class SpecBuildingThread(threading.Thread):
                     return
             compGroups = schematic.getGroupedComponents()
             prevGroup = None
-            emptyRowsType = config.getint("spec", "empty rows between diff type")
+            emptyRowsType = config.getint("doc", "empty rows between diff type")
 
             progressTotal = 5 if self.update else 8
             if config.getboolean("sections", "other parts"):
@@ -360,7 +360,7 @@ class SpecBuildingThread(threading.Thread):
 
             if not self.update:
                 if config.getboolean("sections", "documentation"):
-                    if not config.getboolean("spec", "prohibit empty rows at top"):
+                    if not config.getboolean("doc", "prohibit empty rows at top"):
                         gotoNextRow()
                     fillSectionTitle("Документация")
 
@@ -463,10 +463,10 @@ class SpecBuildingThread(threading.Thread):
                         doc.lockControllers()
                         gotoNextRow(emptyRowsType)
                         doc.unlockControllers()
-                        if config.getboolean("spec", "reserve position numbers"):
+                        if config.getboolean("doc", "reserve position numbers"):
                             increment += emptyRowsType
                     if len(group) == 1 \
-                        and not config.getboolean("spec", "every group has title"):
+                        and not config.getboolean("doc", "every group has title"):
                             compType = group[0].getSpecValue("type", singular=True)
                             compName = group[0].getSpecValue("name")
                             compDoc = group[0].getSpecValue("doc")
@@ -497,9 +497,9 @@ class SpecBuildingThread(threading.Thread):
                                     ["", "", "", "", title],
                                     isTitle=True
                                 )
-                        if config.getboolean("spec", "empty row after group title"):
+                        if config.getboolean("doc", "empty row after group title"):
                             gotoNextRow()
-                            if config.getboolean("spec", "reserve position numbers"):
+                            if config.getboolean("doc", "reserve position numbers"):
                                 increment += 1
                         for compRange in group:
                             compName = compRange.getSpecValue("name")
@@ -539,7 +539,7 @@ class SpecBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("spec", "prohibit titles at bottom"):
+            if config.getboolean("doc", "prohibit titles at bottom"):
                 _, firstRowCount, otherRowCount, _ = common.getFirstPageInfo()
                 pos = firstRowCount
                 while pos < table.Rows.Count:
@@ -567,7 +567,7 @@ class SpecBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("spec", "prohibit empty rows at top"):
+            if config.getboolean("doc", "prohibit empty rows at top"):
                 _, firstRowCount, otherRowCount, _ = common.getFirstPageInfo()
                 pos = firstRowCount + 1
                 while pos < table.Rows.Count:
@@ -584,9 +584,9 @@ class SpecBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("spec", "append rev table"):
+            if config.getboolean("doc", "append rev table"):
                 pageCount = doc.CurrentController.PageCount
-                if pageCount > config.getint("spec", "pages rev table"):
+                if pageCount > config.getint("doc", "pages rev table"):
                     common.appendRevTable()
 
         except StopException:

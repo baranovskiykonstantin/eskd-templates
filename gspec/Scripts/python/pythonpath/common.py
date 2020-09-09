@@ -191,7 +191,7 @@ def getSourceFileName():
         не найден или не выбран.
 
     """
-    sourcePath = config.get("spec", "source")
+    sourcePath = config.get("doc", "source")
     if os.path.exists(sourcePath):
         return sourcePath
     sourceDir = ""
@@ -206,7 +206,7 @@ def getSourceFileName():
         if sourceName:
             sourcePath = os.path.join(sourceDir, sourceName)
             if os.path.exists(sourcePath):
-                config.set("spec", "source", sourcePath)
+                config.set("doc", "source", sourcePath)
                 config.save()
                 return sourcePath
     sourcePath = showFilePicker(
@@ -214,7 +214,7 @@ def getSourceFileName():
         **{"Список цепей KiCad": "*.net;*.xml", "Все файлы": "*.*"}
     )
     if sourcePath is not None:
-        config.set("spec", "source", sourcePath)
+        config.set("doc", "source", sourcePath)
         config.save()
         return sourcePath
     return None
@@ -265,7 +265,7 @@ def getSchematicInfo():
 
     """
     try:
-        sourcePath = config.get("spec", "source")
+        sourcePath = config.get("doc", "source")
         schPath = os.path.splitext(sourcePath)[0] + ".sch"
         size = ""
         number = ""
@@ -294,7 +294,7 @@ def getPcbInfo():
 
     """
     try:
-        sourcePath = config.get("spec", "source")
+        sourcePath = config.get("doc", "source")
         pcbPath = os.path.splitext(sourcePath)[0] + ".kicad_pcb"
         size = ""
         number = ""

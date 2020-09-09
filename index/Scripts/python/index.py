@@ -175,7 +175,7 @@ class IndexBuildingThread(threading.Thread):
         def fillRow(values, isTitle=False):
             colWidth = (19, 109, 9, 44)
             extraRow = [""] * len(values)
-            extremeWidthFactor = config.getint("index", "extreme width factor")
+            extremeWidthFactor = config.getint("doc", "extreme width factor")
             doc.lockControllers()
             for col in range(len(values)):
                 if values[col] == "":
@@ -236,8 +236,8 @@ class IndexBuildingThread(threading.Thread):
             table = doc.TextTables["Перечень_элементов"]
             compGroups = schematic.getGroupedComponents()
             prevGroup = None
-            emptyRowsRef = config.getint("index", "empty rows between diff ref")
-            emptyRowsType = config.getint("index", "empty rows between diff type")
+            emptyRowsRef = config.getint("doc", "empty rows between diff ref")
+            emptyRowsType = config.getint("doc", "empty rows between diff type")
             self.currentRow = table.Rows.Count - 1
             # В процессе заполнения перечня, в конце таблицы всегда должна
             # оставаться пустая строка с ненарушенным форматированием.
@@ -264,7 +264,7 @@ class IndexBuildingThread(threading.Thread):
                     gotoNextRow(emptyRows)
                     doc.unlockControllers()
                 if len(group) == 1 \
-                    and not config.getboolean("index", "every group has title"):
+                    and not config.getboolean("doc", "every group has title"):
                         compRef = group[0].getRefRangeString()
                         compType = group[0].getIndexValue("type", singular=True)
                         compName = group[0].getIndexValue("name")
@@ -288,7 +288,7 @@ class IndexBuildingThread(threading.Thread):
                                 ["", title],
                                 isTitle=True
                             )
-                    if config.getboolean("index", "empty row after group title"):
+                    if config.getboolean("doc", "empty row after group title"):
                         gotoNextRow()
                     for compRange in group:
                         compRef = compRange.getRefRangeString()
@@ -312,7 +312,7 @@ class IndexBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("index", "prohibit titles at bottom"):
+            if config.getboolean("doc", "prohibit titles at bottom"):
                 _, firstRowCount, otherRowCount = common.getFirstPageInfo()
                 pos = firstRowCount
                 while pos < table.Rows.Count:
@@ -340,7 +340,7 @@ class IndexBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("index", "prohibit empty rows at top"):
+            if config.getboolean("doc", "prohibit empty rows at top"):
                 _, firstRowCount, otherRowCount = common.getFirstPageInfo()
                 pos = firstRowCount + 1
                 while pos < table.Rows.Count:
@@ -356,9 +356,9 @@ class IndexBuildingThread(threading.Thread):
 
             progressDialog.stepUp()
 
-            if config.getboolean("index", "append rev table"):
+            if config.getboolean("doc", "append rev table"):
                 pageCount = doc.CurrentController.PageCount
-                if pageCount > config.getint("index", "pages rev table"):
+                if pageCount > config.getint("doc", "pages rev table"):
                     common.appendRevTable()
 
         except StopException:

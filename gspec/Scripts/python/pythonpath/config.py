@@ -29,7 +29,7 @@ def load():
     """
     SETTINGS.read_dict(
         {
-            "spec": {
+            "doc": {
                 "source": "",
                 "ref separator": "-",
                 "add units": "yes",
