@@ -649,7 +649,7 @@ def removeRevTable():
     if "Ведомость_покупных_изделий" in doc.TextTables:
         viewCursor = doc.CurrentController.ViewCursor
         table = doc.TextTables["Ведомость_покупных_изделий"]
-        viewCursor.gotoRange(table.getCellByName("A3").Start, False)
+        viewCursor.gotoRange(table.getCellByName("A2").Start, False)
     doc.UndoManager.unlock()
     doc.UndoManager.clear()
     doc.unlockControllers()
