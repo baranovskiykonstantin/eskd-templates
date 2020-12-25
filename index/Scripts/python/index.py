@@ -203,7 +203,7 @@ class IndexBuildingThread(threading.Thread):
                         pos = text.find(" ", extremePos)
                     if pos != -1:
                         values[col] = text[:pos]
-                        extraRow[col] = text[(pos + 1):] + extraRow[col]
+                        extraRow[col] = text[(pos + 1):] + '\n' + extraRow[col]
                         widthFactor = textwidth.getWidthFactor(
                             values[col],
                             getFontSize(col),

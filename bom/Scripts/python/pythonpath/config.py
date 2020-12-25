@@ -46,6 +46,7 @@ def load():
                 "pages rev table": 3,
                 "process repeated values": "yes",
                 "footprint only": "yes",
+                "split row by \\n": "no",
             },
             "fields": {
                 "type": "Тип",

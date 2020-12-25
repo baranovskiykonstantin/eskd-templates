@@ -26,7 +26,7 @@ def setup(*args):
         context
     )
     dialogModel.Width = 300
-    dialogModel.Height = 320
+    dialogModel.Height = 335
     dialogModel.PositionX = 0
     dialogModel.PositionY = 0
     dialogModel.Title = "Параметры спецификации"
@@ -533,6 +533,23 @@ def setup(*args):
 будет указано без наименования библиотеки."""
     pageModel0.insertByName("CheckBox010", checkModel010)
 
+    checkModel011 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel011.PositionX = 5
+    checkModel011.PositionY = checkModel010.PositionY + checkModel010.Height
+    checkModel011.Width = tabsModel.Width - 10
+    checkModel011.Height = checkModel00.Height
+    checkModel011.Name = "CheckBox011"
+    checkModel011.State = \
+        {False: 0, True: 1}[config.getboolean("doc", "split row by \\n")]
+    checkModel011.Label = "Обрабатывать \"\\n\" как переход на новую строку"
+    checkModel011.HelpText = """\
+Если отмечено, то комбинация символов
+"\\n" будет обрабатываться как переход
+на следующую строку таблицы."""
+    pageModel0.insertByName("CheckBox011", checkModel011)
+
     # ------------------------------------------------------------------------
     # Sections Tab Model
     # ------------------------------------------------------------------------
@@ -919,7 +936,7 @@ def setup(*args):
     buttonModel10.Width = tabsModel.Width - 7
     buttonModel10.Height = 16
     buttonModel10.PositionX = 2
-    buttonModel10.PositionY = 196
+    buttonModel10.PositionY = dialogModel.Height - 100
     buttonModel10.Name = "Button10"
     buttonModel10.Label = "Установить значения по умолчанию"
     pageModel1.insertByName("Button10", buttonModel10)
@@ -930,7 +947,7 @@ def setup(*args):
     buttonModel11.Width = tabsModel.Width - 7
     buttonModel11.Height = 16
     buttonModel11.PositionX = 2
-    buttonModel11.PositionY = 214
+    buttonModel11.PositionY = buttonModel10.PositionY + buttonModel10.Height + 2
     buttonModel11.Name = "Button11"
     buttonModel11.Label = "Установить значения, совместимые с kicadbom2spec"
     pageModel1.insertByName("Button11", buttonModel11)
@@ -941,7 +958,7 @@ def setup(*args):
     checkModel10.Width = tabsModel.Width - 7
     checkModel10.Height = 15
     checkModel10.PositionX = 2
-    checkModel10.PositionY = 232
+    checkModel10.PositionY = buttonModel11.PositionY + buttonModel11.Height + 2
     checkModel10.Name = "CheckBox10"
     checkModel10.State = \
         {False: 0, True: 1}[config.getboolean("settings", "compatibility mode")]
@@ -1172,6 +1189,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.set("doc", "footprint only",
             {0: "no", 1: "yes"}[page0.getControl("CheckBox010").State]
+        )
+        config.set("doc", "split row by \\n",
+            {0: "no", 1: "yes"}[page0.getControl("CheckBox011").State]
         )
 
         # --------------------------------------------------------------------

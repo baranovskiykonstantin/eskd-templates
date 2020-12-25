@@ -46,6 +46,7 @@ def load():
                 "append rev table": "no",
                 "pages rev table": 3,
                 "footprint only": "yes",
+                "split row by \\n": "no",
             },
             "sections": {
                 "documentation": "yes",

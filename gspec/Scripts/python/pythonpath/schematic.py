@@ -376,12 +376,11 @@ class Component():
             value = self.getFieldValue(fieldName)
             value = self._convertSingularPlural(value, singular, plural)
         if name == "name" and not value:
-            if config.getboolean("doc", "add units"):
-                value = self.getValueWithUnits()
-            else:
-                value = self.value
+            value = self.getFieldValue("Значение")
         if value is None:
             value = ""
+        elif config.getboolean("doc", "split row by \\n"):
+            value = value.replace("\\n", "\n")
         return value
 
     def getExpandedValue(self):
