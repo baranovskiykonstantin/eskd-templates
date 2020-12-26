@@ -1,6 +1,7 @@
 OUT := ~/.config/libreoffice/4/user/template
+VERSION := 1.4
 
-.PHONY: index spec bom gspec gbom manual mexanic
+.PHONY: index spec bom gspec gbom manual mexanic archive
 
 default: all
 
@@ -34,3 +35,14 @@ manual:
 
 mexanic:
 	$(call build_ott,mexanic,Ведомость\ покупных\ изделий\ \(Mexanic\))
+
+archive:
+	cd $(OUT) && \
+	7z a -- /tmp/eskd-templates_v$(VERSION).7z \
+	Перечень\ элементов.ott \
+	Спецификация.ott \
+	Ведомость\ покупных\ изделий.ott \
+	Групповая\ спецификация.ott \
+	Групповая\ ведомость\ покупных\ изделий.ott \
+	Пояснительная\ записка.ott \
+	Ведомость\ покупных\ изделий\ \(Mexanic\).ott
