@@ -57,9 +57,7 @@ def setup(*args):
     checkModelSet.PositionX = 5
     checkModelSet.PositionY = dialogModel.Height - checkModelSet.Height - 4
     checkModelSet.Name = "CheckBoxSet"
-    checkModelSet.State = {False: 0, True: 1}[
-        config.getboolean("settings", "set view options")
-    ]
+    checkModelSet.State = int(config.getboolean("settings", "set view options"))
     checkModelSet.Label = "Оптимальный вид документа"
     checkModelSet.HelpText = """\
 Если отмечено, то при открытии документа
@@ -307,9 +305,7 @@ def setup(*args):
     checkModel00.Width = tabsModel.Width - 10
     checkModel00.Height = 15
     checkModel00.Name = "CheckBox00"
-    checkModel00.State = {False: 0, True: 1}[
-        config.getboolean("doc", "add units")
-    ]
+    checkModel00.State = int(config.getboolean("doc", "add units"))
     checkModel00.Label = "Добавить единицы измерения"
     checkModel00.HelpText = """\
 Если для резисторов, конденсаторов или
@@ -329,8 +325,7 @@ def setup(*args):
     checkModel01.Width = tabsModel.Width - 20
     checkModel01.Height = checkModel00.Height
     checkModel01.Name = "CheckBox01"
-    checkModel01.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "space before units")]
+    checkModel01.State = int(config.getboolean("doc", "space before units"))
     checkModel01.Label = "Вставить пробел перед единицами измерения"
     checkModel01.HelpText = """\
 Если отмечено, то между цифровой
@@ -346,8 +341,7 @@ def setup(*args):
     checkModel02.Width = tabsModel.Width - 10
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
-    checkModel02.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "separate group for each doc")]
+    checkModel02.State = int(config.getboolean("doc", "separate group for each doc"))
     checkModel02.Label = "Формировать отдельную группу для каждого документа"
     checkModel02.HelpText = """\
 По умолчанию, группы компонентов
@@ -368,8 +362,7 @@ def setup(*args):
     checkModel03.Width = tabsModel.Width - 10
     checkModel03.Height = checkModel00.Height
     checkModel03.Name = "CheckBox03"
-    checkModel03.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "title with doc")]
+    checkModel03.State = int(config.getboolean("doc", "title with doc"))
     checkModel03.Label = "Указать документ в заголовке группы"
     checkModel03.HelpText = """\
 По умолчанию, в качестве заголовка группы
@@ -392,8 +385,7 @@ def setup(*args):
     checkModel04.Width = tabsModel.Width - 10
     checkModel04.Height = checkModel00.Height
     checkModel04.Name = "CheckBox04"
-    checkModel04.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "every group has title")]
+    checkModel04.State = int(config.getboolean("doc", "every group has title"))
     checkModel04.Label = "Формировать заголовок для каждой группы"
     checkModel04.HelpText = """\
 По умолчанию, заголовок формируется
@@ -416,8 +408,7 @@ def setup(*args):
     checkModel09.Width = tabsModel.Width - 10
     checkModel09.Height = checkModel00.Height
     checkModel09.Name = "CheckBox09"
-    checkModel09.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "reserve position numbers")]
+    checkModel09.State = int(config.getboolean("doc", "reserve position numbers"))
     checkModel09.Label = "Резервировать номера позиций"
     checkModel09.HelpText = """\
 По умолчанию, позиции в спецификации
@@ -435,8 +426,7 @@ def setup(*args):
     checkModel05.Width = tabsModel.Width - 10
     checkModel05.Height = checkModel00.Height
     checkModel05.Name = "CheckBox05"
-    checkModel05.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "empty row after group title")]
+    checkModel05.State = int(config.getboolean("doc", "empty row after group title"))
     checkModel05.Label = "Добавить пустую строку после заголовка группы"
     checkModel05.HelpText = """\
 Если отмечено, то между заголовком
@@ -472,8 +462,7 @@ def setup(*args):
         "MIDDLE"
     )
     checkModel06.Name = "CheckBox06"
-    checkModel06.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "append rev table")]
+    checkModel06.State = int(config.getboolean("doc", "append rev table"))
     checkModel06.Label = "Добавить лист регистрации изменений, если количество листов больше:"
     checkModel06.HelpText = """\
 Если отмечено и при автоматическом
@@ -491,8 +480,7 @@ def setup(*args):
     checkModel07.Width = tabsModel.Width - 10
     checkModel07.Height = checkModel00.Height
     checkModel07.Name = "CheckBox07"
-    checkModel07.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "prohibit titles at bottom")]
+    checkModel07.State = int(config.getboolean("doc", "prohibit titles at bottom"))
     checkModel07.Label = "Запретить заголовки групп внизу страницы"
     checkModel07.HelpText = """\
 Если отмечено, то заголовки групп,
@@ -509,8 +497,7 @@ def setup(*args):
     checkModel08.Width = tabsModel.Width - 10
     checkModel08.Height = checkModel00.Height
     checkModel08.Name = "CheckBox08"
-    checkModel08.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "prohibit empty rows at top")]
+    checkModel08.State = int(config.getboolean("doc", "prohibit empty rows at top"))
     checkModel08.Label = "Запретить пустые строки вверху страницы"
     checkModel08.HelpText = """\
 Если отмечено, то пустые строки
@@ -525,8 +512,7 @@ def setup(*args):
     checkModel010.Width = tabsModel.Width - 10
     checkModel010.Height = checkModel00.Height
     checkModel010.Name = "CheckBox010"
-    checkModel010.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "footprint only")]
+    checkModel010.State = int(config.getboolean("doc", "footprint only"))
     checkModel010.Label = "\"Посад.место\" без наименования библиотеки"
     checkModel010.HelpText = """\
 Если отмечено, то посадочное место
@@ -541,8 +527,7 @@ def setup(*args):
     checkModel011.Width = tabsModel.Width - 10
     checkModel011.Height = checkModel00.Height
     checkModel011.Name = "CheckBox011"
-    checkModel011.State = \
-        {False: 0, True: 1}[config.getboolean("doc", "split row by \\n")]
+    checkModel011.State = int(config.getboolean("doc", "split row by \\n"))
     checkModel011.Label = "Обрабатывать \"\\n\" как переход на новую строку"
     checkModel011.HelpText = """\
 Если отмечено, то комбинация символов
@@ -568,9 +553,7 @@ def setup(*args):
     checkModel30.Width = tabsModel.Width - 10
     checkModel30.Height = 15
     checkModel30.Name = "CheckBox30"
-    checkModel30.State = {False: 0, True: 1}[
-        config.getboolean("sections", "documentation")
-    ]
+    checkModel30.State = int(config.getboolean("sections", "documentation"))
     checkModel30.Label = "Документация"
     checkModel30.HelpText = """\
 Если отмечено, то при формировании
@@ -586,9 +569,7 @@ def setup(*args):
     checkModel31.Width = checkModel30.Width
     checkModel31.Height = checkModel30.Height
     checkModel31.Name = "CheckBox31"
-    checkModel31.State = {False: 0, True: 1}[
-        config.getboolean("sections", "assembly drawing")
-    ]
+    checkModel31.State = int(config.getboolean("sections", "assembly drawing"))
     checkModel31.Label = "Сборочный чертёж"
     checkModel31.HelpText = """\
 Если отмечено, то при формировании
@@ -604,9 +585,7 @@ def setup(*args):
     checkModel32.Width = checkModel30.Width
     checkModel32.Height = checkModel30.Height
     checkModel32.Name = "CheckBox32"
-    checkModel32.State = {False: 0, True: 1}[
-        config.getboolean("sections", "schematic")
-    ]
+    checkModel32.State = int(config.getboolean("sections", "schematic"))
     checkModel32.Label = "Схема электрическая принципиальная"
     checkModel32.HelpText = """\
 Если отмечено, то при формировании
@@ -622,9 +601,7 @@ def setup(*args):
     checkModel33.Width = checkModel30.Width
     checkModel33.Height = checkModel30.Height
     checkModel33.Name = "CheckBox33"
-    checkModel33.State = {False: 0, True: 1}[
-        config.getboolean("sections", "index")
-    ]
+    checkModel33.State = int(config.getboolean("sections", "index"))
     checkModel33.Label = "Перечень элементов"
     checkModel33.HelpText = """\
 Если отмечено, то при формировании
@@ -640,9 +617,7 @@ def setup(*args):
     checkModel310.Width = checkModel30.Height
     checkModel310.Height = checkModel30.Height
     checkModel310.Name = "CheckBox310"
-    checkModel310.State = {False: 0, True: 1}[
-        config.getboolean("sections", "bom")
-    ]
+    checkModel310.State = int(config.getboolean("sections", "bom"))
     checkModel310.Label = ""
     checkModel310.HelpText = """\
 Если отмечено, то при формировании
@@ -669,9 +644,7 @@ def setup(*args):
     checkModel34.Width = checkModel30.Width
     checkModel34.Height = checkModel30.Height
     checkModel34.Name = "CheckBox34"
-    checkModel34.State = {False: 0, True: 1}[
-        config.getboolean("sections", "assembly units")
-    ]
+    checkModel34.State = int(config.getboolean("sections", "assembly units"))
     checkModel34.Label = "Сборочные единицы"
     checkModel34.HelpText = """\
 Если отмечено, то при формировании
@@ -687,9 +660,7 @@ def setup(*args):
     checkModel35.Width = checkModel30.Width
     checkModel35.Height = checkModel30.Height
     checkModel35.Name = "CheckBox35"
-    checkModel35.State = {False: 0, True: 1}[
-        config.getboolean("sections", "details")
-    ]
+    checkModel35.State = int(config.getboolean("sections", "details"))
     checkModel35.Label = "Детали"
     checkModel35.HelpText = """\
 Если отмечено, то при формировании
@@ -705,9 +676,7 @@ def setup(*args):
     checkModel36.Width = checkModel30.Width
     checkModel36.Height = checkModel30.Height
     checkModel36.Name = "CheckBox36"
-    checkModel36.State = {False: 0, True: 1}[
-        config.getboolean("sections", "pcb")
-    ]
+    checkModel36.State = int(config.getboolean("sections", "pcb"))
     checkModel36.Label = "Плата печатная"
     checkModel36.HelpText = """\
 Если отмечено, то при формировании
@@ -723,9 +692,7 @@ def setup(*args):
     checkModel37.Width = checkModel30.Width
     checkModel37.Height = checkModel30.Height
     checkModel37.Name = "CheckBox37"
-    checkModel37.State = {False: 0, True: 1}[
-        config.getboolean("sections", "standard parts")
-    ]
+    checkModel37.State = int(config.getboolean("sections", "standard parts"))
     checkModel37.Label = "Стандартные изделия"
     checkModel37.HelpText = """\
 Если отмечено, то при формировании
@@ -741,9 +708,7 @@ def setup(*args):
     checkModel38.Width = checkModel30.Width
     checkModel38.Height = checkModel30.Height
     checkModel38.Name = "CheckBox38"
-    checkModel38.State = {False: 0, True: 1}[
-        config.getboolean("sections", "other parts")
-    ]
+    checkModel38.State = int(config.getboolean("sections", "other parts"))
     checkModel38.Label = "Прочие изделия"
     checkModel38.HelpText = """\
 Если отмечено, то при формировании
@@ -759,9 +724,7 @@ def setup(*args):
     checkModel39.Width = checkModel30.Width
     checkModel39.Height = checkModel30.Height
     checkModel39.Name = "CheckBox39"
-    checkModel39.State = {False: 0, True: 1}[
-        config.getboolean("sections", "materials")
-    ]
+    checkModel39.State = int(config.getboolean("sections", "materials"))
     checkModel39.Label = "Материалы"
     checkModel39.HelpText = """\
 Если отмечено, то при формировании
@@ -960,8 +923,7 @@ def setup(*args):
     checkModel10.PositionX = 2
     checkModel10.PositionY = buttonModel11.PositionY + buttonModel11.Height + 2
     checkModel10.Name = "CheckBox10"
-    checkModel10.State = \
-        {False: 0, True: 1}[config.getboolean("settings", "compatibility mode")]
+    checkModel10.State = int(config.getboolean("settings", "compatibility mode"))
     checkModel10.Label = "Режим совместимости с kicadbom2spec"
     checkModel10.HelpText = """\
 Если отмечено, то при формировании
@@ -989,9 +951,7 @@ def setup(*args):
     checkModel20.Width = tabsModel.Width - 10
     checkModel20.Height = 15
     checkModel20.Name = "CheckBox20"
-    checkModel20.State = {False: 0, True: 1}[
-        config.getboolean("stamp", "convert doc title")
-    ]
+    checkModel20.State = int(config.getboolean("stamp", "convert doc title"))
     checkModel20.Label = "Преобразовать наименование документа"
     checkModel20.HelpText = """\
 Если отмечено, тип схемы в наименовании
@@ -1008,9 +968,7 @@ def setup(*args):
     checkModel21.Width = checkModel20.Width
     checkModel21.Height = checkModel20.Height
     checkModel21.Name = "CheckBox21"
-    checkModel21.State = {False: 0, True: 1}[
-        config.getboolean("stamp", "convert doc id")
-    ]
+    checkModel21.State = int(config.getboolean("stamp", "convert doc id"))
     checkModel21.Label = "Преобразовать обозначение документа"
     checkModel21.HelpText = """\
 Если отмечено, тип схемы в
@@ -1028,9 +986,7 @@ def setup(*args):
     checkModel22.Width = checkModel20.Width
     checkModel22.Height = checkModel20.Height
     checkModel22.Name = "CheckBox22"
-    checkModel22.State = {False: 0, True: 1}[
-        config.getboolean("stamp", "fill first usage")
-    ]
+    checkModel22.State = int(config.getboolean("stamp", "fill first usage"))
     checkModel22.Label = "Автоматически заполнить графу \"Перв. примен.\""
     checkModel22.HelpText = """\
 Если отмечено, в графу первичной
@@ -1133,8 +1089,8 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # --------------------------------------------------------------------
         # Оптимальный вид
         # --------------------------------------------------------------------
-        config.set("settings", "set view options",
-            {0: "no", 1: "yes"}[self.dialog.getControl("CheckBoxSet").State]
+        config.setboolean("settings", "set view options",
+            self.dialog.getControl("CheckBoxSet").State
         )
 
         # --------------------------------------------------------------------
@@ -1154,85 +1110,85 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
             config.set("doc", "ref separator", "-")
         if page0.getControl("RadioButton01").State:
             config.set("doc", "ref separator", "…")
-        config.set("doc", "add units",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox00").State]
+        config.setboolean("doc", "add units",
+            page0.getControl("CheckBox00").State
         )
-        config.set("doc", "space before units",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox01").State]
+        config.setboolean("doc", "space before units",
+            page0.getControl("CheckBox01").State
         )
-        config.set("doc", "separate group for each doc",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox02").State]
+        config.setboolean("doc", "separate group for each doc",
+            page0.getControl("CheckBox02").State
         )
-        config.set("doc", "title with doc",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox03").State]
+        config.setboolean("doc", "title with doc",
+            page0.getControl("CheckBox03").State
         )
-        config.set("doc", "every group has title",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox04").State]
+        config.setboolean("doc", "every group has title",
+            page0.getControl("CheckBox04").State
         )
-        config.set("doc", "reserve position numbers",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox09").State]
+        config.setboolean("doc", "reserve position numbers",
+            page0.getControl("CheckBox09").State
         )
-        config.set("doc", "empty row after group title",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox05").State]
+        config.setboolean("doc", "empty row after group title",
+            page0.getControl("CheckBox05").State
         )
-        config.set("doc", "append rev table",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox06").State]
+        config.setboolean("doc", "append rev table",
+            page0.getControl("CheckBox06").State
         )
         config.set("doc", "pages rev table",
             str(int(page0.getControl("EditControl04").Value))
         )
-        config.set("doc", "prohibit titles at bottom",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox07").State]
+        config.setboolean("doc", "prohibit titles at bottom",
+            page0.getControl("CheckBox07").State
         )
-        config.set("doc", "prohibit empty rows at top",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox08").State]
+        config.setboolean("doc", "prohibit empty rows at top",
+            page0.getControl("CheckBox08").State
         )
-        config.set("doc", "footprint only",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox010").State]
+        config.setboolean("doc", "footprint only",
+            page0.getControl("CheckBox010").State
         )
-        config.set("doc", "split row by \\n",
-            {0: "no", 1: "yes"}[page0.getControl("CheckBox011").State]
+        config.setboolean("doc", "split row by \\n",
+            page0.getControl("CheckBox011").State
         )
 
         # --------------------------------------------------------------------
         # Разделы
         # --------------------------------------------------------------------
 
-        config.set("sections", "documentation",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox30").State]
+        config.setboolean("sections", "documentation",
+            page3.getControl("CheckBox30").State
         )
-        config.set("sections", "assembly drawing",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox31").State]
+        config.setboolean("sections", "assembly drawing",
+            page3.getControl("CheckBox31").State
         )
-        config.set("sections", "schematic",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox32").State]
+        config.setboolean("sections", "schematic",
+            page3.getControl("CheckBox32").State
         )
-        config.set("sections", "index",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox33").State]
+        config.setboolean("sections", "index",
+            page3.getControl("CheckBox33").State
         )
-        config.set("sections", "bom",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox310").State]
+        config.setboolean("sections", "bom",
+            page3.getControl("CheckBox310").State
         )
         config.set("sections", "bom name",
             page3.getControl("EditControl311").Text
         )
-        config.set("sections", "assembly units",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox34").State]
+        config.setboolean("sections", "assembly units",
+            page3.getControl("CheckBox34").State
         )
-        config.set("sections", "details",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox35").State]
+        config.setboolean("sections", "details",
+            page3.getControl("CheckBox35").State
         )
-        config.set("sections", "pcb",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox36").State]
+        config.setboolean("sections", "pcb",
+            page3.getControl("CheckBox36").State
         )
-        config.set("sections", "standard parts",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox37").State]
+        config.setboolean("sections", "standard parts",
+            page3.getControl("CheckBox37").State
         )
-        config.set("sections", "other parts",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox38").State]
+        config.setboolean("sections", "other parts",
+            page3.getControl("CheckBox38").State
         )
-        config.set("sections", "materials",
-            {0: "no", 1: "yes"}[page3.getControl("CheckBox39").State]
+        config.setboolean("sections", "materials",
+            page3.getControl("CheckBox39").State
         )
 
         # --------------------------------------------------------------------
@@ -1254,22 +1210,22 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("fields", "excluded",
             page1.getControl("EditControl15").Text
         )
-        config.set("settings", "compatibility mode",
-            {0: "no", 1: "yes"}[page1.getControl("CheckBox10").State]
+        config.setboolean("settings", "compatibility mode",
+            page1.getControl("CheckBox10").State
         )
 
         # --------------------------------------------------------------------
         # Основная надпись
         # --------------------------------------------------------------------
 
-        config.set("stamp", "convert doc title",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox20").State]
+        config.setboolean("stamp", "convert doc title",
+            page2.getControl("CheckBox20").State
         )
-        config.set("stamp", "convert doc id",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox21").State]
+        config.setboolean("stamp", "convert doc id",
+            page2.getControl("CheckBox21").State
         )
-        config.set("stamp", "fill first usage",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox22").State]
+        config.setboolean("stamp", "fill first usage",
+            page2.getControl("CheckBox22").State
         )
 
         self.dialog.endExecute()

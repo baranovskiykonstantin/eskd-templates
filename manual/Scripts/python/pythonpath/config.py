@@ -105,6 +105,11 @@ def set(section, option, value):
     """Установить значение "value" параметру "option" из раздела "section"."""
     return SETTINGS.set(section, option, value)
 
+def setboolean(section, option, value):
+    """Установить булево значение "value" параметру "option" из раздела "section"."""
+    yesno = "yes" if bool(value) else "no"
+    return SETTINGS.set(section, option, yesno)
+
 def loadFromKicadbom2spec():
     """Загрузить настройки kicadbom2spec.
 

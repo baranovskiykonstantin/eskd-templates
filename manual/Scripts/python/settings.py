@@ -55,9 +55,7 @@ def setup(*args):
     checkModelSet.PositionX = 5
     checkModelSet.PositionY = dialogModel.Height - checkModelSet.Height - 4
     checkModelSet.Name = "CheckBoxSet"
-    checkModelSet.State = {False: 0, True: 1}[
-        config.getboolean("settings", "set view options")
-    ]
+    checkModelSet.State = int(config.getboolean("settings", "set view options"))
     checkModelSet.Label = "Оптимальный вид документа"
     checkModelSet.HelpText = """\
 Если отмечено, то при открытии документа
@@ -204,9 +202,7 @@ def setup(*args):
     checkModel20.Width = tabsModel.Width - 10
     checkModel20.Height = 15
     checkModel20.Name = "CheckBox20"
-    checkModel20.State = {False: 0, True: 1}[
-        config.getboolean("stamp", "convert doc title")
-    ]
+    checkModel20.State = int(config.getboolean("stamp", "convert doc title"))
     checkModel20.Label = "Преобразовать наименование документа"
     checkModel20.HelpText = """\
 Если отмечено, тип схемы в наименовании
@@ -224,9 +220,7 @@ def setup(*args):
     checkModel21.Width = checkModel20.Width
     checkModel21.Height = checkModel20.Height
     checkModel21.Name = "CheckBox21"
-    checkModel21.State = {False: 0, True: 1}[
-        config.getboolean("stamp", "convert doc id")
-    ]
+    checkModel21.State = int(config.getboolean("stamp", "convert doc id"))
     checkModel21.Label = "Преобразовать обозначение документа"
     checkModel21.HelpText = """\
 Если отмечено, вместо типа схемы
@@ -244,9 +238,7 @@ def setup(*args):
     checkModel22.Width = checkModel20.Width
     checkModel22.Height = checkModel20.Height
     checkModel22.Name = "CheckBox22"
-    checkModel22.State = {False: 0, True: 1}[
-        config.getboolean("stamp", "fill first usage")
-    ]
+    checkModel22.State = int(config.getboolean("stamp", "fill first usage"))
     checkModel22.Label = "Автоматически заполнить графу \"Перв. примен.\""
     checkModel22.HelpText = """\
 Если отмечено, в графу первичной
@@ -342,8 +334,8 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # --------------------------------------------------------------------
         # Оптимальный вид
         # --------------------------------------------------------------------
-        config.set("settings", "set view options",
-            {0: "no", 1: "yes"}[self.dialog.getControl("CheckBoxSet").State]
+        config.setboolean("settings", "set view options",
+            self.dialog.getControl("CheckBoxSet").State
         )
 
         # --------------------------------------------------------------------
@@ -358,14 +350,14 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         # Основная надпись
         # --------------------------------------------------------------------
 
-        config.set("stamp", "convert doc title",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox20").State]
+        config.setboolean("stamp", "convert doc title",
+            page2.getControl("CheckBox20").State
         )
-        config.set("stamp", "convert doc id",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox21").State]
+        config.setboolean("stamp", "convert doc id",
+            page2.getControl("CheckBox21").State
         )
-        config.set("stamp", "fill first usage",
-            {0: "no", 1: "yes"}[page2.getControl("CheckBox22").State]
+        config.setboolean("stamp", "fill first usage",
+            page2.getControl("CheckBox22").State
         )
 
         self.dialog.endExecute()
