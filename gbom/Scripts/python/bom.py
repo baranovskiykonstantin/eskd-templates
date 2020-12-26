@@ -294,9 +294,7 @@ class BomBuildingThread(threading.Thread):
                         compDoc = group[0].getBomValue("doc")
                         compDealer = group[0].getBomValue("dealer")
                         compComment = group[0].getBomValue("comment")
-                        name = ""
-                        if compType:
-                            name += compType + ' '
+                        name = (compType + ' ') if compType else ""
                         name += compName
                         compCount = str(len(group[0]))
                         fillRow(

@@ -470,9 +470,7 @@ class SpecBuildingThread(threading.Thread):
                             compType = group[0].getSpecValue("type", singular=True)
                             compName = group[0].getSpecValue("name")
                             compDoc = group[0].getSpecValue("doc")
-                            name = ""
-                            if compType:
-                                name += compType + ' '
+                            name = (compType + ' ') if compType else ""
                             name += compName
                             if compDoc:
                                 name += ' ' + compDoc

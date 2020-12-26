@@ -269,9 +269,7 @@ class IndexBuildingThread(threading.Thread):
                         compType = group[0].getIndexValue("type", singular=True)
                         compName = group[0].getIndexValue("name")
                         compDoc = group[0].getIndexValue("doc")
-                        name = ""
-                        if compType:
-                            name += compType + ' '
+                        name = (compType + ' ') if compType else ""
                         name += compName
                         if compDoc:
                             name += ' ' + compDoc
