@@ -430,6 +430,14 @@ class SpecBuildingThread(threading.Thread):
                     gotoNextRow()
                     fillSectionTitle("Сборочные единицы")
 
+                    if config.getboolean("sections", "assembly pcb"):
+                        gotoNextRow()
+                        name = "Плата печатная"
+                        fillRow(
+                            ["", "", "", "", name, "1"],
+                            posIncrement=1
+                        )
+
                 progressDialog.stepUp()
 
                 if config.getboolean("sections", "details"):

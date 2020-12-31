@@ -56,6 +56,7 @@ def load():
                 "bom": "no",
                 "bom name": "Ведомость покупных изделий",
                 "assembly units": "no",
+                "assembly pcb": "no",
                 "details": "yes",
                 "pcb": "yes",
                 "standard parts": "no",

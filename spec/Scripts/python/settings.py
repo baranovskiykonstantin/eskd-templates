@@ -652,11 +652,27 @@ def setup(*args):
 "Сборочные единицы"."""
     pageModel3.insertByName("CheckBox34", checkModel34)
 
+    checkModel312 = pageModel3.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel312.PositionX = checkModel30.PositionX + 10
+    checkModel312.PositionY = checkModel30.PositionY + checkModel30.Height * 6
+    checkModel312.Width = checkModel30.Width
+    checkModel312.Height = checkModel30.Height
+    checkModel312.Name = "CheckBox312"
+    checkModel312.State = int(config.getboolean("sections", "assembly pcb"))
+    checkModel312.Label = "Плата печатная"
+    checkModel312.HelpText = """\
+Если отмечено, то при формировании
+спецификации в разделе "Сборочные единицы"
+будет указана печатная плата."""
+    pageModel3.insertByName("CheckBox312", checkModel312)
+
     checkModel35 = pageModel3.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel35.PositionX = checkModel30.PositionX
-    checkModel35.PositionY = checkModel30.PositionY + checkModel30.Height * 6
+    checkModel35.PositionY = checkModel30.PositionY + checkModel30.Height * 7
     checkModel35.Width = checkModel30.Width
     checkModel35.Height = checkModel30.Height
     checkModel35.Name = "CheckBox35"
@@ -672,7 +688,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel36.PositionX = checkModel30.PositionX + 10
-    checkModel36.PositionY = checkModel30.PositionY + checkModel30.Height * 7
+    checkModel36.PositionY = checkModel30.PositionY + checkModel30.Height * 8
     checkModel36.Width = checkModel30.Width
     checkModel36.Height = checkModel30.Height
     checkModel36.Name = "CheckBox36"
@@ -688,7 +704,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel37.PositionX = checkModel30.PositionX
-    checkModel37.PositionY = checkModel30.PositionY + checkModel30.Height * 8
+    checkModel37.PositionY = checkModel30.PositionY + checkModel30.Height * 9
     checkModel37.Width = checkModel30.Width
     checkModel37.Height = checkModel30.Height
     checkModel37.Name = "CheckBox37"
@@ -704,7 +720,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel38.PositionX = checkModel30.PositionX
-    checkModel38.PositionY = checkModel30.PositionY + checkModel30.Height * 9
+    checkModel38.PositionY = checkModel30.PositionY + checkModel30.Height * 10
     checkModel38.Width = checkModel30.Width
     checkModel38.Height = checkModel30.Height
     checkModel38.Name = "CheckBox38"
@@ -720,7 +736,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel39.PositionX = checkModel30.PositionX
-    checkModel39.PositionY = checkModel30.PositionY + checkModel30.Height * 10
+    checkModel39.PositionY = checkModel30.PositionY + checkModel30.Height * 11
     checkModel39.Width = checkModel30.Width
     checkModel39.Height = checkModel30.Height
     checkModel39.Name = "CheckBox39"
@@ -1174,6 +1190,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.setboolean("sections", "assembly units",
             page3.getControl("CheckBox34").State
+        )
+        config.setboolean("sections", "assembly pcb",
+            page3.getControl("CheckBox312").State
         )
         config.setboolean("sections", "details",
             page3.getControl("CheckBox35").State
