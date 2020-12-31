@@ -12,7 +12,8 @@
 = Групповая ведомость покупных изделий
 :author: Барановский Константин
 :email: baranovskiykonstantin@gmail.com
-:revnumber: 1.4
+:revnumber: : \
+include::../../../../version[]
 
 Справочное руководство
 

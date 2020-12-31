@@ -1,5 +1,5 @@
 OUT := ~/.config/libreoffice/4/user/template
-VERSION := 1.4
+VERSION := $(file < version)
 
 .PHONY: index spec bom gspec gbom manual mexanic archive
 
