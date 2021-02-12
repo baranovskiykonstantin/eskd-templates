@@ -52,7 +52,7 @@ def setup(*args):
     checkModelSet = dialogModel.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
-    checkModelSet.Width = 150
+    checkModelSet.Width = 140
     checkModelSet.Height = 16
     checkModelSet.PositionX = 5
     checkModelSet.PositionY = dialogModel.Height - checkModelSet.Height - 4
@@ -950,6 +950,479 @@ def setup(*args):
     pageModel1.insertByName("CheckBox10", checkModel10)
 
     # ------------------------------------------------------------------------
+    # Sorting Tab Model
+    # ------------------------------------------------------------------------
+
+    pageModel4 = tabsModel.createInstance(
+        "com.sun.star.awt.UnoPageModel"
+    )
+    tabsModel.insertByName("Page4", pageModel4)
+    pageModel4.Title = " Сортировка "
+
+    # group frame
+
+    groupBoxModel400 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlGroupBoxModel"
+    )
+    groupBoxModel400.PositionX = 0
+    groupBoxModel400.PositionY = 5
+    groupBoxModel400.Width = dialogModel.Width - 4
+    groupBoxModel400.Height = 15 + 3 * editControlHeight + 16
+    groupBoxModel400.Label = "Сортировка групп"
+    pageModel4.insertByName("GroupBox400", groupBoxModel400)
+
+    labelModel400 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel400.PositionX = 5
+    labelModel400.PositionY = groupBoxModel400.PositionY + 10
+    labelModel400.Width = int((dialogModel.Width - 10) * 0.05)
+    labelModel400.Height = 15
+    labelModel400.Align = 1 # center
+    labelModel400.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel400.Name = "Label400"
+    labelModel400.Label = "№"
+    pageModel4.insertByName("Label400", labelModel400)
+
+    labelModel401 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel401.PositionX = labelModel400.PositionX + labelModel400.Width
+    labelModel401.PositionY = labelModel400.PositionY
+    labelModel401.Width = int((dialogModel.Width - 10) * 0.35)
+    labelModel401.Height = labelModel400.Height
+    labelModel401.Align = 1 # center
+    labelModel401.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel401.Name = "Label401"
+    labelModel401.Label = "Поле или шаблон"
+    pageModel4.insertByName("Label401", labelModel401)
+
+    labelModel402 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel402.PositionX = labelModel401.PositionX + labelModel401.Width
+    labelModel402.PositionY = labelModel400.PositionY
+    labelModel402.Width = int((dialogModel.Width - 10) * 0.3)
+    labelModel402.Height = labelModel400.Height
+    labelModel402.Align = 1 # center
+    labelModel402.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel402.Name = "Label402"
+    labelModel402.Label = "Порядок"
+    pageModel4.insertByName("Label402", labelModel402)
+
+    labelModel403 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel403.PositionX = labelModel402.PositionX + labelModel402.Width
+    labelModel403.PositionY = labelModel400.PositionY
+    labelModel403.Width = int((dialogModel.Width - 10) * 0.3) - 3
+    labelModel403.Height = labelModel400.Height
+    labelModel403.Align = 1 # center
+    labelModel403.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel403.Name = "Label403"
+    labelModel403.Label = "Содержимое"
+    pageModel4.insertByName("Label403", labelModel403)
+
+    # group sort level 1
+
+    labelModel410 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel410.PositionX = labelModel400.PositionX
+    labelModel410.PositionY = labelModel400.PositionY + labelModel400.Height
+    labelModel410.Width = labelModel400.Width
+    labelModel410.Height = editControlHeight
+    labelModel410.Align = 1 # center
+    labelModel410.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel410.Name = "Label410"
+    labelModel410.NoLabel = True
+    pageModel4.insertByName("Label410", labelModel410)
+
+    editControlModel411 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel411.Width = labelModel401.Width
+    editControlModel411.Height = labelModel410.Height
+    editControlModel411.PositionX = labelModel401.PositionX
+    editControlModel411.PositionY = labelModel410.PositionY
+    editControlModel411.Name = "EditControl411"
+    pageModel4.insertByName("EditControl411", editControlModel411)
+
+    listBoxModel412 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel412.Width = labelModel402.Width
+    listBoxModel412.Height = labelModel410.Height
+    listBoxModel412.PositionX = labelModel402.PositionX
+    listBoxModel412.PositionY = labelModel410.PositionY
+    listBoxModel412.Name = "ListBox412"
+    listBoxModel412.Dropdown = True
+    pageModel4.insertByName("ListBox412", listBoxModel412)
+
+    listBoxModel413 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel413.Width = labelModel403.Width
+    listBoxModel413.Height = labelModel410.Height
+    listBoxModel413.PositionX = labelModel403.PositionX
+    listBoxModel413.PositionY = labelModel410.PositionY
+    listBoxModel413.Name = "ListBox413"
+    listBoxModel413.Dropdown = True
+    pageModel4.insertByName("ListBox413", listBoxModel413)
+
+    # group sort level 2
+
+    labelModel420 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel420.PositionX = labelModel400.PositionX
+    labelModel420.PositionY = labelModel410.PositionY + labelModel410.Height
+    labelModel420.Width = labelModel400.Width
+    labelModel420.Height = editControlHeight
+    labelModel420.Align = 1 # center
+    labelModel420.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel420.Name = "Label420"
+    labelModel420.NoLabel = True
+    pageModel4.insertByName("Label420", labelModel420)
+
+    editControlModel421 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel421.Width = labelModel401.Width
+    editControlModel421.Height = labelModel420.Height
+    editControlModel421.PositionX = labelModel401.PositionX
+    editControlModel421.PositionY = labelModel420.PositionY
+    editControlModel421.Name = "EditControl421"
+    pageModel4.insertByName("EditControl421", editControlModel421)
+
+    listBoxModel422 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel422.Width = labelModel402.Width
+    listBoxModel422.Height = labelModel420.Height
+    listBoxModel422.PositionX = labelModel402.PositionX
+    listBoxModel422.PositionY = labelModel420.PositionY
+    listBoxModel422.Name = "ListBox422"
+    listBoxModel422.Dropdown = True
+    pageModel4.insertByName("ListBox422", listBoxModel422)
+
+    listBoxModel423 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel423.Width = labelModel403.Width
+    listBoxModel423.Height = labelModel420.Height
+    listBoxModel423.PositionX = labelModel403.PositionX
+    listBoxModel423.PositionY = labelModel420.PositionY
+    listBoxModel423.Name = "ListBox423"
+    listBoxModel423.Dropdown = True
+    pageModel4.insertByName("ListBox423", listBoxModel423)
+
+    # group sort level 3
+
+    labelModel430 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel430.PositionX = labelModel400.PositionX
+    labelModel430.PositionY = labelModel420.PositionY + labelModel420.Height
+    labelModel430.Width = labelModel400.Width
+    labelModel430.Height = editControlHeight
+    labelModel430.Align = 1 # center
+    labelModel430.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel430.Name = "Label430"
+    labelModel430.NoLabel = True
+    pageModel4.insertByName("Label430", labelModel430)
+
+    editControlModel431 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel431.Width = labelModel401.Width
+    editControlModel431.Height = labelModel430.Height
+    editControlModel431.PositionX = labelModel401.PositionX
+    editControlModel431.PositionY = labelModel430.PositionY
+    editControlModel431.Name = "EditControl431"
+    pageModel4.insertByName("EditControl431", editControlModel431)
+
+    listBoxModel432 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel432.Width = labelModel402.Width
+    listBoxModel432.Height = labelModel430.Height
+    listBoxModel432.PositionX = labelModel402.PositionX
+    listBoxModel432.PositionY = labelModel430.PositionY
+    listBoxModel432.Name = "ListBox432"
+    listBoxModel432.Dropdown = True
+    pageModel4.insertByName("ListBox432", listBoxModel432)
+
+    listBoxModel433 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel433.Width = labelModel403.Width
+    listBoxModel433.Height = labelModel430.Height
+    listBoxModel433.PositionX = labelModel403.PositionX
+    listBoxModel433.PositionY = labelModel430.PositionY
+    listBoxModel433.Name = "ListBox433"
+    listBoxModel433.Dropdown = True
+    pageModel4.insertByName("ListBox433", listBoxModel433)
+
+    # comp frame
+
+    groupBoxModel401 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlGroupBoxModel"
+    )
+    groupBoxModel401.PositionX = 0
+    groupBoxModel401.PositionY = groupBoxModel400.PositionY + groupBoxModel400.Height + 10
+    groupBoxModel401.Width = groupBoxModel400.Width
+    groupBoxModel401.Height = groupBoxModel400.Height
+    groupBoxModel401.Label = "Сортировка компонентов"
+    pageModel4.insertByName("GroupBox401", groupBoxModel401)
+
+    labelModel404 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel404.PositionX = labelModel400.PositionX
+    labelModel404.PositionY = groupBoxModel401.PositionY + 10
+    labelModel404.Width = labelModel400.Width
+    labelModel404.Height = labelModel400.Height
+    labelModel404.Align = 1 # center
+    labelModel404.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel404.Name = "Label404"
+    labelModel404.Label = "№"
+    pageModel4.insertByName("Label404", labelModel404)
+
+    labelModel405 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel405.PositionX = labelModel401.PositionX
+    labelModel405.PositionY = labelModel404.PositionY
+    labelModel405.Width = labelModel401.Width
+    labelModel405.Height = labelModel404.Height
+    labelModel405.Align = 1 # center
+    labelModel405.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel405.Name = "Label405"
+    labelModel405.Label = "Поле или шаблон"
+    pageModel4.insertByName("Label405", labelModel405)
+
+    labelModel406 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel406.PositionX = labelModel402.PositionX
+    labelModel406.PositionY = labelModel404.PositionY
+    labelModel406.Width = labelModel402.Width
+    labelModel406.Height = labelModel404.Height
+    labelModel406.Align = 1 # center
+    labelModel406.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel406.Name = "Label406"
+    labelModel406.Label = "Порядок"
+    pageModel4.insertByName("Label406", labelModel406)
+
+    labelModel407 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel407.PositionX = labelModel403.PositionX
+    labelModel407.PositionY = labelModel404.PositionY
+    labelModel407.Width = labelModel403.Width
+    labelModel407.Height = labelModel404.Height
+    labelModel407.Align = 1 # center
+    labelModel407.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel407.Name = "Label407"
+    labelModel407.Label = "Содержимое"
+    pageModel4.insertByName("Label407", labelModel407)
+
+    # comp sort level 1
+
+    labelModel440 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel440.PositionX = labelModel400.PositionX
+    labelModel440.PositionY = labelModel404.PositionY + labelModel404.Height
+    labelModel440.Width = labelModel400.Width
+    labelModel440.Height = labelModel410.Height
+    labelModel440.Align = 1 # center
+    labelModel440.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel440.Name = "Label440"
+    labelModel440.NoLabel = True
+    pageModel4.insertByName("Label440", labelModel440)
+
+    editControlModel441 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel441.Width = labelModel405.Width
+    editControlModel441.Height = labelModel440.Height
+    editControlModel441.PositionX = labelModel405.PositionX
+    editControlModel441.PositionY = labelModel440.PositionY
+    editControlModel441.Name = "EditControl441"
+    pageModel4.insertByName("EditControl441", editControlModel441)
+
+    listBoxModel442 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel442.Width = labelModel406.Width
+    listBoxModel442.Height = labelModel440.Height
+    listBoxModel442.PositionX = labelModel406.PositionX
+    listBoxModel442.PositionY = labelModel440.PositionY
+    listBoxModel442.Name = "ListBox442"
+    listBoxModel442.Dropdown = True
+    pageModel4.insertByName("ListBox442", listBoxModel442)
+
+    listBoxModel443 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel443.Width = labelModel407.Width
+    listBoxModel443.Height = labelModel440.Height
+    listBoxModel443.PositionX = labelModel407.PositionX
+    listBoxModel443.PositionY = labelModel440.PositionY
+    listBoxModel443.Name = "ListBox443"
+    listBoxModel443.Dropdown = True
+    pageModel4.insertByName("ListBox443", listBoxModel443)
+
+    # comp sort level 2
+
+    labelModel450 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel450.PositionX = labelModel404.PositionX
+    labelModel450.PositionY = labelModel440.PositionY + labelModel440.Height
+    labelModel450.Width = labelModel404.Width
+    labelModel450.Height = labelModel440.Height
+    labelModel450.Align = 1 # center
+    labelModel450.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel450.Name = "Label450"
+    labelModel450.NoLabel = True
+    pageModel4.insertByName("Label450", labelModel450)
+
+    editControlModel451 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel451.Width = labelModel405.Width
+    editControlModel451.Height = labelModel450.Height
+    editControlModel451.PositionX = labelModel405.PositionX
+    editControlModel451.PositionY = labelModel450.PositionY
+    editControlModel451.Name = "EditControl451"
+    pageModel4.insertByName("EditControl451", editControlModel451)
+
+    listBoxModel452 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel452.Width = labelModel406.Width
+    listBoxModel452.Height = labelModel450.Height
+    listBoxModel452.PositionX = labelModel406.PositionX
+    listBoxModel452.PositionY = labelModel450.PositionY
+    listBoxModel452.Name = "ListBox452"
+    listBoxModel452.Dropdown = True
+    pageModel4.insertByName("ListBox452", listBoxModel452)
+
+    listBoxModel453 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel453.Width = labelModel407.Width
+    listBoxModel453.Height = labelModel450.Height
+    listBoxModel453.PositionX = labelModel407.PositionX
+    listBoxModel453.PositionY = labelModel450.PositionY
+    listBoxModel453.Name = "ListBox453"
+    listBoxModel453.Dropdown = True
+    pageModel4.insertByName("ListBox453", listBoxModel453)
+
+    # comp sort level 3
+
+    labelModel460 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel460.PositionX = labelModel404.PositionX
+    labelModel460.PositionY = labelModel450.PositionY + labelModel450.Height
+    labelModel460.Width = labelModel404.Width
+    labelModel460.Height = labelModel440.Height
+    labelModel460.Align = 1 # center
+    labelModel460.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel460.Name = "Label460"
+    labelModel460.NoLabel = True
+    pageModel4.insertByName("Label460", labelModel460)
+
+    editControlModel461 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel461.Width = labelModel405.Width
+    editControlModel461.Height = labelModel460.Height
+    editControlModel461.PositionX = labelModel405.PositionX
+    editControlModel461.PositionY = labelModel460.PositionY
+    editControlModel461.Name = "EditControl461"
+    pageModel4.insertByName("EditControl461", editControlModel461)
+
+    listBoxModel462 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel462.Width = labelModel406.Width
+    listBoxModel462.Height = labelModel460.Height
+    listBoxModel462.PositionX = labelModel406.PositionX
+    listBoxModel462.PositionY = labelModel460.PositionY
+    listBoxModel462.Name = "ListBox462"
+    listBoxModel462.Dropdown = True
+    pageModel4.insertByName("ListBox462", listBoxModel462)
+
+    listBoxModel463 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlListBoxModel"
+    )
+    listBoxModel463.Width = labelModel407.Width
+    listBoxModel463.Height = labelModel460.Height
+    listBoxModel463.PositionX = labelModel407.PositionX
+    listBoxModel463.PositionY = labelModel460.PositionY
+    listBoxModel463.Name = "ListBox463"
+    listBoxModel463.Dropdown = True
+    pageModel4.insertByName("ListBox463", listBoxModel463)
+
+    buttonModel400 = pageModel4.createInstance(
+        "com.sun.star.awt.UnoControlButtonModel"
+    )
+    buttonModel400.Width = tabsModel.Width - 7
+    buttonModel400.Height = 16
+    buttonModel400.PositionX = 2
+    buttonModel400.PositionY = dialogModel.Height - 67
+    buttonModel400.Name = "Button400"
+    buttonModel400.Label = "Установить значения по умолчанию"
+    pageModel4.insertByName("Button400", buttonModel400)
+
+    # ------------------------------------------------------------------------
     # Stamp Tab Model
     # ------------------------------------------------------------------------
 
@@ -1052,6 +1525,8 @@ def setup(*args):
     Button11 = dialog.getControl("Tabs").getControl("Page1").getControl("Button11")
     Button10.addActionListener(Button10ActionListener(dialog))
     Button11.addActionListener(Button10ActionListener(dialog))
+    Button400 = dialog.getControl("Tabs").getControl("Page4").getControl("Button400")
+    Button400.addActionListener(Button400ActionListener(dialog))
 
     # ------------------------------------------------------------------------
 
@@ -1060,6 +1535,53 @@ def setup(*args):
         context
     )
     dialog.createPeer(toolkit, None)
+    dialog.Visible = True
+
+    # Initialize sort controls in loop
+    # Some properties cannot be set while dialog is not shown
+    page4 = dialog.getControl("Tabs").getControl("Page4")
+    for sortLevel in "123":
+        # group
+        page4.getControl("Label4{}0".format(sortLevel)).Text = sortLevel
+        page4.getControl("EditControl4{}1".format(sortLevel)).Text = \
+            config.get("group sort fields", sortLevel)
+        page4.getControl("ListBox4{}2".format(sortLevel)).addItems(
+            ("По возрастанию", "По убыванию"),
+            0
+        )
+        page4.getControl("ListBox4{}2".format(sortLevel)).selectItem(
+            config.get("group sort order", sortLevel),
+            True
+        )
+        page4.getControl("ListBox4{}3".format(sortLevel)).addItems(
+            ("Текст", "Число", "Текст+Число"),
+            0
+        )
+        page4.getControl("ListBox4{}3".format(sortLevel)).selectItem(
+            config.get("group sort data", sortLevel),
+            True
+        )
+        # comp
+        page4.getControl("Label4{}0".format(int(sortLevel) + 3)).Text = sortLevel
+        page4.getControl("EditControl4{}1".format(int(sortLevel) + 3)).Text = \
+            config.get("comp sort fields", sortLevel)
+        page4.getControl("ListBox4{}2".format(int(sortLevel) + 3)).addItems(
+            ("По возрастанию", "По убыванию"),
+            0
+        )
+        page4.getControl("ListBox4{}2".format(int(sortLevel) + 3)).selectItem(
+            config.get("comp sort order", sortLevel),
+            True
+        )
+        page4.getControl("ListBox4{}3".format(int(sortLevel) + 3)).addItems(
+            ("Текст", "Число", "Текст+Число"),
+            0
+        )
+        page4.getControl("ListBox4{}3".format(int(sortLevel) + 3)).selectItem(
+            config.get("comp sort data", sortLevel),
+            True
+        )
+
     dialog.execute()
 
 
@@ -1121,6 +1643,7 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         page1 = self.dialog.getControl("Tabs").getControl("Page1")
         page2 = self.dialog.getControl("Tabs").getControl("Page2")
         page3 = self.dialog.getControl("Tabs").getControl("Page3")
+        page4 = self.dialog.getControl("Tabs").getControl("Page4")
 
         # --------------------------------------------------------------------
         # Оптимальный вид
@@ -1254,6 +1777,32 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
 
         # --------------------------------------------------------------------
+        # Сортировка
+        # --------------------------------------------------------------------
+
+        for sortLevel in "123":
+            # group
+            config.set("group sort fields", sortLevel,
+                page4.getControl("EditControl4{}1".format(sortLevel)).Text
+            )
+            config.set("group sort order", sortLevel,
+                page4.getControl("ListBox4{}2".format(sortLevel)).getSelectedItem()
+            )
+            config.set("group sort data", sortLevel,
+                page4.getControl("ListBox4{}3".format(sortLevel)).getSelectedItem()
+            )
+            # comp
+            config.set("comp sort fields", sortLevel,
+                page4.getControl("EditControl4{}1".format(int(sortLevel) + 3)).Text
+            )
+            config.set("comp sort order", sortLevel,
+                page4.getControl("ListBox4{}2".format(int(sortLevel) + 3)).getSelectedItem()
+            )
+            config.set("comp sort data", sortLevel,
+                page4.getControl("ListBox4{}3".format(int(sortLevel) + 3)).getSelectedItem()
+            )
+
+        # --------------------------------------------------------------------
         # Основная надпись
         # --------------------------------------------------------------------
 
@@ -1351,3 +1900,31 @@ class Button10ActionListener(unohelper.Base, XActionListener):
             page1.getControl("CheckBox10").State = 0
         for control, value in defaultValues:
             page1.getControl(control).Text = value
+
+
+class Button400ActionListener(unohelper.Base, XActionListener):
+    def __init__(self, dialog):
+        self.dialog = dialog
+
+    def actionPerformed(self, event):
+        page4 = self.dialog.getControl("Tabs").getControl("Page4")
+        # group
+        page4.getControl("EditControl411").Text = "Обозначение"
+        page4.getControl("ListBox412").selectItem("По возрастанию", True)
+        page4.getControl("ListBox413").selectItem("Текст+Число", True)
+        page4.getControl("EditControl421").Text = "Заголовок группы"
+        page4.getControl("ListBox422").selectItem("По возрастанию", True)
+        page4.getControl("ListBox423").selectItem("Текст", True)
+        page4.getControl("EditControl431").Text = ""
+        page4.getControl("ListBox432").selectItem("По возрастанию", True)
+        page4.getControl("ListBox433").selectItem("Текст", True)
+        # comp
+        page4.getControl("EditControl441").Text = "Значение!"
+        page4.getControl("ListBox442").selectItem("По возрастанию", True)
+        page4.getControl("ListBox443").selectItem("Число", True)
+        page4.getControl("EditControl451").Text = ""
+        page4.getControl("ListBox452").selectItem("По возрастанию", True)
+        page4.getControl("ListBox453").selectItem("Текст", True)
+        page4.getControl("EditControl461").Text = ""
+        page4.getControl("ListBox462").selectItem("По возрастанию", True)
+        page4.getControl("ListBox463").selectItem("Текст", True)
