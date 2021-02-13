@@ -13,7 +13,7 @@ def setup(*args):
     context = XSCRIPTCONTEXT.getComponentContext()
 
     editControlHeight = 14
-    if sys.platform == "linux":
+    if sys.platform.startswith("linux"):
         # Элементы управления GTK3 требуют больше места
         editControlHeight = 20
 
@@ -263,7 +263,7 @@ def setup(*args):
     )
     labelModel04.PositionX = 0
     labelModel04.PositionY = labelModel03.PositionY + labelModel03.Height
-    labelModel04.Width = 150
+    labelModel04.Width = 120
     labelModel04.Height = 16
     labelModel04.VerticalAlign = uno.Enum(
         "com.sun.star.style.VerticalAlignment",
@@ -276,10 +276,16 @@ def setup(*args):
     radioButtonModel00 = pageModel0.createInstance(
         "com.sun.star.awt.UnoControlRadioButtonModel"
     )
-    radioButtonModel00.PositionX = 150
+    radioButtonModel00.PositionX = labelModel04.Width
     radioButtonModel00.PositionY = labelModel04.PositionY
-    radioButtonModel00.Width = 75
+    radioButtonModel00.Width = 20
     radioButtonModel00.Height = labelModel04.Height
+    if sys.platform.startswith("win"):
+        radioButtonModel00.Height = radioButtonModel00.Height - 4
+        radioButtonModel00.PositionY = radioButtonModel00.PositionY + 4
+    else:
+        radioButtonModel00.Height = radioButtonModel00.Height - 1
+        radioButtonModel00.PositionY = radioButtonModel00.PositionY + 1
     radioButtonModel00.Name = "RadioButton00"
     radioButtonModel00.Label = "-"
     radioButtonModel00.State = 1 if config.get("doc", "ref separator") == '-' else 0
@@ -337,7 +343,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel02.PositionX = 5
-    checkModel02.PositionY = checkModel01.PositionY + checkModel00.Height
+    checkModel02.PositionY = checkModel01.PositionY + checkModel01.Height
     checkModel02.Width = tabsModel.Width - 10
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
@@ -358,7 +364,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel03.PositionX = 5
-    checkModel03.PositionY = checkModel02.PositionY + checkModel00.Height
+    checkModel03.PositionY = checkModel02.PositionY + checkModel02.Height
     checkModel03.Width = tabsModel.Width - 10
     checkModel03.Height = checkModel00.Height
     checkModel03.Name = "CheckBox03"
@@ -381,7 +387,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel04.PositionX = 5
-    checkModel04.PositionY = checkModel03.PositionY + checkModel00.Height
+    checkModel04.PositionY = checkModel03.PositionY + checkModel03.Height
     checkModel04.Width = tabsModel.Width - 10
     checkModel04.Height = checkModel00.Height
     checkModel04.Name = "CheckBox04"
@@ -404,7 +410,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel09.PositionX = 5
-    checkModel09.PositionY = checkModel04.PositionY + checkModel00.Height
+    checkModel09.PositionY = checkModel04.PositionY + checkModel04.Height
     checkModel09.Width = tabsModel.Width - 10
     checkModel09.Height = checkModel00.Height
     checkModel09.Name = "CheckBox09"
@@ -422,7 +428,7 @@ def setup(*args):
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel05.PositionX = 5
-    checkModel05.PositionY = checkModel09.PositionY + checkModel00.Height
+    checkModel05.PositionY = checkModel09.PositionY + checkModel09.Height
     checkModel05.Width = tabsModel.Width - 10
     checkModel05.Height = checkModel00.Height
     checkModel05.Name = "CheckBox05"
@@ -457,10 +463,11 @@ def setup(*args):
     checkModel06.PositionY = editControlModel04.PositionY
     checkModel06.Width = editControlModel04.PositionX - 5
     checkModel06.Height = editControlHeight
-    checkModel06.VerticalAlign = uno.Enum(
-        "com.sun.star.style.VerticalAlignment",
-        "MIDDLE"
-    )
+    if not sys.platform.startswith("win"):
+        checkModel06.VerticalAlign = uno.Enum(
+            "com.sun.star.style.VerticalAlignment",
+            "MIDDLE"
+        )
     checkModel06.Name = "CheckBox06"
     checkModel06.State = int(config.getboolean("doc", "append rev table"))
     checkModel06.Label = "Добавить лист регистрации изменений, если количество листов больше:"

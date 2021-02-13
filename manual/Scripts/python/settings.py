@@ -11,7 +11,7 @@ def setup(*args):
     context = XSCRIPTCONTEXT.getComponentContext()
 
     editControlHeight = 14
-    if sys.platform == "linux":
+    if sys.platform.startswith("linux"):
         # Элементы управления GTK3 требуют больше места
         editControlHeight = 20
 
@@ -50,7 +50,7 @@ def setup(*args):
     checkModelSet = dialogModel.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
-    checkModelSet.Width = 150
+    checkModelSet.Width = 140
     checkModelSet.Height = 16
     checkModelSet.PositionX = 5
     checkModelSet.PositionY = dialogModel.Height - checkModelSet.Height - 4

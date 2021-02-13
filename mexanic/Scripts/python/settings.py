@@ -13,7 +13,7 @@ def setup(*args):
     context = XSCRIPTCONTEXT.getComponentContext()
 
     editControlHeight = 14
-    if sys.platform == "linux":
+    if sys.platform.startswith("linux"):
         # Элементы управления GTK3 требуют больше места
         editControlHeight = 20
 
