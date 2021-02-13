@@ -540,6 +540,9 @@ class CompRange(Component):
             and self.getSpecValue("doc") == comp.getSpecValue("doc") \
             and self.getSpecValue("comment") == comp.getSpecValue("comment"):
                 self._refRange.append(comp.reference)
+                if self.getRefNumber() > comp.getRefNumber():
+                    # Указывать на обозначение с наименьшим номером
+                    self.reference = comp.reference
                 return True
         return False
 

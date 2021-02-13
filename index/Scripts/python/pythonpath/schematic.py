@@ -433,6 +433,9 @@ class CompRange(Component):
             and self.getIndexValue("doc") == comp.getIndexValue("doc") \
             and self.getIndexValue("comment") == comp.getIndexValue("comment"):
                 self._refRange.append(comp.reference)
+                if self.getRefNumber() > comp.getRefNumber():
+                    # Указывать на обозначение с наименьшим номером
+                    self.reference = comp.reference
                 return True
         return False
 

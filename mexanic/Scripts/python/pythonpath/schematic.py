@@ -540,6 +540,9 @@ class CompRange(Component):
             and self.getBomValue("doc") == comp.getBomValue("doc") \
             and self.getBomValue("comment") == comp.getBomValue("comment"):
                 self._refRange.append(comp.reference)
+                if self.getRefNumber() > comp.getRefNumber():
+                    # Указывать на обозначение с наименьшим номером
+                    self.reference = comp.reference
                 return True
         return False
 

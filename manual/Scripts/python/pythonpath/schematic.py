@@ -42,3 +42,6 @@ class Schematic():
                         elif item.attributes["number"] == "6":
                             self.inspector = item.attributes["value"]
                 break
+                if self.getRefNumber() > comp.getRefNumber():
+                    # Указывать на обозначение с наименьшим номером
+                    self.reference = comp.reference
