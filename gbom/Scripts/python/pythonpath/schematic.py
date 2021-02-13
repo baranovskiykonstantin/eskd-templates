@@ -58,6 +58,8 @@ class Component():
                 value = self.getValueWithUnits()
             else:
                 value = self.value
+        elif name == "Значение!":
+            value = self.getExpandedValue()
         elif name == "Посад.место":
             if config.getboolean("doc", "footprint only"):
                 value = self.getFieldValue("Посад.место!")
@@ -264,6 +266,7 @@ class Component():
         Возвращаемое значение (str) -- преобразованное значение.
 
         """
+        pattern = str(pattern)
         out = ""
         prefix = ""
         fieldName = ""
@@ -479,6 +482,11 @@ class Component():
                 else:
                     multiplier = 1
                 extValue = float(numValue.replace(',', '.')) * multiplier
+        else:
+            try:
+                extValue = float(self.value.replace(',', '.'))
+            except ValueError:
+                pass
 
         return extValue
 
@@ -604,8 +612,8 @@ class CompGroup():
     def __len__(self):
         return len(self._compRanges)
 
-    def sort(self, key=None):
-        self._compRanges.sort(key=key)
+    def sort(self, key=None, reverse=False):
+        self._compRanges.sort(key=key, reverse=reverse)
 
     def append(self, compRange):
         """Добавить множество компонентов в группу.
@@ -740,20 +748,82 @@ class Schematic():
         if len(compGroup) > 0:
             groups.append(compGroup)
 
-        # Группы компонентов должны быть отсортированы по буквенной части
-        # обозначений.
+        if not groups:
+            return []
+
+        # По умолчанию, группы компонентов должны быть отсортированы по
+        # буквенной части обозначений.
         # Если группы имеют одинаковые буквенные обозначения - сортировать
         # по наименованию группы (тип или тип+документ).
         # Внутри группы, элементы перечисляются в порядке возрастания значения.
+        def convertData(value, dataType):
+            convData = value
+            if dataType == "Текст":
+                convData = str(value)
+            elif dataType == "Число":
+                try:
+                    convData = float(value)
+                except ValueError:
+                    convData = float("inf")
+            elif dataType == "Текст+Число":
+                convData = re.split("(\d+)", str(value))
+                if '' in convData:
+                    convData.remove('')
+                for index in range(len(convData)):
+                    if convData[index].isdigit():
+                        convData[index] = int(convData[index])
+                    # Преобразовать все части в пары:
+                    # (False, int) - для чисел;
+                    # (True, str) - для текста.
+                    # Это необходимо для сравнения чисел с текстом
+                    # (числа идут перед текстом).
+                    convData[index] = (isinstance(convData[index], str), convData[index])
+            return convData
+
         for index in range(len(groups)):
-            groups[index].sort(
-                key=lambda compRange: compRange.getExpandedValue()
-            )
-        groups.sort(
-            key=lambda group: group[0].getBomValue("type")
-        )
-        groups.sort(
-            key=lambda group: group[0].getRefType()
-        )
+            for sortLevel in "321":
+                sortField = config.get("comp sort fields", sortLevel)
+                if not sortField:
+                    continue
+                sortOrder = config.get("comp sort order", sortLevel)
+                sortData = config.get("comp sort data", sortLevel)
+                if groups[index][0].formatPattern(sortField, check=True):
+                    groups[index].sort(
+                        key=lambda compRange: convertData(
+                            compRange.formatPattern(sortField),
+                            sortData
+                        ),
+                        reverse=(sortOrder == "По убыванию")
+                    )
+                else:
+                    groups[index].sort(
+                        key=lambda compRange: convertData(
+                            compRange.getFieldValue(sortField),
+                            sortData
+                        ),
+                        reverse=(sortOrder == "По убыванию")
+                    )
+        for sortLevel in "321":
+            sortField = config.get("group sort fields", sortLevel)
+            if not sortField:
+                continue
+            sortOrder = config.get("group sort order", sortLevel)
+            sortData = config.get("group sort data", sortLevel)
+            if groups[0][0].formatPattern(sortField, check=True):
+                groups.sort(
+                    key=lambda group: convertData(
+                        group[0].formatPattern(sortField),
+                        sortData
+                    ),
+                    reverse=(sortOrder == "По убыванию")
+                )
+            else:
+                groups.sort(
+                    key=lambda group: convertData(
+                        group[0].getFieldValue(sortField),
+                        sortData
+                    ),
+                    reverse=(sortOrder == "По убыванию")
+                )
 
         return groups
