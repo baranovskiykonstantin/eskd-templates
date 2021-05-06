@@ -12,6 +12,7 @@ define build_ott
 	cd Scripts/python/doc/ && \
 	asciidoctor help.adoc && \
 	cd - && \
+	mkdir -p $(OUT) && \
 	zip -FS -r $(OUT)/$(2).ott * -x Scripts/python/doc/help.adoc
 endef
 
