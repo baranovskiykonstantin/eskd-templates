@@ -36,7 +36,9 @@ class NetlistItem():
         name (str) -- имя элемента;
         attributes (dict of str) -- словарь атрибутов ("имя": "значение");
         items (list of NetlistItem) -- массив дочерних элементов;
-        text (str) -- текстовое значение элемента.
+        text (str/list of str) -- текстовое значение элемента. Если значение
+            состоит из нескольких строк, то оно будет представлено в виде
+            списка строк (например для tstamps).
 
         """
         self.parent = parent
@@ -180,12 +182,12 @@ class Netlist():
                 break
             else:
                 text = self._parseNetText()
-                if item.text is not None:
-                    self._error(
-                        "У элемента обнаружено второе значение " \
-                        "(не может быть больше одного)!"
-                    )
-                item.text = text
+                if item.text is None:
+                    item.text = text
+                else:
+                    if type(item.text) != "list":
+                        item.text = [item.text]
+                    item.text.append(text)
         else:
             self._error(
                 "Элемент неожиданно закончился " \
@@ -218,7 +220,11 @@ class Netlist():
                 for line in childText.splitlines():
                     output += "  {}\n".format(line)
         if item.text is not None:
-            output += ' ' + self._formatNetText(item.text)
+            if type(item.text) == "list":
+                for val in item.text:
+                    output += ' ' + self._formatNetText(val)
+            else:
+                output += ' ' + self._formatNetText(item.text)
         else:
             output = output.rstrip('\n')
         output += ')'
