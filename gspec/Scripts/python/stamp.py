@@ -72,6 +72,11 @@ def clean(*args):
                     doc.UndoManager.lock()
                 cursor = frame.createTextCursor()
                 cursor.CharScaleWidth = 100
+        if frame.Name.startswith("Изм_стр_"):
+            tabName = frame.Name.replace("стр", "таб")
+            if tabName in doc.TextTables:
+                doc.TextTables[tabName].dispose()
+            doc.TextFrames[frame.Name].dispose()
     if config.getboolean("stamp", "place doc id to table title") \
         and "Спецификация" in doc.TextTables:
             amountTitleCell = doc.TextTables["Спецификация"].getCellByName("F1")
