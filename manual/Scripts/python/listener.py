@@ -59,6 +59,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
             if currentCell:
                 if currentTable.Name == "Лист_регистрации_изменений":
                     itemName = "ТабРИ." + currentCell.CellName[0]
+                elif currentTable.Name.startswith("Изм_таб_"):
+                    itemName = "ТабТИ." + currentCell.CellName[0]
                 else:
                     itemName = currentCell.createTextCursor().ParaStyleName
                 item = currentCell

@@ -7,7 +7,8 @@
   <toolbar:toolbaritem xlink:href="vnd.sun.star.script:stamp.py$fill?language=Python&amp;location=document" toolbar:text="Заполнить осн. надпись"/>
   <toolbar:toolbaritem xlink:href="vnd.sun.star.script:stamp.py$clean?language=Python&amp;location=document" toolbar:text="Очистить осн. надпись"/>
   <toolbar:toolbarseparator/>
-  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:index.py$toggleRevTable?language=Python&amp;location=document" toolbar:text="Добавить/удалить лист рег. изм."/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:index.py$togglePageRevTable?language=Python&amp;location=document" toolbar:text="Изм."/>
+  <toolbar:toolbaritem xlink:href="vnd.sun.star.script:index.py$toggleRevTable?language=Python&amp;location=document" toolbar:text="Лист рег. изм."/>
   <toolbar:toolbarseparator/>
   <toolbar:toolbaritem xlink:href="vnd.sun.star.script:settings.py$setup?language=Python&amp;location=document" toolbar:text="Параметры"/>
   <toolbar:toolbarseparator/>

@@ -101,6 +101,12 @@ ITEM_WIDTHS = {
     "ТабРИ.H": 25,
     "ТабРИ.I": 15,
     "ТабРИ.J": 12,
+
+    "ТабТИ.A": 7,
+    "ТабТИ.B": 10,
+    "ТабТИ.C": 23,
+    "ТабТИ.D": 15,
+    "ТабТИ.E": 10,
 }
 
 SKIP_MODIFY_EVENTS = False
@@ -961,3 +967,149 @@ def syncCommonFields():
                 otherCursor.CharScaleWidth = firstCursor.CharScaleWidth
     doc.unlockControllers()
     doc.UndoManager.unlock()
+
+def addPageRevTable():
+    """Добавить таблицу изменений на текущем листе."""
+    doc = XSCRIPTCONTEXT.getDocument()
+    pageNum = doc.CurrentController.ViewCursor.Page
+    pageStyle = doc.CurrentController.ViewCursor.PageStyleName
+    if not pageStyle.startswith("Первый лист") \
+            and pageStyle not in ("Последующие листы", "Лист регистрации изменений"):
+        return
+    global SKIP_MODIFY_EVENTS
+    SKIP_MODIFY_EVENTS = True
+    doc.lockControllers()
+    doc.UndoManager.lock()
+
+    # Врезка
+    frame = doc.createInstance("com.sun.star.text.TextFrame")
+    frame.Name = "Изм_стр_%d" % pageNum
+    doc.Text.insertTextContent(doc.Text.End, frame, False)
+    frame.AnchorType = uno.Enum("com.sun.star.text.TextContentAnchorType", "AT_PAGE")
+    frame.AnchorPageNo = pageNum
+    # Обрамление
+    noLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    frame.LeftBorder = noLine
+    frame.RightBorder = noLine
+    frame.TopBorder = noLine
+    frame.BottomBorder = noLine
+    frame.BorderDistance = 0
+    frame.LeftMargin = 0
+    frame.RightMargin = 0
+    frame.TopMargin = 0
+    frame.BottomMargin = 0
+    # Размер и расположение
+    frame.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.NONE")
+    frame.VertOrient = uno.getConstantByName("com.sun.star.text.VertOrientation.NONE")
+    frame.HoriOrientRelation = 0 # Frame
+    frame.VertOrientRelation = 0 # Frame
+    if pageStyle == "Лист регистрации изменений":
+        frame.HoriOrientPosition = 2000
+        frame.VertOrientPosition = 27700
+    elif pageStyle == "Последующие листы":
+        frame.HoriOrientPosition = 10700
+        frame.VertOrientPosition = 19000
+    else: # Первый лист
+        frame.HoriOrientPosition = 10700
+        frame.VertOrientPosition = 16500
+    frame.Height = 1000
+    frame.Width = 6500
+    frame.PositionProtected = True
+    frame.SizeProtected = True
+
+    # Таблица
+    table = doc.createInstance("com.sun.star.text.TextTable")
+    table.initialize(2, 5)
+    frame.Text.insertTextContent(frame.Text.End, table, False)
+    table.Name = "Изм_таб_%d" % pageNum
+    table.HoriOrient = uno.getConstantByName("com.sun.star.text.HoriOrientation.LEFT_AND_WIDTH")
+    table.Width = 6500
+    table.LeftMargin = 0
+    table.Rows[0].Height = 500
+    table.Rows[0].IsAutoHeight = False
+    table.Rows[1].Height = 500
+    table.Rows[1].IsAutoHeight = False
+    columnSeparators = table.TableColumnSeparators
+    columnSeparators[0].Position = 1076  # int((7)/65*10000)
+    columnSeparators[1].Position = 2615  # int((7+10)/65*10000)
+    columnSeparators[2].Position = 6153  # int((7+10+23)/65*10000)
+    columnSeparators[3].Position = 8461  # int((7+10+23+15)/65*10000)
+    table.TableColumnSeparators = columnSeparators
+    for j in range(2):
+        for i in range(5):
+            cell = table.getCellByPosition(i, j)
+            cursor = cell.createTextCursor()
+            cursor.ParaStyleName = "Значение графы форматной рамки"
+            cell.TopBorderDistance = 0
+            cell.BottomBorderDistance = 0
+            cell.LeftBorderDistance = 0
+            cell.RightBorderDistance = 0
+            cell.VertOrient = uno.getConstantByName(
+                "com.sun.star.text.VertOrientation.CENTER"
+            )
+    # Обрамление
+    border = table.TableBorder
+    noLine = uno.createUnoStruct("com.sun.star.table.BorderLine")
+    border.TopLine = noLine
+    border.LeftLine = noLine
+    border.RightLine = noLine
+    border.BottomLine = noLine
+    border.HorizontalLine = noLine
+    border.VerticalLine = noLine
+    table.TableBorder = border
+    doc.refresh()
+    viewCursor = doc.CurrentController.ViewCursor
+    viewCursor.gotoRange(table.getCellByName("A2").Start, False)
+    doc.UndoManager.unlock()
+    doc.UndoManager.clear()
+    doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
+    return
+
+def removePageRevTable():
+    """Удалить таблицу изменений на текущем листе."""
+    doc = XSCRIPTCONTEXT.getDocument()
+    frame = doc.CurrentController.Frame
+    pageNum = doc.CurrentController.ViewCursor.Page
+    if ("Изм_стр_%d" % pageNum) not in doc.TextFrames:
+        return
+    global SKIP_MODIFY_EVENTS
+    SKIP_MODIFY_EVENTS = True
+    isEmpty = True
+    for j in range(2):
+        for i in range(5):
+            cell = doc.TextTables["Изм_таб_%d" % pageNum].getCellByPosition(i, j)
+            if cell.String != "":
+                isEmpty = False
+                viewCursor = doc.CurrentController.ViewCursor
+                viewCursor.gotoRange(cell.Start, False)
+                doc.refresh()
+                break
+    doRemove = True
+    if not isEmpty:
+        msgbox = frame.ContainerWindow.Toolkit.createMessageBox(
+            frame.ContainerWindow,
+            uno.Enum("com.sun.star.awt.MessageBoxType", "MESSAGEBOX"),
+            uno.getConstantByName("com.sun.star.awt.MessageBoxButtons.BUTTONS_YES_NO"),
+            "Внимание!",
+            "Таблица с изменениями не пуста.\n"
+            "Удалить?"
+        )
+        yes = uno.getConstantByName("com.sun.star.awt.MessageBoxResults.YES")
+        result = msgbox.execute()
+        if result != yes:
+            doRemove = False
+    if doRemove:
+        if not isEmpty:
+            viewCursor = doc.CurrentController.ViewCursor
+            viewCursor.jumpToEndOfPage()
+            doc.refresh()
+        doc.lockControllers()
+        doc.UndoManager.lock()
+        doc.TextTables["Изм_таб_%d" % pageNum].dispose()
+        doc.TextFrames["Изм_стр_%d" % pageNum].dispose()
+        doc.UndoManager.unlock()
+        doc.UndoManager.clear()
+        doc.unlockControllers()
+    SKIP_MODIFY_EVENTS = False
+    return

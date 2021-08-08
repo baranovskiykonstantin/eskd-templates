@@ -71,6 +71,8 @@ class DocModifyListener(unohelper.Base, XModifyListener):
                             itemName = "ТабСП." + currentCell.CellName[0]
                     elif currentTable.Name == "Лист_регистрации_изменений":
                         itemName = "ТабРИ." + currentCell.CellName[0]
+                    elif currentTable.Name.startswith("Изм_таб_"):
+                        itemName = "ТабТИ." + currentCell.CellName[0]
                     item = currentCell
                 else: # currentFrame
                     itemName = currentFrame.Name[8:]

@@ -668,3 +668,14 @@ def toggleVarTable(*args):
         common.removeVarTable()
     else:
         common.addVarTable()
+
+def togglePageRevTable(*args):
+    """Добавить/удалить таблицу изменений на текущей странице"""
+    if common.isThreadWorking():
+        return
+    doc = XSCRIPTCONTEXT.getDocument()
+    frameName = "Изм_стр_%d" % doc.CurrentController.ViewCursor.Page
+    if frameName in doc.TextFrames:
+        common.removePageRevTable()
+    else:
+        common.addPageRevTable()
