@@ -702,6 +702,7 @@ class Schematic():
         for comp in netlist.items("comp"):
             component = Component(self)
             component.reference = comp.attributes["ref"]
+            skip = False
             for item in comp.items:
                 if item.name == "value":
                     component.value = item.text if item.text is not None and item.text != "~" else ""
@@ -716,7 +717,12 @@ class Schematic():
                     for field in item.items:
                         fieldName = field.attributes["name"]
                         component.fields[fieldName] = field.text if field.text is not None and field.text != "~" else ""
-            self.components.append(component)
+                elif item.name == "property":
+                    if item.attributes["name"] == "exclude_from_bom":
+                        skip = True
+                        break
+            if not skip:
+                self.components.append(component)
 
     def getGroupedComponents(self):
         """Вернуть компоненты, сгруппированные по типу."""
