@@ -212,19 +212,6 @@ def importEmbeddedModules(*args):
     return True
 
 
-def get_config_value(config, path, name):
-    runtimeException = uno.getClass("com.sun.star.uno.RuntimeException")
-    try:
-        configAccess = config.createInstanceWithArguments(
-            "com.sun.star.configuration.ConfigurationAccess",
-            (path,)
-        )
-        value = configAccess.getPropertyValue(name)
-    except runtimeException:
-        value = None
-    return value
-
-
 def init(*args):
     """Начальная настройка при открытии документа."""
     context = XSCRIPTCONTEXT.getComponentContext()
@@ -252,37 +239,31 @@ def init(*args):
                 "path": "/org.openoffice.Office.Writer/Content/NonprintingCharacter",
                 "property": "HiddenParagraph",
                 "value": False,
-                "command": ".uno:ShowHiddenParagraphs"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/DocBoundaries",
                 "property": "IsVisible",
                 "value": False,
-                "command": ".uno:ViewBounds"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/TableBoundaries",
                 "property": "IsVisible",
                 "value": False,
-                "command": ".uno:TableBoundaries"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/WriterSectionBoundaries",
                 "property": "IsVisible",
                 "value": False,
-                "command": ".uno:SectionBoundaries"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/WriterFieldShadings",
                 "property": "IsVisible",
                 "value": False,
-                "command": ".uno:Marks"
             },
             {
                 "path": "/org.openoffice.Office.Common/Help",
                 "property": "ExtendedTip",
                 "value": True,
-                "command": ".uno:ActiveHelp"
             },
         )
         configProvider = context.ServiceManager.createInstanceWithContext(
@@ -292,19 +273,24 @@ def init(*args):
         nodePath = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
         nodePath.Name = "nodepath"
         nodePath.Value = "/org.openoffice.Office.UI/ColorScheme"
-        colorScheme = get_config_value(configProvider, nodePath, "CurrentColorScheme")
+        configAccess = configProvider.createInstanceWithArguments(
+            "com.sun.star.configuration.ConfigurationAccess",
+            (nodePath,)
+        )
+        colorScheme = configAccess.getPropertyValue("CurrentColorScheme")
         for option in options:
             nodePath.Value = option["path"].format(colorScheme=colorScheme)
-            value = get_config_value(configProvider, nodePath, option["property"])
-
-            if value is not None and value != option["value"]:
-                dispatchHelper.executeDispatch(
-                    frame,
-                    option["command"],
-                    "",
-                    0,
-                    ()
+            configAccess = configProvider.createInstanceWithArguments(
+                "com.sun.star.configuration.ConfigurationUpdateAccess",
+                (nodePath,)
+            )
+            value = configAccess.getPropertyValue(option["property"])
+            if value != option["value"]:
+                value = configAccess.setPropertyValue(
+                    option["property"],
+                    option["value"]
                 )
+                configAccess.commitChanges()
         toolbarPos = frame.LayoutManager.getElementPos(
             "private:resource/toolbar/custom_index"
         )
