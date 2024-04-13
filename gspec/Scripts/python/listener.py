@@ -317,7 +317,7 @@ def init(*args):
             )
             value = configAccess.getPropertyValue(option["property"])
             if value != option["value"]:
-                value = configAccess.setPropertyValue(
+                configAccess.setPropertyValue(
                     option["property"],
                     option["value"]
                 )
