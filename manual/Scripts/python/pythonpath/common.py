@@ -449,7 +449,7 @@ def addPageRevTable():
     pageNum = doc.CurrentController.ViewCursor.Page
     pageStyle = doc.CurrentController.ViewCursor.PageStyleName
     if not pageStyle.startswith("Первый лист") \
-            and pageStyle not in ("Последующие листы", "Лист регистрации изменений"):
+            and pageStyle not in ("Последующие листы", "Последующие листы А3", "Лист регистрации изменений"):
         return
     global SKIP_MODIFY_EVENTS
     SKIP_MODIFY_EVENTS = True
@@ -478,7 +478,7 @@ def addPageRevTable():
     frame.VertOrient = uno.getConstantByName("com.sun.star.text.VertOrientation.NONE")
     frame.HoriOrientRelation = 0 # Frame
     frame.VertOrientRelation = 0 # Frame
-    frame.HoriOrientPosition = 2000
+    frame.HoriOrientPosition = 23000 if pageStyle == "Последующие листы А3" else 2000
     frame.VertOrientPosition = 25200 if pageStyle.startswith("Первый лист") else 27700
     frame.Height = 1000
     frame.Width = 6500
