@@ -232,31 +232,43 @@ def init(*args):
                 "path": "/org.openoffice.Office.Writer/Content/NonprintingCharacter",
                 "property": "HiddenParagraph",
                 "value": False,
+                "command": ".uno:ShowHiddenParagraphs"
             },
             {
-                "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/DocBoundaries",
-                "property": "IsVisible",
+                "path": "/org.openoffice.Office.Writer/Content/Display",
+                "property": "ShowBoundaries",
                 "value": False,
+                "command": ".uno:ShowBoundaries"
             },
             {
-                "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/TableBoundaries",
-                "property": "IsVisible",
+                "path": "/org.openoffice.Office.Writer/Content/Display",
+                "property": "TextBoundaries",
                 "value": False,
+                "command": ".uno:ViewBounds"
             },
             {
-                "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/WriterSectionBoundaries",
-                "property": "IsVisible",
+                "path": "/org.openoffice.Office.Writer/Content/Display",
+                "property": "TableBoundaries",
                 "value": False,
+                "command": ".uno:TableBoundaries"
+            },
+            {
+                "path": "/org.openoffice.Office.Writer/Content/Display",
+                "property": "SectionBoundaries",
+                "value": False,
+                "command": ".uno:SectionBoundaries"
             },
             {
                 "path": "/org.openoffice.Office.UI/ColorScheme/ColorSchemes/org.openoffice.Office.UI:ColorScheme['{colorScheme}']/WriterFieldShadings",
                 "property": "IsVisible",
                 "value": False,
+                "command": ".uno:Marks"
             },
             {
                 "path": "/org.openoffice.Office.Common/Help",
                 "property": "ExtendedTip",
                 "value": True,
+                "command": ".uno:ActiveHelp"
             },
         )
         configProvider = context.ServiceManager.createInstanceWithContext(
@@ -277,13 +289,26 @@ def init(*args):
                 "com.sun.star.configuration.ConfigurationUpdateAccess",
                 (nodePath,)
             )
-            value = configAccess.getPropertyValue(option["property"])
-            if value != option["value"]:
-                configAccess.setPropertyValue(
-                    option["property"],
-                    option["value"]
+            if configAccess.hasByName(option["property"]):
+                # Если параметр уже существует в файле конфигурации,
+                # устанавливаем его напрямую.
+                value = configAccess.getPropertyValue(option["property"])
+                if value != option["value"]:
+                    configAccess.setPropertyValue(
+                        option["property"],
+                        option["value"]
+                    )
+                    configAccess.commitChanges()
+            else:
+                # Если в конфигурационном файле нужного нам параметра ещё нет,
+                # изменяем его значение через UI (иначе никак).
+                dispatchHelper.executeDispatch(
+                    frame,
+                    option["command"],
+                    "",
+                    0,
+                    ()
                 )
-                configAccess.commitChanges()
         toolbarPos = frame.LayoutManager.getElementPos(
             "private:resource/toolbar/custom_manual"
         )
