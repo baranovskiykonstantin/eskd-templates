@@ -48,8 +48,8 @@ class Component():
         self.description = ""
         self.fields = {}
 
-    def getFieldValue(self, name):
-        """Вернуть значение поля с указанным именем."""
+    def getRawFieldValue(self, name):
+        """Вернуть значение поля с указанным именем без обрабатки шаблов."""
         value = None
         if name == "Обозначение":
             value = self.reference
@@ -62,7 +62,7 @@ class Component():
             value = self.getExpandedValue()
         elif name == "Посад.место":
             if config.getboolean("doc", "footprint only"):
-                value = self.getFieldValue("Посад.место!")
+                value = self.getRawFieldValue("Посад.место!")
             else:
                 value = self.footprint
         elif name == "Посад.место!":
@@ -76,6 +76,11 @@ class Component():
             value = self.description
         elif name in self.fields:
             value = self.fields[name]
+        return value
+
+    def getFieldValue(self, name):
+        """Вернуть значение поля с указанным именем."""
+        value = self.getRawFieldValue(name)
         if value:
             value = self.formatPattern(value)
         return value
@@ -741,10 +746,22 @@ class Schematic():
         groups = []
         compGroup = CompGroup(self)
         compRange = CompRange(self)
-        excludedField = config.get("fields", "excluded")
+        excludedFieldName = config.get("fields", "excluded")
         for comp in sortedComponents:
-            if excludedField and excludedField in comp.fields:
-                continue
+            excludedFieldValue = comp.getRawFieldValue(excludedFieldName)
+            if excludedFieldValue is not None:
+                excludedFieldRegex = config.get("fields", "excluded regex")
+                try:
+                    re.compile(excludedFieldRegex)
+                except re.error as error:
+                    errorMessage = 'Регулярное выражение "{}" для поля "{}" имеет неверный формат:\n{}'.format(
+                        excludedFieldRegex,
+                        excludedFieldName,
+                        str(error)
+                    )
+                    raise Exception(errorMessage) from error
+                if re.match(excludedFieldRegex, excludedFieldValue):
+                    continue
             if not compRange.append(comp):
                 if not compGroup.append(compRange):
                     groups.append(compGroup)
