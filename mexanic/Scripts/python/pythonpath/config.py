@@ -55,6 +55,7 @@ def load():
                 "dealer": "",
                 "comment": "Примечание",
                 "excluded": "",
+                "excluded regex": ".*",
             },
             "group sort fields": {
                 "1": "Обозначение",
