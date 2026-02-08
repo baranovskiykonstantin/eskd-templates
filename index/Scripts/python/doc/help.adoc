@@ -7,13 +7,13 @@
 :toclevels: 4
 :sectnumlevels: 4
 :note-caption: !
-
-
-= Перечень элементов
 :author: Барановский Константин
 :email: baranovskiykonstantin@gmail.com
 :revnumber: : \
 include::../../../../version[]
+
+
+= Перечень элементов
 
 Справочное руководство
 
