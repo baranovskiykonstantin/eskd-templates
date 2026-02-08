@@ -57,6 +57,7 @@ def load():
                 "for what": "",
                 "comment": "Примечание",
                 "excluded": "",
+                "excluded regex": ".*",
             },
             "group sort fields": {
                 "1": "Обозначение",
