@@ -54,7 +54,9 @@ def load():
                 "doc": "Документ",
                 "comment": "Примечание",
                 "adjustable": "Подбирают при регулировании",
+                "adjustable regex": ".*",
                 "excluded": "",
+                "excluded regex": ".*",
             },
             "stamp": {
                 "convert doc title": "yes",

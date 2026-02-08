@@ -709,22 +709,54 @@ def setup(*args):
     labelModel14.Label = "Подбирают при регулировании:"
     labelModel14.HelpText = """\
 Если компонент содержит
-поле с указанным именем,
-то возле его обозначения
-в перечне, будет указан
-символ "*"."""
+поле с указанным именем
+и его значение соответствует
+регулярному выражению после =,
+то возле обозначения компонента
+в перечне, будет указан символ
+"*"."""
     pageModel1.insertByName("Label14", labelModel14)
 
     editControlModel14 = pageModel1.createInstance(
         "com.sun.star.awt.UnoControlEditModel"
     )
-    editControlModel14.Width = tabsModel.Width - labelModel14.Width - 3
+    editControlModel14.Width = (tabsModel.Width - labelModel14.Width - 10 - 3) / 2
     editControlModel14.Height = labelModel14.Height
     editControlModel14.PositionX = labelModel14.Width
     editControlModel14.PositionY = labelModel14.PositionY
     editControlModel14.Name = "EditControl14"
     editControlModel14.Text = config.get("fields", "adjustable")
     pageModel1.insertByName("EditControl14", editControlModel14)
+
+    editControlModel14_1 = pageModel1.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel14_1.Width = editControlModel14.Width
+    editControlModel14_1.Height = labelModel14.Height
+    editControlModel14_1.PositionX = editControlModel14.PositionX + editControlModel14.Width + 10 - 1
+    editControlModel14_1.PositionY = labelModel14.PositionY
+    editControlModel14_1.Name = "EditControl14_1"
+    editControlModel14_1.Text = config.get("fields", "adjustable regex")
+    pageModel1.insertByName("EditControl14_1", editControlModel14_1)
+
+    labelModel14_1 = pageModel1.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel14_1.PositionX = editControlModel14.PositionX + editControlModel14.Width
+    labelModel14_1.PositionY = labelModel10.Height * 4
+    labelModel14_1.Width = 10
+    labelModel14_1.Height = labelModel10.Height
+    labelModel14_1.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel14_1.Align = uno.Enum(
+        "com.sun.star.style.HorizontalAlignment",
+        "CENTER"
+    )
+    labelModel14_1.Name = "Label14_1"
+    labelModel14_1.Label = "="
+    pageModel1.insertByName("Label14_1", labelModel14_1)
 
     labelModel15 = pageModel1.createInstance(
         "com.sun.star.awt.UnoControlFixedTextModel"
@@ -741,7 +773,9 @@ def setup(*args):
     labelModel15.Label = "Исключить:"
     labelModel15.HelpText = """\
 Если компонент содержит
-поле с указанным именем,
+поле с указанным именем
+и его значение соответствует
+регулярному выражению после =,
 то он будет исключён из
 перечня элементов."""
     pageModel1.insertByName("Label15", labelModel15)
@@ -749,13 +783,43 @@ def setup(*args):
     editControlModel15 = pageModel1.createInstance(
         "com.sun.star.awt.UnoControlEditModel"
     )
-    editControlModel15.Width = tabsModel.Width - labelModel15.Width - 3
+    editControlModel15.Width = (tabsModel.Width - labelModel15.Width - 10 - 3) / 2
     editControlModel15.Height = labelModel15.Height
     editControlModel15.PositionX = labelModel15.Width
     editControlModel15.PositionY = labelModel15.PositionY
     editControlModel15.Name = "EditControl15"
     editControlModel15.Text = config.get("fields", "excluded")
     pageModel1.insertByName("EditControl15", editControlModel15)
+
+    editControlModel15_1 = pageModel1.createInstance(
+        "com.sun.star.awt.UnoControlEditModel"
+    )
+    editControlModel15_1.Width = editControlModel15.Width
+    editControlModel15_1.Height = labelModel15.Height
+    editControlModel15_1.PositionX = editControlModel15.PositionX + editControlModel15.Width + 10 - 1
+    editControlModel15_1.PositionY = labelModel15.PositionY
+    editControlModel15_1.Name = "EditControl15_1"
+    editControlModel15_1.Text = config.get("fields", "excluded regex")
+    pageModel1.insertByName("EditControl15_1", editControlModel15_1)
+
+    labelModel15_1 = pageModel1.createInstance(
+        "com.sun.star.awt.UnoControlFixedTextModel"
+    )
+    labelModel15_1.PositionX = editControlModel15.PositionX + editControlModel15.Width
+    labelModel15_1.PositionY = labelModel10.Height * 5
+    labelModel15_1.Width = 10
+    labelModel15_1.Height = labelModel10.Height
+    labelModel15_1.VerticalAlign = uno.Enum(
+        "com.sun.star.style.VerticalAlignment",
+        "MIDDLE"
+    )
+    labelModel15_1.Align = uno.Enum(
+        "com.sun.star.style.HorizontalAlignment",
+        "CENTER"
+    )
+    labelModel15_1.Name = "Label15_1"
+    labelModel15_1.Label = "="
+    pageModel1.insertByName("Label15_1", labelModel15_1)
 
     buttonModel10 = pageModel1.createInstance(
         "com.sun.star.awt.UnoControlButtonModel"
@@ -1033,8 +1097,14 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         config.set("fields", "adjustable",
             page1.getControl("EditControl14").Text
         )
+        config.set("fields", "adjustable regex",
+            page1.getControl("EditControl14_1").Text
+        )
         config.set("fields", "excluded",
             page1.getControl("EditControl15").Text
+        )
+        config.set("fields", "excluded regex",
+            page1.getControl("EditControl15_1").Text
         )
         config.setboolean("settings", "compatibility mode",
             page1.getControl("CheckBox10").State
@@ -1091,7 +1161,9 @@ class Button10ActionListener(unohelper.Base, XActionListener):
             ("EditControl12", "Документ"),
             ("EditControl13", "Примечание"),
             ("EditControl14", "Подбирают при регулировании"),
+            ("EditControl14_1", ".*"),
             ("EditControl15", ""),
+            ("EditControl15_1", ".*"),
         )
         if event.Source.Model.Name == "Button11":
             separators = {
@@ -1130,7 +1202,9 @@ class Button10ActionListener(unohelper.Base, XActionListener):
                 ("EditControl12", "Стандарт"),
                 ("EditControl13", "Примечание"),
                 ("EditControl14", "Подбирают при регулировании"),
+                ("EditControl14_1", ".*"),
                 ("EditControl15", "Исключён из ПЭ"),
+                ("EditControl15_1", ".*"),
             )
             page1.getControl("CheckBox10").State = 1
         else:

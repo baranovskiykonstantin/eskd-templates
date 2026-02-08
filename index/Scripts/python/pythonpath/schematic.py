@@ -27,8 +27,8 @@ class Component():
         self.description = ""
         self.fields = {}
 
-    def getFieldValue(self, name):
-        """Вернуть значение поля с указанным именем."""
+    def getRawFieldValue(self, name):
+        """Вернуть значение поля с указанным именем без обрабатки шаблов."""
         value = None
         if name == "Обозначение":
             value = self.reference
@@ -39,7 +39,7 @@ class Component():
                 value = self.value
         elif name == "Посад.место":
             if config.getboolean("doc", "footprint only"):
-                value = self.getFieldValue("Посад.место!")
+                value = self.getRawFieldValue("Посад.место!")
             else:
                 value = self.footprint
         elif name == "Посад.место!":
@@ -53,6 +53,11 @@ class Component():
             value = self.description
         elif name in self.fields:
             value = self.fields[name]
+        return value
+
+    def getFieldValue(self, name):
+        """Вернуть значение поля с указанным именем."""
+        value = self.getRawFieldValue(name)
         if value:
             value = self.formatPattern(value)
         return value
@@ -443,9 +448,21 @@ class CompRange(Component):
         """Вернуть перечень обозначений множества одинаковых компонентов."""
         refStr = ""
         adjustable = False
-        adjustableField = config.get("fields", "adjustable")
-        if self.getFieldValue(adjustableField) is not None:
-            adjustable = True
+        adjustableFieldName = config.get("fields", "adjustable")
+        adjustableFieldValue = self.getRawFieldValue(adjustableFieldName)
+        if adjustableFieldValue is not None:
+            adjustableFieldRegex = config.get("fields", "adjustable regex")
+            try:
+                re.compile(adjustableFieldRegex)
+            except re.error as error:
+                errorMessage = 'Регулярное выражение "{}" для поля "{}" имеет неверный формат:\n{}'.format(
+                    adjustableFieldRegex,
+                    adjustableFieldName,
+                    str(error)
+                )
+                raise Exception(errorMessage) from error
+            if re.match(adjustableFieldRegex, adjustableFieldValue):
+                adjustable = True
         if len(self._refRange) > 1:
             # "VD1, VD2", "C8-C11", "R7, R9-R14", "C8*-C11*" ...
             prevType = self.getRefType(self._refRange[0])
@@ -733,10 +750,22 @@ class Schematic():
         groups = []
         compGroup = CompGroup(self)
         compRange = CompRange(self)
-        excludedField = config.get("fields", "excluded")
+        excludedFieldName = config.get("fields", "excluded")
         for comp in sortedComponents:
-            if excludedField and excludedField in comp.fields:
-                continue
+            excludedFieldValue = comp.getRawFieldValue(excludedFieldName)
+            if excludedFieldValue is not None:
+                excludedFieldRegex = config.get("fields", "excluded regex")
+                try:
+                    re.compile(excludedFieldRegex)
+                except re.error as error:
+                    errorMessage = 'Регулярное выражение "{}" для поля "{}" имеет неверный формат:\n{}'.format(
+                        excludedFieldRegex,
+                        excludedFieldName,
+                        str(error)
+                    )
+                    raise Exception(errorMessage) from error
+                if re.match(excludedFieldRegex, excludedFieldValue):
+                    continue
             if not compRange.append(comp):
                 if not compGroup.append(compRange):
                     groups.append(compGroup)
