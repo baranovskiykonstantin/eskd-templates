@@ -399,9 +399,12 @@ class CompRange(Component):
 
     def __init__(self, schematic, comp=None):
         Component.__init__(self, schematic)
-        self._refRange = []
+        self.refRange = []
         if comp is not None:
-            self._refRange.append(comp.reference)
+            if isinstance(comp, CompRange):
+                self.refRange.extend(comp.refRange)
+            else:
+                self.refRange.append(comp.reference)
             self.reference = comp.reference
             self.value = comp.value
             self.footprint = comp.footprint
@@ -410,11 +413,11 @@ class CompRange(Component):
             self.fields = comp.fields
 
     def __iter__(self):
-        for ref in self._refRange:
+        for ref in self.refRange:
             yield ref
 
     def __len__(self):
-        return len(self._refRange)
+        return len(self.refRange)
 
     def append(self, comp):
         """Добавить новый компонент.
@@ -423,13 +426,14 @@ class CompRange(Component):
         Если компонент отличается от имеющихся, то он не будет добавлен.
 
         Аргументы:
-        comp (Component) -- компонент, который необходимо добавить.
+        comp (Component, CompRange) -- компонент или множество компонентов,
+        которые необходимо добавить.
 
         Возвращаемые значения (boolean) -- True - если компонент был добавлен,
             False - в противном случае.
 
         """
-        if not self._refRange:
+        if not self.refRange:
             self.__init__(self.schematic, comp)
             return True
         if self.getRefType() == comp.getRefType() \
@@ -437,7 +441,10 @@ class CompRange(Component):
             and self.getIndexValue("name") == comp.getIndexValue("name") \
             and self.getIndexValue("doc") == comp.getIndexValue("doc") \
             and self.getIndexValue("comment") == comp.getIndexValue("comment"):
-                self._refRange.append(comp.reference)
+                if isinstance(comp, CompRange):
+                    self.refRange.extend(comp.refRange)
+                else:
+                    self.refRange.append(comp.reference)
                 if self.getRefNumber() > comp.getRefNumber():
                     # Указывать на обозначение с наименьшим номером
                     self.reference = comp.reference
@@ -463,16 +470,16 @@ class CompRange(Component):
                 raise Exception(errorMessage) from error
             if re.match(adjustableFieldRegex, adjustableFieldValue):
                 adjustable = True
-        if len(self._refRange) > 1:
+        if len(self.refRange) > 1:
             # "VD1, VD2", "C8-C11", "R7, R9-R14", "C8*-C11*" ...
-            prevType = self.getRefType(self._refRange[0])
-            prevNumber = self.getRefNumber(self._refRange[0])
+            prevType = self.getRefType(self.refRange[0])
+            prevNumber = self.getRefNumber(self.refRange[0])
             counter = 0
             separator = ", "
             refStr = prevType + str(prevNumber)
             if adjustable:
                 refStr += '*'
-            for nextRef in self._refRange[1:]:
+            for nextRef in self.refRange[1:]:
                 currentType = self.getRefType(nextRef)
                 currentNumber = self.getRefNumber(nextRef)
                 if currentType == prevType \
@@ -777,4 +784,16 @@ class Schematic():
                 compGroup = CompGroup(self, compRange)
         if len(compGroup) > 0:
             groups.append(compGroup)
+        if config.getboolean("doc", "gather same name components"):
+            combinedGroups = []
+            for compGroup in groups:
+                combinedCompGroup = CompGroup(self)
+                for compRange in compGroup:
+                    for combinedCompRange in combinedCompGroup:
+                        if combinedCompRange.append(compRange):
+                            break
+                    else:
+                        combinedCompGroup.append(compRange)
+                combinedGroups.append(combinedCompGroup)
+            groups = combinedGroups
         return groups

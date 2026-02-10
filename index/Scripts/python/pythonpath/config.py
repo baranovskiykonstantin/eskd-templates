@@ -34,6 +34,7 @@ def load():
                 "ref separator": "-",
                 "add units": "yes",
                 "space before units": "no",
+                "gather same name components": "no",
                 "concatenate same name groups": "no",
                 "title with doc": "no",
                 "every group has title": "no",

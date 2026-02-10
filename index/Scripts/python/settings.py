@@ -26,7 +26,7 @@ def setup(*args):
         context
     )
     dialogModel.Width = 300
-    dialogModel.Height = 335
+    dialogModel.Height = 345
     dialogModel.PositionX = 0
     dialogModel.PositionY = 0
     dialogModel.Title = "Параметры перечня элементов"
@@ -380,11 +380,30 @@ def setup(*args):
 (включая множитель) будет вставлен пробел."""
     pageModel0.insertByName("CheckBox01", checkModel01)
 
+    checkModel011 = pageModel0.createInstance(
+        "com.sun.star.awt.UnoControlCheckBoxModel"
+    )
+    checkModel011.PositionX = 5
+    checkModel011.PositionY = checkModel01.PositionY + checkModel01.Height
+    checkModel011.Width = tabsModel.Width - 10
+    checkModel011.Height = checkModel00.Height
+    checkModel011.Name = "CheckBox011"
+    checkModel011.State = int(config.getboolean("doc", "gather same name components"))
+    checkModel011.Label = "Объединить все одноимённые компоненты"
+    checkModel011.HelpText = """\
+По умолчанию, компоненты с одинаковым
+наименованием сводятся в одну строку
+только если они идут подряд.
+Если отмечено, то в одну строку будут
+объединены все компоненты группы с
+одинаковым наименованием."""
+    pageModel0.insertByName("CheckBox011", checkModel011)
+
     checkModel02 = pageModel0.createInstance(
         "com.sun.star.awt.UnoControlCheckBoxModel"
     )
     checkModel02.PositionX = 5
-    checkModel02.PositionY = checkModel01.PositionY + checkModel01.Height
+    checkModel02.PositionY = checkModel011.PositionY + checkModel011.Height
     checkModel02.Width = tabsModel.Width - 10
     checkModel02.Height = checkModel00.Height
     checkModel02.Name = "CheckBox02"
@@ -1046,6 +1065,9 @@ class ButtonOKActionListener(unohelper.Base, XActionListener):
         )
         config.setboolean("doc", "space before units",
             page0.getControl("CheckBox01").State
+        )
+        config.setboolean("doc", "gather same name components",
+            page0.getControl("CheckBox011").State
         )
         config.setboolean("doc", "concatenate same name groups",
             page0.getControl("CheckBox02").State
