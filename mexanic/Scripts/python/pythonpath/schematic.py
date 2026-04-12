@@ -685,7 +685,7 @@ class Schematic():
 
         netlist = kicadnet.Netlist(netlistName)
         for sheet in netlist.items("sheet"):
-            if sheet.attributes["name"] == "/":
+            if sheet.getText("name") == "/":
                 title_block = netlist.find("title_block", sheet)
                 for item in title_block.items:
                     if item.name == "title":
@@ -693,20 +693,20 @@ class Schematic():
                     elif item.name == "company":
                         self.company = item.text if item.text is not None else ""
                     elif item.name == "comment":
-                        if item.attributes["number"] == "1":
-                            self.number = item.attributes["value"]
-                        elif item.attributes["number"] == "2":
-                            self.developer = item.attributes["value"]
-                        elif item.attributes["number"] == "3":
-                            self.verifier = item.attributes["value"]
-                        elif item.attributes["number"] == "4":
-                            self.approver = item.attributes["value"]
-                        elif item.attributes["number"] == "6":
-                            self.inspector = item.attributes["value"]
+                        if item.getText("number") == "1":
+                            self.number = item.getText("value")
+                        elif item.getText("number") == "2":
+                            self.developer = item.getText("value")
+                        elif item.getText("number") == "3":
+                            self.verifier = item.getText("value")
+                        elif item.getText("number") == "4":
+                            self.approver = item.getText("value")
+                        elif item.getText("number") == "6":
+                            self.inspector = item.getText("value")
                 break
         for comp in netlist.items("comp"):
             component = Component(self)
-            component.reference = comp.attributes["ref"]
+            component.reference = comp.getText("ref")
             skip = False
             for item in comp.items:
                 if item.name == "value":
@@ -716,14 +716,13 @@ class Schematic():
                 elif item.name == "datasheet":
                     component.datasheet = item.text if item.text is not None and item.text != "~" else ""
                 elif item.name == "libsource":
-                    if "description" in item.attributes:
-                        component.description = item.attributes["description"]
+                    component.description = item.getText("description")
                 elif item.name == "fields":
                     for field in item.items:
-                        fieldName = field.attributes["name"]
+                        fieldName = field.getText("name")
                         component.fields[fieldName] = field.text if field.text is not None and field.text != "~" else ""
                 elif item.name == "property":
-                    if item.attributes["name"] == "exclude_from_bom":
+                    if item.getText("name") == "exclude_from_bom":
                         skip = True
                         break
             if not skip:

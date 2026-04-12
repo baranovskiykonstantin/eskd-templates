@@ -160,8 +160,7 @@ def setup(*args):
 Источником данных о схеме является
 файл списка цепей KiCad.
 Поддерживаются файлы с расширением
-*.net (Pcbnew) и с расширением
-*.xml (вспомогательный)."""
+*.net (Pcbnew)."""
     pageModel0.insertByName("Label00", labelModel00)
 
     buttonModel00 = pageModel0.createInstance(
@@ -1681,7 +1680,7 @@ class Button00ActionListener(unohelper.Base, XActionListener):
         editControl = self.dialog.getControl("Tabs").getControl("Page0").getControl("EditControl00")
         source = common.showFilePicker(
             editControl.Text,
-            **{"Список цепей KiCad": "*.net;*.xml", "Все файлы": "*.*"}
+            **{"Список цепей KiCad": "*.net", "Все файлы": "*.*"}
         )
         if source is not None:
             editControl.Text = source

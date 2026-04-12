@@ -177,8 +177,8 @@ def getSourceFileName():
         docPath = uno.fileUrlToSystemPath(docUrl)
         sourceDir = os.path.dirname(docPath)
         for fileName in os.listdir(sourceDir):
-            if fileName.endswith(".pro"):
-                sourceName = fileName.replace(".pro", ".net")
+            if fileName.endswith(".kicad_pro"):
+                sourceName = fileName.replace(".kicad_pro", ".net")
         if sourceName:
             sourcePath = os.path.join(sourceDir, sourceName)
             if os.path.exists(sourcePath):
@@ -187,7 +187,7 @@ def getSourceFileName():
                 return sourcePath
     sourcePath = showFilePicker(
         os.path.join(sourceDir, sourceName),
-        **{"Список цепей KiCad": "*.net;*.xml", "Все файлы": "*.*"}
+        **{"Список цепей KiCad": "*.net", "Все файлы": "*.*"}
     )
     if sourcePath is not None:
         config.set("doc", "source", sourcePath)

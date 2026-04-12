@@ -21,20 +21,18 @@ class ParseException(Exception):
 class NetlistItem():
     """Элемент списка цепей."""
 
-    def __init__(self, parent, name, attributes=None, items=None, text=None):
+    def __init__(self, parent, name, items=None, text=None):
         """Создать элемент списка цепей.
 
         Каждый элемент:
         - должен иметь родителя или None -- если элемент корневой;
         - должен иметь имя;
-        - может иметь атрибуты;
-        - может иметь дочерние (вложенные) элементы;
-        - может содержать значение в виде строки текста.
+        - может иметь дочерние элементы;
+        - может содержать одну или несколько строк текста.
 
         Аргументы:
         parent (NetlistItem) -- родительский элемент;
         name (str) -- имя элемента;
-        attributes (dict of str) -- словарь атрибутов ("имя": "значение");
         items (list of NetlistItem) -- массив дочерних элементов;
         text (str/list of str) -- текстовое значение элемента. Если значение
             состоит из нескольких строк, то оно будет представлено в виде
@@ -43,9 +41,28 @@ class NetlistItem():
         """
         self.parent = parent
         self.name = name
-        self.attributes = {} if attributes is None else attributes
         self.items = [] if items is None else items
         self.text = text
+
+    def getText(self, name):
+        """Получить текст элемента списка цепей с указанным именем.
+
+        Будет возвращён текст дочернего элемента с указанным именем.
+        Если элемента с указанным именем нет -- будет возвращена пустая строка.
+
+        Аргументы:
+        name (str) -- имя элемента.
+
+        """
+        for item in self.items:
+            if item.name == name:
+                if type(item.text) is str:
+                    return item.text
+                elif type(item.text) is list:
+                    return ' '.join(item.text)
+                else:
+                    break
+        return ""
 
 
 class Netlist():
@@ -137,7 +154,7 @@ class Netlist():
         else:
             while self._hasChar():
                 character = self._getChar()
-                if character in " ()\n":
+                if character in " \t()\n":
                     break
                 text += character
                 self._nextChar()
@@ -154,7 +171,7 @@ class Netlist():
         name = ""
         while self._hasChar():
             character = self._getChar()
-            if character in " ()\n":
+            if character in " \t()\n":
                 break
             name += character
             self._nextChar()
@@ -163,20 +180,13 @@ class Netlist():
         if name == "":
             self._error("Элемент не имеет имени!")
         item = NetlistItem(parent, name)
-        isAttribute = True
         while self._hasChar():
             character = self._getChar()
-            if character == ' ':
-                self._nextChar()
-            elif character == '\n':
-                isAttribute = False
+            if character in ' \t\n':
                 self._nextChar()
             elif character == '(':
                 subitem = self._parseNetItem(item)
-                if isAttribute:
-                    item.attributes[subitem.name] = subitem.text
-                else:
-                    item.items.append(subitem)
+                item.items.append(subitem)
             elif character == ')':
                 self._nextChar()
                 break
@@ -185,7 +195,7 @@ class Netlist():
                 if item.text is None:
                     item.text = text
                 else:
-                    if type(item.text) != "list":
+                    if type(item.text) is not list:
                         item.text = [item.text]
                     item.text.append(text)
         else:
@@ -197,169 +207,27 @@ class Netlist():
 
     @staticmethod
     def _formatNetText(text):
-        if text == "" \
-            or ' ' in text \
-            or '(' in text \
-            or ')' in text \
-            or '"' in text:
-                text = text.replace("\\", "\\\\")
-                text = text.replace("\"", "\\\"")
-                text = '"{}"'.format(text)
+        text = text.replace("\\", "\\\\")
+        text = text.replace("\"", "\\\"")
+        text = '"{}"'.format(text)
         return text
 
     def _formatNetItem(self, item):
         output = '(' + item.name
-        for attrName in item.attributes:
-            attrValue = item.attributes[attrName]
-            attrValue = self._formatNetText(attrValue)
-            output += " ({} {})".format(attrName, attrValue)
         if item.items:
             output += '\n'
             for subitem in item.items:
                 childText = self._formatNetItem(subitem)
                 for line in childText.splitlines():
-                    output += "  {}\n".format(line)
+                    output += "\t{}\n".format(line)
         if item.text is not None:
-            if type(item.text) == "list":
+            output = output.rstrip('\n')
+            if type(item.text) is list:
                 for val in item.text:
                     output += ' ' + self._formatNetText(val)
             else:
                 output += ' ' + self._formatNetText(item.text)
-        else:
-            output = output.rstrip('\n')
         output += ')'
-        return output
-
-    def _parseXmlAttribute(self):
-        if not self._hasChar():
-            return None
-        name = ""
-        while self._hasChar():
-            character = self._getChar()
-            self._nextChar()
-            if character == '=':
-                break
-            elif not character.isalnum():
-                self._error(
-                    "В имени атрибута содержится недопустимый символ '{}'!".format(character)
-                )
-            name += character
-        else:
-            self._error("Элемент неожиданно закончился!")
-        if name == "":
-            self._error("Атрибут не имеет имени!")
-        value = ""
-        if self._getChar() != '"':
-            self._error("Значение должно начинаться символом '\"')!")
-        self._nextChar()
-        while self._hasChar():
-            character = self._getChar()
-            self._nextChar()
-            if character == '"':
-                break
-            value += character
-        else:
-            self._error(
-                "Значение неожиданно закончилось " \
-                "(должно заканчиваться символом '\"')!"
-            )
-        value = html.unescape(value)
-        return (name, value)
-
-    def _parseXmlItem(self, parent):
-        if not self._hasChar():
-            return None
-        if self._getChar() != '<':
-            self._error("Элемент должен начинаться символом '<'!")
-        self._nextChar()
-        name = ""
-        while self._hasChar():
-            character = self._getChar()
-            if character in "/> ":
-                break
-            name += character
-            self._nextChar()
-        else:
-            self._error("Элемент неожиданно закончился!")
-        if name == "":
-            self._error("Элемент не имеет имени!")
-        item = NetlistItem(parent, name)
-        # Атрибуты
-        while self._hasChar():
-            character = self._getChar()
-            if character == ' ':
-                self._nextChar()
-            elif character == '>':
-                self._nextChar()
-                break
-            elif character == '/':
-                if self._getChar(+1) != '>':
-                    self._error(
-                        "Недопустимая последовательность символов " \
-                        "(после '/' ожидался символ '>')!"
-                    )
-                self._nextChar(2)
-                return item
-            else:
-                attrName, attrValue = self._parseXmlAttribute()
-                item.attributes[attrName] = attrValue
-        else:
-            self._error("Элемент неожиданно закончился!")
-        # Дочерние элементы
-        closingTag = "</{}>".format(name)
-        if self._getChar() == '\n':
-            self._nextChar()
-            while self._hasChar():
-                character = self._getChar()
-                if character in " \n":
-                    self._nextChar()
-                elif self._content[self._index:].startswith(closingTag):
-                    self._nextChar(len(closingTag))
-                    break
-                elif character == '<':
-                    subitem = self._parseXmlItem(item)
-                    item.items.append(subitem)
-                else:
-                    self._error(
-                        "Обнаружен недопустимый символ '{}'!".format(character)
-                    )
-            else:
-                self._error("Элемент неожиданно закончился!")
-        # Значение
-        else:
-            text = ""
-            while self._hasChar():
-                character = self._getChar()
-                if self._content[self._index:].startswith(closingTag):
-                    self._nextChar(len(closingTag))
-                    break
-                text += character
-                self._nextChar()
-            else:
-                self._error("Элемент неожиданно закончился!")
-            if text:
-                item.text = text
-        return item
-
-    def _formatXmlItem(self, item):
-        output = '<' + item.name
-        for attrName in item.attributes:
-            attrValue = item.attributes[attrName]
-            attrValue = html.escape(attrValue)
-            output += ' {}="{}"'.format(attrName, attrValue)
-        if not item.text and not item.items:
-            output += "/>"
-            return output
-        output += '>'
-        if item.items:
-            output += '\n'
-            for subitem in item.items:
-                childText = self._formatXmlItem(subitem)
-                for line in childText.splitlines():
-                    output += "  {}\n".format(line)
-        if item.text:
-            output += item.text
-        output += "</{}>".format(item.name)
         return output
 
     def find(self, name, item=None):
@@ -418,3 +286,4 @@ class Netlist():
             else:
                 netlist.write('<?xml version="1.0" encoding="UTF-8"?>\n')
                 netlist.write(self._formatXmlItem(self.data))
+
