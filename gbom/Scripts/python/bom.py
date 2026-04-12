@@ -117,7 +117,7 @@ class ProgressDialog:
         self.progress += 1
         self.dialog.getControl("ProgressBar").setValue(self.progress)
         self.dialog.setTitle("Прогресс: {:.0f}%".format(
-            100 * self.progress / self.progressTotal
+            min(100 * self.progress / self.progressTotal, 100)
         ))
 
     def close(self):
