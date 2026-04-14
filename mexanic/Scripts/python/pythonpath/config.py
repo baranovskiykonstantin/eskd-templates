@@ -222,7 +222,7 @@ def importFromDoc(docName):
 
     iSettingsData = docFile.open("Scripts/python/settings.ini")
     iSettings = ConfigParser()
-    iSettings.read_file(io.TextIOWrapper(iSettingsData))
+    iSettings.read_file(io.TextIOWrapper(iSettingsData, encoding='utf-8'))
     pCount = 0
     load()
     for section in iSettings:
