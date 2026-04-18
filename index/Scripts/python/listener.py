@@ -43,83 +43,86 @@ class DocModifyListener(unohelper.Base, XModifyListener):
         doc.removeModifyListener(self)
         doc.UndoManager.lock()
 
-        # Обновление высоты строк.
-        firstPageStyleName = doc.Text.createTextCursor().PageDescName
-        if firstPageStyleName and "Перечень_элементов" in doc.TextTables:
-            table = doc.TextTables["Перечень_элементов"]
-            tableRowCount = table.Rows.Count
-            if firstPageStyleName != self.prevFirstPageStyleName \
-                or tableRowCount != self.prevTableRowCount:
-                    self.prevFirstPageStyleName = firstPageStyleName
-                    self.prevTableRowCount = tableRowCount
-                    if not common.isThreadWorking():
-                        common.updateTableRowsHeight()
-
-        if not common.isThreadWorking():
-            currentCell = doc.CurrentController.ViewCursor.Cell
-            currentTable = doc.CurrentController.ViewCursor.TextTable
-            currentFrame = doc.CurrentController.ViewCursor.TextFrame
-
-            # Подстройка масштаба шрифта по ширине.
-            if currentCell or currentFrame:
-                if currentCell:
-                    itemName = ""
-                    if currentTable.Name == "Перечень_элементов":
-                        itemName = "ТабПЭ." + currentCell.CellName[0]
-                    elif currentTable.Name == "Лист_регистрации_изменений":
-                        itemName = "ТабРИ." + currentCell.CellName[0]
-                    elif currentTable.Name.startswith("Изм_таб_"):
-                        itemName = "ТабТИ." + currentCell.CellName[0]
-                    item = currentCell
-                else: # currentFrame
-                    itemName = currentFrame.Name[8:]
-                    item = currentFrame
-                if itemName in common.ITEM_WIDTHS:
-                    itemWidth = common.ITEM_WIDTHS[itemName]
-                    itemCursor = item.createTextCursor()
-                    for line in item.String.splitlines(keepends=True):
-                        widthFactor = textwidth.getWidthFactor(
-                            line,
-                            itemCursor.CharHeight,
-                            itemWidth - 1
-                        )
-                        itemCursor.goRight(len(line), True)
-                        itemCursor.CharScaleWidth = widthFactor
-                        itemCursor.collapseToEnd()
-
-            # Синхронизация содержимого полей в разных стилях страниц.
-            if currentFrame is not None \
-                and currentFrame.Name.startswith("Перв.") \
-                and not currentFrame.Name.endswith("7 Лист") \
-                and not currentFrame.Name.endswith("8 Листов"):
-                    # Обновить только текущую графу
-                    name = currentFrame.Name[8:]
-                    text = currentFrame.String
-                    cursor = currentFrame.createTextCursor()
-                    fontSize = cursor.CharHeight
-                    widthFactor = cursor.CharScaleWidth
-                    # Есть 4 варианта оформления первого листа
-                    # в виде 4-х стилей страницы.
-                    # Поля форматной рамки хранятся в нижнем колонтитуле
-                    # и для каждого стиля имеется свой набор полей.
-                    # При редактировании, значения полей нужно синхронизировать
-                    # между собой.
-                    for firstPageVariant in "1234":
-                        if currentFrame.Name[5] == firstPageVariant:
-                            continue
-                        otherName = "Перв.{}: {}".format(firstPageVariant, name)
-                        if otherName in doc.TextFrames:
-                            otherFrame = doc.TextFrames[otherName]
-                            otherFrame.String = text
-                            otherCursor = otherFrame.createTextCursor()
-                            otherCursor.gotoEnd(True)
-                            otherCursor.CharHeight = fontSize
-                            otherCursor.CharScaleWidth = widthFactor
-                    # А также, обновить поля на последующих листах
-                    common.syncCommonFields()
-
-        doc.UndoManager.unlock()
-        doc.addModifyListener(self)
+        try:
+            # Обновление высоты строк.
+            firstPageStyleName = doc.Text.createTextCursor().PageDescName
+            if firstPageStyleName and "Перечень_элементов" in doc.TextTables:
+                table = doc.TextTables["Перечень_элементов"]
+                tableRowCount = table.Rows.Count
+                if firstPageStyleName != self.prevFirstPageStyleName \
+                    or tableRowCount != self.prevTableRowCount:
+                        self.prevFirstPageStyleName = firstPageStyleName
+                        self.prevTableRowCount = tableRowCount
+                        if not common.isThreadWorking():
+                            common.updateTableRowsHeight()
+    
+            if not common.isThreadWorking():
+                currentCell = doc.CurrentController.ViewCursor.Cell
+                currentTable = doc.CurrentController.ViewCursor.TextTable
+                currentFrame = doc.CurrentController.ViewCursor.TextFrame
+    
+                # Подстройка масштаба шрифта по ширине.
+                if currentCell or currentFrame:
+                    if currentCell:
+                        itemName = ""
+                        if currentTable.Name == "Перечень_элементов":
+                            itemName = "ТабПЭ." + currentCell.CellName[0]
+                        elif currentTable.Name == "Лист_регистрации_изменений":
+                            itemName = "ТабРИ." + currentCell.CellName[0]
+                        elif currentTable.Name.startswith("Изм_таб_"):
+                            itemName = "ТабТИ." + currentCell.CellName[0]
+                        item = currentCell
+                    else: # currentFrame
+                        itemName = currentFrame.Name[8:]
+                        item = currentFrame
+                    if itemName in common.ITEM_WIDTHS:
+                        itemWidth = common.ITEM_WIDTHS[itemName]
+                        itemCursor = item.createTextCursor()
+                        for line in item.String.splitlines(keepends=True):
+                            widthFactor = textwidth.getWidthFactor(
+                                line,
+                                itemCursor.CharHeight,
+                                itemWidth - 1
+                            )
+                            itemCursor.goRight(len(line), True)
+                            itemCursor.CharScaleWidth = widthFactor
+                            itemCursor.collapseToEnd()
+    
+                # Синхронизация содержимого полей в разных стилях страниц.
+                if currentFrame is not None \
+                    and currentFrame.Name.startswith("Перв.") \
+                    and not currentFrame.Name.endswith("7 Лист") \
+                    and not currentFrame.Name.endswith("8 Листов"):
+                        # Обновить только текущую графу
+                        name = currentFrame.Name[8:]
+                        text = currentFrame.String
+                        cursor = currentFrame.createTextCursor()
+                        fontSize = cursor.CharHeight
+                        widthFactor = cursor.CharScaleWidth
+                        # Есть 4 варианта оформления первого листа
+                        # в виде 4-х стилей страницы.
+                        # Поля форматной рамки хранятся в нижнем колонтитуле
+                        # и для каждого стиля имеется свой набор полей.
+                        # При редактировании, значения полей нужно синхронизировать
+                        # между собой.
+                        for firstPageVariant in "1234":
+                            if currentFrame.Name[5] == firstPageVariant:
+                                continue
+                            otherName = "Перв.{}: {}".format(firstPageVariant, name)
+                            if otherName in doc.TextFrames:
+                                otherFrame = doc.TextFrames[otherName]
+                                otherFrame.String = text
+                                otherCursor = otherFrame.createTextCursor()
+                                otherCursor.gotoEnd(True)
+                                otherCursor.CharHeight = fontSize
+                                otherCursor.CharScaleWidth = widthFactor
+                        # А также, обновить поля на последующих листах
+                        common.syncCommonFields()
+    
+        finally:
+            if doc.UndoManager.isLocked():
+                doc.UndoManager.unlock()
+            doc.addModifyListener(self)
 
 
 def importEmbeddedModules(*args):
