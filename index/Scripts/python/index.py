@@ -226,6 +226,7 @@ class IndexBuildingThread(threading.Thread):
         # --------------------------------------------------------------------
         # Начало построения таблицы
         # --------------------------------------------------------------------
+        doc = None
         try:
             schematic = common.getSchematicData()
             if schematic is None:
@@ -372,11 +373,12 @@ class IndexBuildingThread(threading.Thread):
         finally:
             if "progressDialog" in locals():
                 progressDialog.close()
-            if doc.UndoManager.isLocked():
-                doc.UndoManager.unlock()
-            doc.UndoManager.clear()
-            if doc.hasControllersLocked():
-                doc.unlockControllers()
+            if doc is not None:
+                if doc.UndoManager.isLocked():
+                    doc.UndoManager.unlock()
+                doc.UndoManager.clear()
+                if doc.hasControllersLocked():
+                    doc.unlockControllers()
 
 
 def clean(*args, force=False):
