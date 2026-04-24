@@ -1,0 +1,1642 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "a90aecb9-5cb3-4019-91c9-0d245f6b8dc2")
+	(paper "A4" portrait)
+	(title_block
+		(title "Однокаскадный транзисторный усилитель.\\nСхема электрическая принципиальная")
+		(date "13 may 2013")
+		(company "\"kicadbom2spec\"")
+		(comment 1 "АБВГ.112345.001 Э3")
+		(comment 2 "Иванова А.М.")
+		(comment 3 "Петров Н.Г.")
+		(comment 4 "Смирнов С.Н.")
+	)
+	(lib_symbols
+		(symbol "example:C"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 5.715 2.54 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Value" "C"
+				(at 4.445 -4.445 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(rectangle
+					(start -3.81 0)
+					(end 3.81 0)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 3.81 -1.27)
+					(end -3.81 -1.27)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin input line
+					(at 0 5.08 270)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 0 -6.35 90)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "example:Cpol"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 5.715 2.54 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Value" "Cpol"
+				(at 8.255 -4.445 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Cpol_0_1"
+				(polyline
+					(pts
+						(xy -3.81 2.54) (xy -1.27 2.54)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -3.81 0)
+					(end 3.81 0)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 1.27) (xy -2.54 3.81)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 3.81 -1.27)
+					(end -3.81 -1.27)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Cpol_1_1"
+				(pin input line
+					(at 0 5.08 270)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 0 -6.35 90)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "example:NPN"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "VT"
+				(at -7.62 6.985 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Value" "NPN"
+				(at -7.62 -8.89 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "NPN_0_1"
+				(polyline
+					(pts
+						(xy -1.905 4.445) (xy -1.905 -4.445) (xy -1.905 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.905 0) (xy -6.35 0) (xy -4.445 0)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center -0.254 0)
+					(radius 6.096)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.508 -3.302) (xy 2.54 -5.334) (xy -0.254 -4.318)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 5.334) (xy -1.905 2.54)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -5.334) (xy -1.905 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "NPN_1_1"
+				(pin input line
+					(at -8.89 0 0)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 2.54 7.62 270)
+					(length 2.286)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 2.54 -7.62 90)
+					(length 2.286)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "example:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 0 4.445 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 -5.715 0)
+				(effects
+					(font
+						(size 3.5052 3.5052)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -5.08 1.905)
+					(end 5.08 -1.905)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.381 -0.889) (xy -2.159 0.889)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.159 -0.889) (xy 0.381 0.889)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin input line
+					(at -10.16 0 0)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 10.16 0 180)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(text "* Подбирают при регилировании"
+		(exclude_from_sim no)
+		(at 64.135 212.09 0)
+		(effects
+			(font
+				(size 3.5052 3.5052)
+			)
+			(justify left bottom)
+		)
+		(uuid "39c9c865-49d7-4d61-9a76-0f6827133010")
+	)
+	(junction
+		(at 121.92 101.6)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "17609dc5-02d5-4e4c-be6f-6e79d612d7a1")
+	)
+	(junction
+		(at 147.32 194.31)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "22b1cd10-04bc-4575-9c9d-7c55b6f20a7f")
+	)
+	(junction
+		(at 85.09 123.19)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "3161bbb6-5905-4e8f-8f9f-c113682d41f5")
+	)
+	(junction
+		(at 121.92 146.05)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "5d6a9ed6-35f0-48de-93ea-9e5cd4248d50")
+	)
+	(junction
+		(at 121.92 194.31)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6fe2aa33-ca7d-4110-a97e-3e0dde6e0828")
+	)
+	(wire
+		(pts
+			(xy 85.09 101.6) (xy 85.09 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0c52c931-8feb-4075-9f86-982db3ccd7e2")
+	)
+	(wire
+		(pts
+			(xy 90.17 101.6) (xy 85.09 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0da8559a-acf2-4c61-8919-caf33b43364b")
+	)
+	(wire
+		(pts
+			(xy 62.23 123.19) (xy 50.8 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "23228997-d148-4d45-905d-84fb6b168bc9")
+	)
+	(wire
+		(pts
+			(xy 121.92 194.31) (xy 147.32 194.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "24921169-8f97-4c43-b835-14c86e52a7b8")
+	)
+	(wire
+		(pts
+			(xy 121.92 66.04) (xy 121.92 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2838ac40-fe03-4def-9df0-485ca48399f3")
+	)
+	(wire
+		(pts
+			(xy 73.66 123.19) (xy 85.09 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2b1e435a-c6fa-4ee4-913a-6a047ab2f539")
+	)
+	(wire
+		(pts
+			(xy 121.92 101.6) (xy 139.7 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "316eeca2-d8f3-4fb9-9874-6b9be1adb47d")
+	)
+	(wire
+		(pts
+			(xy 110.49 101.6) (xy 121.92 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4915b523-adc2-4c54-bfdb-5f71d71bf7e7")
+	)
+	(wire
+		(pts
+			(xy 121.92 49.53) (xy 50.8 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "505781e0-2ed6-4700-9b5d-39b79ad7b079")
+	)
+	(wire
+		(pts
+			(xy 121.92 146.05) (xy 121.92 158.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "56e4da6e-9988-4935-8122-95a86efde58c")
+	)
+	(wire
+		(pts
+			(xy 147.32 146.05) (xy 121.92 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "606b90c9-532a-4afe-a659-d926cd58f960")
+	)
+	(wire
+		(pts
+			(xy 121.92 130.81) (xy 121.92 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e05a7de-0f94-4270-8c5d-7ec8f7107496")
+	)
+	(wire
+		(pts
+			(xy 147.32 175.26) (xy 147.32 194.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7ade7022-df41-4469-8e90-f39d4a600d01")
+	)
+	(wire
+		(pts
+			(xy 147.32 163.83) (xy 147.32 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "953775eb-bdd3-4ef3-98bf-05b78f458151")
+	)
+	(wire
+		(pts
+			(xy 121.92 101.6) (xy 121.92 115.57)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "97890bac-0f08-4565-b0a3-bea1a30382e3")
+	)
+	(wire
+		(pts
+			(xy 50.8 194.31) (xy 121.92 194.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a822796a-5d77-4beb-a51f-d46e44ce4800")
+	)
+	(wire
+		(pts
+			(xy 147.32 194.31) (xy 177.8 194.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b39c584f-d12b-4fa7-bd5a-7a9efbae6d4c")
+	)
+	(wire
+		(pts
+			(xy 85.09 123.19) (xy 110.49 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ba9d805d-0455-4442-9200-83d34f665e5b")
+	)
+	(wire
+		(pts
+			(xy 121.92 86.36) (xy 121.92 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c88ef15c-5226-46fc-8fbb-ce71ad0b0fd0")
+	)
+	(wire
+		(pts
+			(xy 157.48 101.6) (xy 151.13 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d2287f4d-069d-4bbf-a719-17dbd898b7d5")
+	)
+	(wire
+		(pts
+			(xy 121.92 179.07) (xy 121.92 194.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e661999d-694d-4ca8-a4e2-ff4e37ae685d")
+	)
+	(global_label "+9 В"
+		(shape input)
+		(at 50.8 49.53 180)
+		(effects
+			(font
+				(size 3.5052 3.5052)
+			)
+			(justify right)
+		)
+		(uuid "1297c803-9c5d-4cf6-83a2-fabef92d34e9")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 50.8 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Вход"
+		(shape input)
+		(at 50.8 123.19 180)
+		(effects
+			(font
+				(size 3.5052 3.5052)
+			)
+			(justify right)
+		)
+		(uuid "5c1bb1d9-6042-483d-a26a-d7bc8f037f47")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 50.8 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Общ."
+		(shape input)
+		(at 177.8 194.31 0)
+		(effects
+			(font
+				(size 3.5052 3.5052)
+			)
+			(justify left)
+		)
+		(uuid "785300d5-b847-49a5-b372-bb38b56755a4")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 177.8 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Выход"
+		(shape output)
+		(at 157.48 101.6 0)
+		(effects
+			(font
+				(size 3.5052 3.5052)
+			)
+			(justify left)
+		)
+		(uuid "e8d4eba9-08a6-4460-9472-1e518633702f")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 157.48 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Общ."
+		(shape input)
+		(at 50.8 194.31 180)
+		(effects
+			(font
+				(size 3.5052 3.5052)
+			)
+			(justify right)
+		)
+		(uuid "f1d6f8d0-f5cc-4183-a3ae-a708d6db9ff8")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 50.8 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:NPN")
+		(at 119.38 123.19 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-000051850fe1")
+		(property "Reference" "VT1"
+			(at 104.14 129.54 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Value" "КТ3102А"
+			(at 104.14 135.89 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Footprint" "~"
+			(at 119.38 123.19 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 119.38 123.19 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 119.38 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Транзистор {Транзисторы}"
+			(at 119.38 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "2e5e7f68-cd79-42b9-ae65-deac22259356")
+		)
+		(pin "1"
+			(uuid "51b81837-8ef8-4025-8c28-1656ee4da926")
+		)
+		(pin "2"
+			(uuid "c1eda8e2-0ab5-4027-9c12-aaa9497ef8ef")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "VT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:R")
+		(at 121.92 168.91 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-000051850ff0")
+		(property "Reference" "R3"
+			(at 125.73 166.37 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "68"
+			(at 125.73 171.45 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "~"
+			(at 121.92 168.91 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 121.92 168.91 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 121.92 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Резистор {Резисторы}"
+			(at 121.92 168.91 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Наименование" "МЛТ-0,125-${Значение}±5%-В"
+			(at 121.92 168.91 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Документ" "ОЖ0.467.18"
+			(at 121.92 168.91 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0def42bb-7670-4758-a92a-b50527e2745d")
+		)
+		(pin "2"
+			(uuid "21cd5720-cb7a-43c2-8e5b-852c49dcda0d")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:Cpol")
+		(at 147.32 168.91 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-0000518511b5")
+		(property "Reference" "C3"
+			(at 153.67 166.37 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "10мк"
+			(at 153.67 172.72 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "~"
+			(at 147.32 168.91 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 147.32 168.91 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 147.32 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Наименование" "К50-35-63В-${Значение}±10%"
+			(at 147.32 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Конденсатор {Конденсаторы}"
+			(at 147.32 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Документ" "ОЖО.464.214 ТУ"
+			(at 147.32 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fdaa90e2-cfa0-4135-a0e0-e8c93f1e020a")
+		)
+		(pin "2"
+			(uuid "dcdfb49b-928b-49a1-a453-24fb15f2a9e6")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "C3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:R")
+		(at 121.92 76.2 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-0000518516d6")
+		(property "Reference" "R2"
+			(at 125.73 73.66 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "1.5к"
+			(at 125.73 78.74 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "~"
+			(at 121.92 76.2 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 121.92 76.2 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 121.92 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Резистор {Резисторы}"
+			(at 121.92 76.2 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Наименование" "МЛТ-0,125-${Значение}±5%-В"
+			(at 121.92 76.2 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Документ" "ОЖ0.467.18"
+			(at 121.92 76.2 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f2c85700-6b0c-4aa0-a741-6c46af699e63")
+		)
+		(pin "2"
+			(uuid "40605e57-52ec-41cc-9594-0494024e9b8d")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:R")
+		(at 100.33 101.6 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-0000518516ff")
+		(property "Reference" "R1"
+			(at 100.33 96.52 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Value" "330к"
+			(at 100.33 107.95 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Footprint" "~"
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Резистор {Резисторы}"
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Примечание" "270...360 кОм"
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Подбирают при регулировании" "*"
+			(at 105.5878 96.52 0)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Наименование" "МЛТ-0,125-${Значение}±5%-В"
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Документ" "ОЖ0.467.18"
+			(at 100.33 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "210724f2-4d7e-4bee-ac47-1d4c92fee18e")
+		)
+		(pin "2"
+			(uuid "43e06241-00c9-4b39-9378-6e4b3c24ec85")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:Cpol")
+		(at 67.31 123.19 90)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-000051851778")
+		(property "Reference" "C1"
+			(at 68.58 115.57 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Value" "4.7мк"
+			(at 68.58 132.08 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Footprint" "~"
+			(at 67.31 123.19 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 67.31 123.19 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 67.31 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Наименование" "К50-35-63В-${Значение}±10%"
+			(at 67.31 123.19 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Конденсатор {Конденсаторы}"
+			(at 67.31 123.19 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Документ" "ОЖО.464.214 ТУ"
+			(at 67.31 123.19 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "36a0d7d9-da5e-43e1-9961-21a9ff12645f")
+		)
+		(pin "1"
+			(uuid "47f9c5b1-0070-416e-9ac0-2c4b693b514e")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "C1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "example:C")
+		(at 144.78 101.6 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "00000000-0000-0000-0000-0000518517ec")
+		(property "Reference" "C2"
+			(at 144.78 93.98 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Value" "1мк"
+			(at 146.05 110.49 90)
+			(effects
+				(font
+					(size 3.5052 3.5052)
+				)
+			)
+		)
+		(property "Footprint" "~"
+			(at 144.78 101.6 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 144.78 101.6 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 144.78 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Наименование" "К73-17-1б-Н90-${Значение}±10%"
+			(at 144.78 101.6 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Тип" "Конденсатор {Конденсаторы}"
+			(at 144.78 101.6 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Документ" "ОЖ0.461.104ТУ"
+			(at 144.78 101.6 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "9d2cd111-f3b2-49ee-926d-42810c2f79c4")
+		)
+		(pin "1"
+			(uuid "49bf262a-4b40-4308-a811-ba7861136a68")
+		)
+		(instances
+			(project ""
+				(path "/a90aecb9-5cb3-4019-91c9-0d245f6b8dc2"
+					(reference "C2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(embedded_files
+		(file
+			(name "gost_portrait.kicad_wks")
+			(type worksheet)
+			(data |KLUv/WBfIJ0nAKaqgjFQdTow6/sN5DR/vmVgznO2BusTYfKKtjvhvi10ZG94TYSBbSllkimVFJR/
+				JcJMEVMDfQBlAHsA/b2ibZNh1Fa+VDM/zXDdzDACAfZwJqiCdFvXkE1qq21mm7Zh6Kzb5qWbhoKo
+				rTB0Mw0EGLPTo8mopZu5eTRKNYaPRqnqHzjYRlVyM4yzaTwL1GF2qu/KLbcPtAGTmBnWoaq3eucE
+				BqKhSan9RNAJonYBaIQm0nQWJkfzoQLv37/LXUZ+96Rc5+2ZRrXMPbNDXufcwQCPstdd7jK6B/n7
+				H6/I9br3yO7t2vcfd8i5vqTD+A/dn597+/J5dAn7H7s7duv+1/XV8h+vi/BjwIai84suun+LOpnG
+				m2kY/Wh02yf3cZErSLUj+jYc9fdj3nePkfd6PDpVcHTAOnYqJhQnU3XZaL5KLvGSKrWkVONbcLPZ
+				CWk81LKEGt/86uhEqhnu2kk1VNviumVSWaqpkipKxai9TZrNzYocMAqKgLDa9y34vCDtgyDAGGul
+				WpxSakstVdJLAWZpaFIGGiOzCwCVf+R+7O1ev8UdIV9Mtygvfuvi5XgfQjfwWL6435/QvfMhujvN
+				NAdq5UPIvPc+yPBKLsg85wqZXWmpJNfoNCJb5OLYpJAIUUC6/+NFZ4/N/bhLdU0uH9+OpZ7UlWpy
+				qUtxOqkf76I4jU4sKdXyuGRJvXgLBoFmqDFJqmZEkoKkkGENUZXAGIKZOzuSOBCCMBgCQRxJYhQE
+				QgJIDCGEEEIIIoqIkGQ7oDMhQbjPlMS2/IRhPtncHs662b/eaerSQP0n4jdzbD8u/VPhXFQkM2PB
+				M0g4hoL9O8ZSZEm5eA2V4JIOydCXS4ODcxF0jXxkoHp02a1p0VWn0RH/UT2UCmF0AY2BARt6VKSp
+				gy3TjZB50tKWVI2OYJndTneHHl/+377mTjdBl6kg5Go11c418qFuscR2AW1OtO3IisvYjmJ+w58b
+				c9JeFpbOz4LMnRi25YGhtIQW4+EThtnr4kEFdINAwgmehuJVwZdiwpsGvYciq868Acp2BMhuHaIY
+				OSflHN88tPw6j7Ii5jQjP9RyHMYjEi217W8Bb2xjsUllKkVUdaBwTl+UwB8I9XYILeLLGJyw59Lg
+				H2bmncfQ7zdMc7r3Gf1t8c34Rj804IPi02raFTByf7X1OcvgF/3kyJm0YUE3jKWeiqOQBMgn8eVg
+				NHw5JGcxNd+Wnk6JiLnnVbRtA+Ctc2wm7jBR1eCVAb1FalVYmS0HkQFi13lSvG8WWkggX+Um6guL
+				rQqIhoEUqq074gZa5HydHh0a1jL9WrmaWHQKXJjAwaP7PI5PCR9gu+py5aFQXQsvORgWUjAqHEwM
+				1gjs1uDkkHTR+B+EuYqifD+CyUcpnuhOMo/JlRxVXXWPcfP3RLGQktY0djMAVp5cuo1mHKc+zm8z
+				q6+LhbIj9XTzgRL2wSwltvYP1lNCKGY35/Y8rklAN0AGmtCvIi+pH4/pTYJ8KYiqA6PQzOqYQ6pS
+				+vpSGT0fIzcQu6AJgQGk8nDSy/UF1HhMCT1u7oq2zqca8/mVNHKkTSZbXWQddurNvCEJy9xUqstI
+				G16wDja2NAOxnRe76HdcZ07Ji6cAhASJCIjRKLwvfyErA8lYA1fi7UdjIR5LXbJ5UHTbYLDMcV/O
+				qhMvBEwg7/KRiD/VFwTWPL0i1KmJyFU=|
+			)
+			(checksum "55C95474EEE6BFA28099C40EE6009E36")
+		)
+	)
+)
