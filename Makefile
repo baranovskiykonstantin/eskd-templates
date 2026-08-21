@@ -1,11 +1,13 @@
 OUT := ~/.config/libreoffice/4/user/template
 VERSION := $(file < version)
 
-# Проверка наличия asciidoctor
-ASCIIDOCTOR := $(shell command -v asciidoctor 2> /dev/null)
-ifeq ($(ASCIIDOCTOR),)
-$(error "asciidoctor not found. Please install it (sudo apt install asciidoctor / brew install asciidoctor / gem install asciidoctor)")
-endif
+# Проверка наличия asciidoctor и zip (обязательные для сборки)
+REQUIRED := asciidoctor zip
+$(foreach cmd,$(REQUIRED), \
+    $(if $(shell command -v $(cmd) 2>/dev/null),, \
+        $(error "Не найдена утилита '$(cmd)'. Установите её (см. README)") \
+    ) \
+)
 
 .PHONY: index spec bom gspec gbom manual mexanic archive
 
@@ -44,6 +46,7 @@ mexanic:
 	$(call build_ott,mexanic,Ведомость\ покупных\ изделий\ \(Mexanic\))
 
 archive:
+	@command -v 7z >/dev/null 2>&1 || { echo "Ошибка: 7z не найден. Установите p7zip (Ubuntu: sudo apt install p7zip-full)"; exit 1; }
 	cd $(OUT) && \
 	7z a -- /tmp/eskd-templates_v$(VERSION).7z \
 	Перечень\ элементов.ott \
