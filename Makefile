@@ -1,6 +1,12 @@
 OUT := ~/.config/libreoffice/4/user/template
 VERSION := $(file < version)
 
+# Проверка наличия asciidoctor
+ASCIIDOCTOR := $(shell command -v asciidoctor 2> /dev/null)
+ifeq ($(ASCIIDOCTOR),)
+$(error "asciidoctor not found. Please install it (sudo apt install asciidoctor / brew install asciidoctor / gem install asciidoctor)")
+endif
+
 .PHONY: index spec bom gspec gbom manual mexanic archive
 
 default: all
