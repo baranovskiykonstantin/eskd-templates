@@ -48,6 +48,12 @@
 В этом же каталоге содержится PDF-версия перечня элементов, который должен в
 итоге получиться.
 
+> **Примечание.** Шаблоны используют макросы на Python. Если при открытии шаблона появляется ошибка `The scripting language Python is not supported`, установите пакет поддержки Python в LibreOffice:
+> - Ubuntu/Debian: `sudo apt install libreoffice-script-provider-python`
+> - Fedora/RHEL: `sudo dnf install libreoffice-pyuno`
+> - Arch Linux: Python-поддержка уже включена в пакеты `libreoffice-fresh`/`-still`.
+> - macOS: убедитесь, что в настройках LibreOffice (Сервисы → Макросы → Управление макросами → Python) поддержка включена.
+
 ## Описание
 
 Шаблоны документов в отрытом формате `*.ott` - это обычные zip-архивы
@@ -68,6 +74,17 @@
 нём нужно добавить в файл manifest.xml.
 
 ### Сборка шаблонов
+
+Для сборки шаблонов из исходных файлов необходимы утилиты **asciidoctor** и **zip**.  
+Установите их, если ещё не установлены:
+
+- **Ubuntu/Debian**: `sudo apt install asciidoctor zip`
+- **macOS**: `brew install asciidoctor zip`
+- **Другие системы**: `gem install asciidoctor` (требуется Ruby) и установите zip из вашего менеджера пакетов.
+
+Для создания архива (`make archive`) дополнительно понадобится **7z**:
+- Ubuntu/Debian: `sudo apt install p7zip-full`
+- macOS: `brew install p7zip`
 
 Разработка шаблонов ведётся в среде GNU/Linux. На операционных системах
 Windows нужно воспользоваться подсистемой WSL.
