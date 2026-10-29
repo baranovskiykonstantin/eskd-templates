@@ -227,7 +227,7 @@ class Component():
         return self.value
 
     def formatPattern(self, pattern, check=False, singular=False, plural=False):
-        """Преобразовать шаблон.
+        r"""Преобразовать шаблон.
 
         Шаблон представляет собой строку текста, в которой конструкции типа:
 
@@ -699,26 +699,26 @@ class Schematic():
                             self.typeNamesDict[singular] = plural
 
         netlist = kicadnet.Netlist(netlistName)
-        for sheet in netlist.items("sheet"):
-            if sheet.getText("name") == "/":
-                title_block = netlist.find("title_block", sheet)
-                for item in title_block.items:
-                    if item.name == "title":
-                        self.title = item.text if item.text is not None else ""
-                    elif item.name == "company":
-                        self.company = item.text if item.text is not None else ""
-                    elif item.name == "comment":
-                        if item.getText("number") == "1":
-                            self.number = item.getText("value")
-                        elif item.getText("number") == "2":
-                            self.developer = item.getText("value")
-                        elif item.getText("number") == "3":
-                            self.verifier = item.getText("value")
-                        elif item.getText("number") == "4":
-                            self.approver = item.getText("value")
-                        elif item.getText("number") == "6":
-                            self.inspector = item.getText("value")
-                break
+        sheets = list(netlist.items("sheet"))
+        if sheets:
+            sheet = sheets[0]
+            title_block = netlist.find("title_block", sheet)
+            for item in title_block.items:
+                if item.name == "title":
+                    self.title = item.text if item.text is not None else ""
+                elif item.name == "company":
+                    self.company = item.text if item.text is not None else ""
+                elif item.name == "comment":
+                    if item.getText("number") == "1":
+                        self.number = item.getText("value")
+                    elif item.getText("number") == "2":
+                        self.developer = item.getText("value")
+                    elif item.getText("number") == "3":
+                        self.verifier = item.getText("value")
+                    elif item.getText("number") == "4":
+                        self.approver = item.getText("value")
+                    elif item.getText("number") == "6":
+                        self.inspector = item.getText("value")
         for comp in netlist.items("comp"):
             component = Component(self)
             component.reference = comp.getText("ref")
